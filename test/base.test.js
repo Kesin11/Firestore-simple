@@ -2,6 +2,7 @@ const admin = require('firebase-admin')
 const serviceAccount = require('../firebase_secret.json')
 const test = require('ava')
 const { FirestoreSimple } = require('../src/index.js')
+const { deleteCollection } = require('./util')
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -26,12 +27,7 @@ test.before(async t => {
 
 // Delete all documents. (= delete collection)
 test.after.always(async t => {
-  const batch = db.batch()
-  const snapshot = await dao.collectionRef.get()
-  snapshot.forEach(doc => {
-    batch.delete(doc.ref)
-  })
-  await batch.commit()
+  await deleteCollection(db, 'test_collection')
 })
 
 test('fetchDocument', async t => {
