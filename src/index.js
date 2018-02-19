@@ -1,7 +1,37 @@
 class FirestoreSimple {
-  constructor (db, collectionPath) {
+  constructor (db, collectionPath, mapping) {
     this.db = db
     this.collectionRef = this.db.collection(collectionPath)
+    this.serialize_mapping = mapping || {}
+    this.deserialize_mapping = FirestoreSimple._createSwapMapping(this.serialize_mapping)
+  }
+
+  static _createSwapMapping (mapping) {
+    let swapMap = {}
+    Object.keys(mapping).forEach((key) => {
+      swapMap[mapping[key]] = key
+    })
+    return swapMap
+  }
+
+  _serialize (object) {
+    let doc = {}
+    Object.keys(object).forEach((key) => {
+      const serializedKey = this.serialize_mapping[key] || key
+      doc[serializedKey] = object[key]
+    })
+    delete doc.id
+    return doc
+  }
+
+  _deserialize (docId, docData) {
+    let object = {}
+    object['id'] = docId
+    Object.keys(docData).forEach((key) => {
+      const deserializedKey = this.deserialize_mapping[key] || key
+      object[deserializedKey] = docData[key]
+    })
+    return object
   }
 
   async fetchCollection () {
@@ -19,21 +49,6 @@ class FirestoreSimple {
     if (!snapshot.exists) throw new Error(`No document id: ${id}`)
 
     return this._deserialize(snapshot.id, snapshot.data())
-  }
-
-  _serialize (object) {
-    let doc = {
-      ...object,
-    }
-    delete doc.id
-    return doc
-  }
-
-  _deserialize (docId, docData) {
-    return {
-      id: docId,
-      ...docData,
-    }
   }
 
   async add (object) {
