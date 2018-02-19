@@ -6,31 +6,38 @@ class FirestoreSimple {
 
   async fetchCollection () {
     const snapshot = await this.collectionRef.get()
-    return this._createDocObjects(snapshot)
+    let arr = []
+
+    snapshot.forEach(doc => {
+      arr.push(this._deserialize(doc.id, doc.data()))
+    })
+    return arr
   }
 
   async fetchDocument (id) {
     const snapshot = await this.collectionRef.doc(id).get()
     if (!snapshot.exists) throw new Error(`No document id: ${id}`)
 
-    return this._createDocObject(snapshot)
+    return this._deserialize(snapshot.id, snapshot.data())
   }
 
-  _createDocObjects (collection) {
-    let arr = []
-    collection.forEach(doc => arr.push(this._createDocObject(doc)))
-
-    return arr
+  _serialize (object) {
+    let doc = {
+      ...object,
+    }
+    delete doc.id
+    return doc
   }
 
-  _createDocObject (doc) {
+  _deserialize (docId, docData) {
     return {
-      id: doc.id,
-      ...doc.data(),
+      id: docId,
+      ...docData,
     }
   }
 
-  async add (doc) {
+  async add (object) {
+    const doc = this._serialize(object)
     const docRef = await this.collectionRef.add(doc)
     return {
       id: docRef.id,
@@ -38,15 +45,14 @@ class FirestoreSimple {
     }
   }
 
-  async set (doc) {
-    if (!doc.id) throw new Error('Argument doc must have "id" property')
+  async set (object) {
+    if (!object.id) throw new Error('Argument object must have "id" property')
 
-    const docId = doc.id
-    const setDoc = Object.assign({}, doc)
-    delete setDoc.id
+    const docId = object.id
+    const setDoc = this._serialize(object)
 
     await this.collectionRef.doc(docId).set(setDoc)
-    return doc
+    return object
   }
 
   async delete (docId) {
