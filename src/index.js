@@ -44,6 +44,16 @@ class FirestoreSimple {
     return arr
   }
 
+  async fetchByQuery (query) {
+    const snapshot = await query.get()
+    let arr = []
+
+    snapshot.forEach(doc => {
+      arr.push(this._deserialize(doc.id, doc.data()))
+    })
+    return arr
+  }
+
   async fetchDocument (id) {
     const snapshot = await this.collectionRef.doc(id).get()
     if (!snapshot.exists) throw new Error(`No document id: ${id}`)
