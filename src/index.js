@@ -2,6 +2,7 @@ class FirestoreSimple {
   constructor (db, collectionPath, mapping) {
     this.db = db
     this.collectionRef = this.db.collection(collectionPath)
+    this.context = new OperationContext(this.db, this.collectionRef)
     this.serialize_mapping = mapping || {}
     this.deserialize_mapping = FirestoreSimple._createSwapMapping(this.serialize_mapping)
   }
@@ -76,13 +77,52 @@ class FirestoreSimple {
     const docId = object.id
     const setDoc = this._serialize(object)
 
-    await this.collectionRef.doc(docId).set(setDoc)
+    await this.context.set(docId, setDoc)
     return object
   }
 
   async delete (docId) {
-    await this.collectionRef.doc(docId).delete()
+    await this.context.delete(docId)
     return docId
+  }
+}
+
+class OperationContext {
+  constructor (db, collectionRef) {
+    this.db = db
+    this.collectionRef = collectionRef
+    this.batch = null
+  }
+
+  get isBatch () {
+    return !!this.batch
+  }
+
+  batch () {
+    this.batch = this.db.batch()
+  }
+
+  async commit () {
+    return this.batch.commit()
+  }
+
+  async set (docId, doc) {
+    const docRef = this.collectionRef.doc(docId)
+
+    if (this.isBatch) {
+      return this.batch.set(docRef, doc)
+    }
+
+    return docRef.set(doc)
+  }
+
+  async delete (docId) {
+    const docRef = this.collectionRef.doc(docId)
+    if (this.isBatch) {
+      return this.batch.delete(docRef)
+    }
+
+    return docRef.delete()
   }
 }
 
