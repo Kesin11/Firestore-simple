@@ -84,6 +84,26 @@ class FirestoreSimple {
     await this.collectionRef.doc(docId).delete()
     return docId
   }
+
+  async setMulti (objects) {
+    const batch = this.db.batch()
+
+    objects.forEach((object) => {
+      const docId = object.id
+      const setDoc = this._serialize(object)
+      batch.set(this.collectionRef.doc(docId), setDoc)
+    })
+    return batch.commit()
+  }
+
+  async deleteMulti (docIds) {
+    const batch = this.db.batch()
+
+    docIds.forEach((docId) => {
+      batch.delete(this.collectionRef.doc(docId))
+    })
+    return batch.commit()
+  }
 }
 
 module.exports = { FirestoreSimple }
