@@ -9,7 +9,7 @@ admin.initializeApp({
 })
 
 const db = admin.firestore()
-const dao = new FirestoreSimple(db, 'test_collection')
+const dao = new FirestoreSimple(db, 'test_collection_query')
 const existsDocId = 'test'
 const existsDoc = {
   title: 'title',
@@ -26,7 +26,7 @@ test.before(async t => {
 
 // Delete all documents. (= delete collection)
 test.after.always(async t => {
-  await deleteCollection(db, 'test_collection')
+  await deleteCollection(db, 'test_collection_query')
 })
 
 test('where', async t => {

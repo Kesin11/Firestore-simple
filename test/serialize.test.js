@@ -9,7 +9,7 @@ admin.initializeApp({
 })
 
 const db = admin.firestore()
-const dao = new FirestoreSimple(db, 'test_serialize', {
+const dao = new FirestoreSimple(db, 'test_collection_serialize', {
   bookTitle: "book_title",
 })
 const existsDocId = 'test'
@@ -24,7 +24,7 @@ test.before(async t => {
 
 // Delete all documents. (= delete collection)
 test.after.always(async t => {
-  await deleteCollection(db, 'test_serialize')
+  await deleteCollection(db, 'test_collection_serialize')
 })
 
 test('fetchDocument with serialize mapping', async t => {
