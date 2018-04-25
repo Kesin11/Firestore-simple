@@ -4,6 +4,7 @@
   "description": "A simple wrapper for Firestore",
   "main": "src/index.js",
   "scripts": {
+    "ava": "ava",
     "test": "ava test/*.test.js",
     "lint": "eslint .",
     "lint:fix": "eslint --fix ."
