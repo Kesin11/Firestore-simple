@@ -4,7 +4,7 @@ sudo: false
 language: node_js
 cache:
   directories:
-    - node_modules
+  - node_modules
 node_js:
   - '8'
   - '9'
@@ -12,3 +12,5 @@ node_js:
 script:
   - npm run lint
   - npm test
+before_install:
+  - openssl aes-256-cbc -K $encrypted_f5265da104af_key -iv $encrypted_f5265da104af_iv -in firebase_secret.json.enc -out firebase_secret.json -d
