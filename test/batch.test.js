@@ -1,15 +1,9 @@
-const admin = require('firebase-admin')
-const serviceAccount = require('../firebase_secret.json')
 const test = require('ava')
 const { FirestoreSimple } = require('../src/index.js')
-const { deleteCollection, createRandomCollectionName } = require('./util')
+const { deleteCollection, createRandomCollectionName, initFirestore } = require('./util')
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-})
-
+const db = initFirestore()
 const collectionPath = createRandomCollectionName()
-const db = admin.firestore()
 const dao = new FirestoreSimple(db, collectionPath)
 
 // Delete all documents. (= delete collection)

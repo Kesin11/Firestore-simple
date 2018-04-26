@@ -1,4 +1,13 @@
 const crypto = require('crypto')
+const admin = require('firebase-admin')
+const serviceAccount = require('../firebase_secret.json')
+
+const initFirestore = () => {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  })
+  return admin.firestore()
+}
 
 const deleteCollection = async (db, collectionPath) => {
   const batch = db.batch()
@@ -15,6 +24,7 @@ const createRandomCollectionName = (prefix = 'firebase_simple_') => {
 }
 
 module.exports = {
+  initFirestore,
   deleteCollection,
   createRandomCollectionName,
 }
