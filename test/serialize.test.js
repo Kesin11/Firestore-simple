@@ -13,7 +13,6 @@ const existsDoc = {
 }
 
 test.before(async t => {
-  // prepare serialized key document
   await dao.collectionRef.doc(existsDocId).set(existsDoc)
 })
 
@@ -22,7 +21,7 @@ test.after.always(async t => {
   await deleteCollection(db, collectionPath)
 })
 
-test('fetchDocument with serialize mapping', async t => {
+test('fetchDocument with toDoc mapping', async t => {
   const doc = await dao.fetchDocument(existsDocId)
   const expectDoc = {
     id: existsDocId,
@@ -32,7 +31,7 @@ test('fetchDocument with serialize mapping', async t => {
   t.deepEqual(doc, expectDoc)
 })
 
-test('add with serialize mapping', async t => {
+test('add with toDoc mapping', async t => {
   const title = 'add'
   const doc = {
     bookTitle: title,
@@ -43,7 +42,7 @@ test('add with serialize mapping', async t => {
   t.deepEqual(fetchedDoc.data(), { book_title: title }, 'fetched object')
 })
 
-test('set with serialize mapping', async t => {
+test('set with toDoc mapping', async t => {
   const addedDoc = await dao.collectionRef.add({
     book_title: 'hogehoge',
   })

@@ -2,8 +2,8 @@ class FirestoreSimple {
   constructor (db, collectionPath, mapping) {
     this.db = db
     this.collectionRef = this.db.collection(collectionPath)
-    this.serialize_mapping = mapping || {}
-    this.deserialize_mapping = FirestoreSimple._createSwapMapping(this.serialize_mapping)
+    this.toDocMapping = mapping || {}
+    this.toObjectMapping = FirestoreSimple._createSwapMapping(this.toDocMapping)
   }
 
   static _createSwapMapping (mapping) {
@@ -14,22 +14,22 @@ class FirestoreSimple {
     return swapMap
   }
 
-  _serialize (object) {
+  _toDoc (object) {
     let doc = {}
     Object.keys(object).forEach((key) => {
-      const serializedKey = this.serialize_mapping[key] || key
-      doc[serializedKey] = object[key]
+      const toDocKey = this.toDocMapping[key] || key
+      doc[toDocKey] = object[key]
     })
     delete doc.id
     return doc
   }
 
-  _deserialize (docId, docData) {
+  _toObject (docId, docData) {
     let object = {}
     object['id'] = docId
     Object.keys(docData).forEach((key) => {
-      const deserializedKey = this.deserialize_mapping[key] || key
-      object[deserializedKey] = docData[key]
+      const toObjectKey = this.toObjectMapping[key] || key
+      object[toObjectKey] = docData[key]
     })
     return object
   }
@@ -39,7 +39,7 @@ class FirestoreSimple {
     let arr = []
 
     snapshot.forEach(doc => {
-      arr.push(this._deserialize(doc.id, doc.data()))
+      arr.push(this._toObject(doc.id, doc.data()))
     })
     return arr
   }
@@ -49,7 +49,7 @@ class FirestoreSimple {
     let arr = []
 
     snapshot.forEach(doc => {
-      arr.push(this._deserialize(doc.id, doc.data()))
+      arr.push(this._toObject(doc.id, doc.data()))
     })
     return arr
   }
@@ -58,11 +58,11 @@ class FirestoreSimple {
     const snapshot = await this.collectionRef.doc(id).get()
     if (!snapshot.exists) throw new Error(`No document id: ${id}`)
 
-    return this._deserialize(snapshot.id, snapshot.data())
+    return this._toObject(snapshot.id, snapshot.data())
   }
 
   async add (object) {
-    const doc = this._serialize(object)
+    const doc = this._toDoc(object)
     const docRef = await this.collectionRef.add(doc)
     return {
       id: docRef.id,
@@ -74,7 +74,7 @@ class FirestoreSimple {
     if (!object.id) throw new Error('Argument object must have "id" property')
 
     const docId = object.id
-    const setDoc = this._serialize(object)
+    const setDoc = this._toDoc(object)
 
     await this.collectionRef.doc(docId).set(setDoc)
     return object
@@ -90,7 +90,7 @@ class FirestoreSimple {
 
     objects.forEach((object) => {
       const docId = object.id
-      const setDoc = this._serialize(object)
+      const setDoc = this._toDoc(object)
       batch.set(this.collectionRef.doc(docId), setDoc)
     })
     return batch.commit()
