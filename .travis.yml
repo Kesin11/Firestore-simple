@@ -1,0 +1,14 @@
+git:
+  depth: 10
+sudo: false
+language: node_js
+cache:
+  directories:
+    - node_modules
+node_js:
+  - '8'
+  - '9'
+  - '10'
+script:
+  - npm run lint
+  - npm test
