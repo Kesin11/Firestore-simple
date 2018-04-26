@@ -1,3 +1,5 @@
+const crypto = require('crypto')
+
 const deleteCollection = async (db, collectionPath) => {
   const batch = db.batch()
   const snapshot = await db.collection(collectionPath).get()
@@ -7,4 +9,12 @@ const deleteCollection = async (db, collectionPath) => {
   await batch.commit()
 }
 
-module.exports = { deleteCollection }
+const createRandomCollectionName = (prefix = 'firebase_simple_') => {
+  const str = crypto.randomBytes(10).toString('hex')
+  return prefix + str
+}
+
+module.exports = {
+  deleteCollection,
+  createRandomCollectionName,
+}

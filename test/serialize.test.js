@@ -2,14 +2,15 @@ const admin = require('firebase-admin')
 const serviceAccount = require('../firebase_secret.json')
 const test = require('ava')
 const { FirestoreSimple } = require('../src/index.js')
-const { deleteCollection } = require('./util')
+const { deleteCollection, createRandomCollectionName } = require('./util')
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 })
 
+const collectionPath = createRandomCollectionName()
 const db = admin.firestore()
-const dao = new FirestoreSimple(db, 'test_collection_serialize', {
+const dao = new FirestoreSimple(db, collectionPath, {
   bookTitle: "book_title",
 })
 const existsDocId = 'test'
@@ -24,7 +25,7 @@ test.before(async t => {
 
 // Delete all documents. (= delete collection)
 test.after.always(async t => {
-  await deleteCollection(db, 'test_collection_serialize')
+  await deleteCollection(db, collectionPath)
 })
 
 test('fetchDocument with serialize mapping', async t => {

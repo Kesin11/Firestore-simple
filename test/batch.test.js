@@ -2,18 +2,19 @@ const admin = require('firebase-admin')
 const serviceAccount = require('../firebase_secret.json')
 const test = require('ava')
 const { FirestoreSimple } = require('../src/index.js')
-const { deleteCollection } = require('./util')
+const { deleteCollection, createRandomCollectionName } = require('./util')
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 })
 
+const collectionPath = createRandomCollectionName()
 const db = admin.firestore()
-const dao = new FirestoreSimple(db, 'test_collection_batch')
+const dao = new FirestoreSimple(db, collectionPath)
 
 // Delete all documents. (= delete collection)
 test.after.always(async t => {
-  await deleteCollection(db, 'test_collection_batch')
+  await deleteCollection(db, collectionPath)
 })
 
 test('setMulti', async t => {
