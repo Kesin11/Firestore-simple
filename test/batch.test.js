@@ -4,7 +4,9 @@ const { deleteCollection, createRandomCollectionName, initFirestore } = require(
 
 const db = initFirestore()
 const collectionPath = createRandomCollectionName()
-const dao = new FirestoreSimple(db, collectionPath)
+const dao = new FirestoreSimple(db, collectionPath, {
+  bookTitle: "book_title",
+})
 
 // Delete all documents. (= delete collection)
 test.after.always(async t => {
@@ -13,9 +15,9 @@ test.after.always(async t => {
 
 test('bulkSet', async t => {
   const docs = [
-    {id: 'test1', title: 'aaa'},
-    {id: 'test2', title: 'bbb'},
-    {id: 'test3', title: 'ccc'},
+    {id: 'test1', bookTitle: 'aaa'},
+    {id: 'test2', bookTitle: 'bbb'},
+    {id: 'test3', bookTitle: 'ccc'},
   ]
   await dao.bulkSet(docs)
 
@@ -25,9 +27,9 @@ test('bulkSet', async t => {
 
 test('bulkDelete', async t => {
   const docs = [
-    {id: 'test1', title: 'aaa'},
-    {id: 'test2', title: 'bbb'},
-    {id: 'test3', title: 'ccc'},
+    {id: 'test1', bookTitle: 'aaa'},
+    {id: 'test2', bookTitle: 'bbb'},
+    {id: 'test3', bookTitle: 'ccc'},
   ]
   await dao.set(docs[0])
   await dao.set(docs[1])
