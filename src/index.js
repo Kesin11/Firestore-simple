@@ -89,7 +89,7 @@ class FirestoreSimple {
     return docId
   }
 
-  async setMulti (objects) {
+  async bulkSet (objects) {
     const batch = this.db.batch()
 
     objects.forEach((object) => {
@@ -100,7 +100,7 @@ class FirestoreSimple {
     return batch.commit()
   }
 
-  async deleteMulti (docIds) {
+  async bulkDelete (docIds) {
     const batch = this.db.batch()
 
     docIds.forEach((docId) => {

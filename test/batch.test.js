@@ -11,19 +11,19 @@ test.after.always(async t => {
   await deleteCollection(db, collectionPath)
 })
 
-test('setMulti', async t => {
+test('bulkSet', async t => {
   const docs = [
     {id: 'test1', title: 'aaa'},
     {id: 'test2', title: 'bbb'},
     {id: 'test3', title: 'ccc'},
   ]
-  await dao.setMulti(docs)
+  await dao.bulkSet(docs)
 
   const actualDocs = await dao.fetchCollection()
   t.deepEqual(actualDocs, docs, 'success set multi docs')
 })
 
-test('deleteMulti', async t => {
+test('bulkDelete', async t => {
   const docs = [
     {id: 'test1', title: 'aaa'},
     {id: 'test2', title: 'bbb'},
@@ -34,7 +34,7 @@ test('deleteMulti', async t => {
   await dao.set(docs[2])
 
   const docIds = docs.map((docs) => docs.id)
-  await dao.deleteMulti(docIds)
+  await dao.bulkDelete(docIds)
 
   const actualDocs = await dao.fetchCollection()
   t.deepEqual(actualDocs, [], 'success delete multi docs')
