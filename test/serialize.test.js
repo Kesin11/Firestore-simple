@@ -37,6 +37,8 @@ test('add with toDoc mapping', async t => {
     bookTitle: title,
   }
   const addedDoc = await dao.add(doc)
+  const expectDoc = Object.assign({id: addedDoc.id}, doc)
+  t.deepEqual(expectDoc, addedDoc, 'return object keys are equal')
 
   const fetchedDoc = await dao.collectionRef.doc(addedDoc.id).get()
   t.deepEqual(fetchedDoc.data(), { book_title: title }, 'fetched object')
@@ -51,7 +53,8 @@ test('set with toDoc mapping', async t => {
     id: addedDoc.id,
     bookTitle: title,
   }
-  await dao.set(setDoc)
+  const setedDoc = await dao.set(setDoc)
+  t.deepEqual(setDoc, setedDoc, 'return object keys are equal')
 
   const fetchedDoc = await dao.collectionRef.doc(addedDoc.id).get()
   t.deepEqual(fetchedDoc.data(), { book_title: title }, 'fetched object')

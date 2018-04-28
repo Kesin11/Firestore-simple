@@ -66,7 +66,7 @@ class FirestoreSimple {
     const docRef = await this.collectionRef.add(doc)
     return {
       id: docRef.id,
-      ...doc,
+      ...object,
     }
   }
 
