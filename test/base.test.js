@@ -79,6 +79,34 @@ test('set without id', async t => {
   )
 })
 
+test('addOrSet', async t => {
+  // add
+  const doc = {
+    title: 'add',
+    url: 'http://example.com/add',
+  }
+  const addedDoc = await dao.addOrSet(doc)
+  t.deepEqual(Object.assign({}, {
+    title: addedDoc.title,
+    url: addedDoc.url,
+  }), doc, 'return added object')
+
+  const fetchedAddDoc = await dao.fetchDocument(addedDoc.id)
+  t.deepEqual(addedDoc, fetchedAddDoc, 'fetched added object')
+
+  // set
+  const setDoc = {
+    id: addedDoc.id,
+    title: 'set',
+    url: 'http://example.com/set',
+  }
+  const setedDoc = await dao.addOrSet(setDoc)
+  t.deepEqual(setedDoc, setDoc, 'return seted object')
+
+  const fetchedSetDoc = await dao.fetchDocument(addedDoc.id)
+  t.deepEqual(fetchedSetDoc, setDoc, 'fetched set object')
+})
+
 test('delete', async t => {
   const doc = {
     title: 'add',

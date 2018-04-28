@@ -80,6 +80,10 @@ class FirestoreSimple {
     return object
   }
 
+  async addOrSet (object) {
+    return (!object.id) ? this.add(object) : this.set(object)
+  }
+
   async delete (docId) {
     await this.collectionRef.doc(docId).delete()
     return docId
