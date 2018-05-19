@@ -32,5 +32,9 @@
   "bugs": {
     "url": "https://github.com/Kesin11/Firestore-simple/issues"
   },
-  "homepage": "https://github.com/Kesin11/Firestore-simple#readme"
+  "homepage": "https://github.com/Kesin11/Firestore-simple#readme",
+  "dependencies": {
+    "tslint": "5.10.0",
+    "typescript": "2.8.3"
+  }
 }
