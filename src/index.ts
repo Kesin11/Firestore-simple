@@ -11,7 +11,7 @@ interface DocObject {
 }
 // declare type DocObject = { id: string, [extra: string]: any}
 
-class FirestoreSimple {
+export class FirestoreSimple {
   db: Firestore
   collectionRef: CollectionReference
   toDocMapping: Mapping
@@ -126,5 +126,3 @@ class FirestoreSimple {
     return batch.commit()
   }
 }
-
-module.exports = { FirestoreSimple }
