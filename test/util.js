@@ -1,6 +1,7 @@
 const crypto = require('crypto')
 const admin = require('firebase-admin')
-const serviceAccount = require('../firebase_secret.json')
+// because this file path will be dist_test/test/util.js after tsc
+const serviceAccount = require('../../firebase_secret.json')
 
 const initFirestore = () => {
   admin.initializeApp({

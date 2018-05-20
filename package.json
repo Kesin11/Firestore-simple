@@ -2,11 +2,12 @@
   "name": "firestore-simple",
   "version": "1.0.0",
   "description": "A simple wrapper for Firestore",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc --project .",
+    "build:test": "tsc --project test",
     "ava": "ava",
-    "test": "ava test/*.test.js",
+    "test": "npm run build:test && ava dist_test/test/**/*.test.js",
     "lint": "eslint .",
     "lint:fix": "eslint --fix ."
   },
