@@ -1,10 +1,10 @@
-const test = require('ava')
-const { FirestoreSimple } = require('../dist/index.js')
-const { deleteCollection, createRandomCollectionName, initFirestore } = require('./util')
+import test from 'ava'
+import { FirestoreSimple } from '../src/index'
+import { initFirestore, deleteCollection, createRandomCollectionName } from './util'
 
 const db = initFirestore()
 const collectionPath = createRandomCollectionName()
-const dao = new FirestoreSimple(db, collectionPath)
+const dao = new FirestoreSimple(db, collectionPath, {})
 const existsDocId = 'test'
 const existsDoc = {
   title: 'title',
@@ -68,15 +68,6 @@ test('set', async t => {
 
   const fetchedDoc = await dao.fetchDocument(addedDoc.id)
   t.deepEqual(fetchedDoc, setDoc, 'fetched object')
-})
-
-test('set without id', async t => {
-  await t.throws(
-    dao.set({
-      title: 'set',
-      url: 'http://example.com/set',
-    })
-  )
 })
 
 test('addOrSet', async t => {

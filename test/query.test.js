@@ -1,6 +1,6 @@
-const test = require('ava')
-const { FirestoreSimple } = require('../dist/index.js')
-const { deleteCollection, createRandomCollectionName, initFirestore } = require('./util')
+import test from 'ava'
+import { FirestoreSimple } from '../src/index'
+import { initFirestore, deleteCollection, createRandomCollectionName } from './util'
 
 const db = initFirestore()
 const collectionPath = createRandomCollectionName()

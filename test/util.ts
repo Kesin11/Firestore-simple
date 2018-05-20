@@ -1,16 +1,17 @@
-const crypto = require('crypto')
-const admin = require('firebase-admin')
+import crypto from 'crypto'
+import admin from 'firebase-admin'
 // because this file path will be dist_test/test/util.js after tsc
-const serviceAccount = require('../../firebase_secret.json')
+import serviceAccount from '../../firebase_secret.json'
+import { Firestore } from '@google-cloud/firestore';
 
-const initFirestore = () => {
+export const initFirestore = () => {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
   })
   return admin.firestore()
 }
 
-const deleteCollection = async (db, collectionPath) => {
+export const deleteCollection = async (db: Firestore, collectionPath: string) => {
   const batch = db.batch()
   const snapshot = await db.collection(collectionPath).get()
   snapshot.forEach(doc => {
@@ -19,13 +20,7 @@ const deleteCollection = async (db, collectionPath) => {
   await batch.commit()
 }
 
-const createRandomCollectionName = (prefix = 'firebase_simple_') => {
+export const createRandomCollectionName = (prefix = 'firebase_simple_') => {
   const str = crypto.randomBytes(10).toString('hex')
   return prefix + str
-}
-
-module.exports = {
-  initFirestore,
-  deleteCollection,
-  createRandomCollectionName,
 }
