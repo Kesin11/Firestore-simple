@@ -1,5 +1,5 @@
 const test = require('ava')
-const { FirestoreSimple } = require('../src/index.js')
+const { FirestoreSimple } = require('../dist/index.js')
 const { deleteCollection, createRandomCollectionName, initFirestore } = require('./util')
 
 const db = initFirestore()
