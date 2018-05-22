@@ -11,9 +11,9 @@ export const initFirestore = () => {
   return admin.firestore()
 }
 
-export const deleteCollection = async (db: Firestore, collectionPath: string) => {
-  const batch = db.batch()
-  const snapshot = await db.collection(collectionPath).get()
+export const deleteCollection = async (firestore: Firestore, collectionPath: string) => {
+  const batch = firestore.batch()
+  const snapshot = await firestore.collection(collectionPath).get()
   snapshot.forEach(doc => {
     batch.delete(doc.ref)
   })

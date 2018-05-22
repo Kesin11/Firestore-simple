@@ -2,9 +2,9 @@ import test from 'ava'
 import { FirestoreSimple } from '../src/index'
 import { initFirestore, deleteCollection, createRandomCollectionName } from './util'
 
-const db = initFirestore()
+const firestore = initFirestore()
 const collectionPath = createRandomCollectionName()
-const dao = new FirestoreSimple(db, collectionPath)
+const dao = new FirestoreSimple(firestore, collectionPath)
 const existsDocId = 'test'
 const existsDoc = {
   title: 'title',
@@ -21,7 +21,7 @@ test.before(async t => {
 
 // Delete all documents. (= delete collection)
 test.after.always(async t => {
-  await deleteCollection(db, collectionPath)
+  await deleteCollection(firestore, collectionPath)
 })
 
 test('where', async t => {

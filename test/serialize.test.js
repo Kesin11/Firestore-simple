@@ -2,9 +2,9 @@ import test from 'ava'
 import { FirestoreSimple } from '../src/index'
 import { initFirestore, deleteCollection, createRandomCollectionName } from './util'
 
-const db = initFirestore()
+const firestore = initFirestore()
 const collectionPath = createRandomCollectionName()
-const dao = new FirestoreSimple(db, collectionPath, {
+const dao = new FirestoreSimple(firestore, collectionPath, {
   bookTitle: "book_title",
 })
 const existsDocId = 'test'
@@ -18,7 +18,7 @@ test.before(async t => {
 
 // Delete all documents. (= delete collection)
 test.after.always(async t => {
-  await deleteCollection(db, collectionPath)
+  await deleteCollection(firestore, collectionPath)
 })
 
 test('fetchDocument with toDoc mapping', async t => {

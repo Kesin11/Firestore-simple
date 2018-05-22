@@ -12,14 +12,14 @@ interface DocObject {
 // declare type DocObject = { id: string, [extra: string]: any}
 
 export class FirestoreSimple {
-  db: Firestore
+  firestore: Firestore
   collectionRef: CollectionReference
   toDocMapping: Mapping
   toObjectMapping: Mapping
 
-  constructor (db: Firestore, collectionPath: string, mapping: Mapping) {
-    this.db = db
-    this.collectionRef = this.db.collection(collectionPath)
+  constructor (firestore: Firestore, collectionPath: string, mapping: Mapping) {
+    this.firestore = firestore
+    this.collectionRef = this.firestore.collection(collectionPath)
     this.toDocMapping = mapping || {}
     this.toObjectMapping = FirestoreSimple._createSwapMapping(this.toDocMapping)
   }
@@ -107,7 +107,7 @@ export class FirestoreSimple {
   }
 
   async bulkSet (objects: DocObject[]) {
-    const batch = this.db.batch()
+    const batch = this.firestore.batch()
 
     objects.forEach((object) => {
       const docId = object.id
@@ -118,7 +118,7 @@ export class FirestoreSimple {
   }
 
   async bulkDelete (docIds: string[]) {
-    const batch = this.db.batch()
+    const batch = this.firestore.batch()
 
     docIds.forEach((docId: string) => {
       batch.delete(this.collectionRef.doc(docId))

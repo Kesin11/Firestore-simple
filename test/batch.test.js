@@ -2,15 +2,15 @@ import test from 'ava'
 import { FirestoreSimple } from '../src/index'
 import { initFirestore, deleteCollection, createRandomCollectionName } from './util'
 
-const db = initFirestore()
+const firestore = initFirestore()
 const collectionPath = createRandomCollectionName()
-const dao = new FirestoreSimple(db, collectionPath, {
+const dao = new FirestoreSimple(firestore, collectionPath, {
   bookTitle: "book_title",
 })
 
 // Delete all documents. (= delete collection)
 test.after.always(async t => {
-  await deleteCollection(db, collectionPath)
+  await deleteCollection(firestore, collectionPath)
 })
 
 test('bulkSet', async t => {
