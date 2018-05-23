@@ -1,6 +1,6 @@
 import test from 'ava'
 import { FirestoreSimple } from '../src/index'
-import { initFirestore, deleteCollection, createRandomCollectionName } from './util'
+import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
 
 const firestore = initFirestore()
 const collectionPath = createRandomCollectionName()
@@ -11,7 +11,7 @@ const existsDoc = {
   url: 'http://example.com',
 }
 
-test.before(async t => {
+test.before(async (t) => {
   await dao.collectionRef.doc(existsDocId).set(existsDoc)
   await dao.collectionRef.add({ title: 'aaa', order: 2 })
   await dao.collectionRef.add({ title: 'aaa', order: 1 })
@@ -20,11 +20,11 @@ test.before(async t => {
 })
 
 // Delete all documents. (= delete collection)
-test.after.always(async t => {
+test.after.always(async (t) => {
   await deleteCollection(firestore, collectionPath)
 })
 
-test('where', async t => {
+test('where', async (t) => {
   const queryTitle = 'aaa'
   const query = dao.collectionRef.where('title', '==', queryTitle)
   const docs = await dao.fetchByQuery(query)
@@ -33,7 +33,7 @@ test('where', async t => {
   t.deepEqual(actualTitles, [queryTitle, queryTitle], 'where =')
 })
 
-test('order by', async t => {
+test('order by', async (t) => {
   const query = dao.collectionRef.orderBy('order', 'desc')
   const docs = await dao.fetchByQuery(query)
 
@@ -41,14 +41,14 @@ test('order by', async t => {
   t.deepEqual(actualOrders, [4, 3, 2, 1], 'order by desc')
 })
 
-test('limit', async t => {
+test('limit', async (t) => {
   const query = dao.collectionRef.limit(1)
   const docs = await dao.fetchByQuery(query)
 
   t.is(docs.length, 1)
 })
 
-test('composition where + limit', async t => {
+test('composition where + limit', async (t) => {
   const queryTitle = 'aaa'
   const query = dao.collectionRef
     .where('title', '==', queryTitle)
@@ -61,7 +61,7 @@ test('composition where + limit', async t => {
   t.is(doc.title, queryTitle, 'where')
 })
 
-test('composition order + limit', async t => {
+test('composition order + limit', async (t) => {
   const query = dao.collectionRef
     .orderBy('order')
     .limit(2)

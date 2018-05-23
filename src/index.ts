@@ -1,39 +1,44 @@
-import { firestore } from 'firebase-admin'
-import { CollectionReference, Firestore, QuerySnapshot, Query, DocumentData, DocumentSnapshot } from '@google-cloud/firestore';
+import {
+  CollectionReference,
+  DocumentSnapshot,
+  Firestore,
+  Query,
+} from '@google-cloud/firestore'
 
-declare type Mapping = { [key: string]: string }
-interface DocData {
+declare interface IMapping { [key: string]: string }
+interface IDocData {
   [extra: string]: any
 }
-interface DocObject {
+interface IDocObject {
   id: string,
   [extra: string]: any
 }
 // declare type DocObject = { id: string, [extra: string]: any}
 
 export class FirestoreSimple {
-  firestore: Firestore
-  collectionRef: CollectionReference
-  toDocMapping: Mapping
-  toObjectMapping: Mapping
+  public firestore: Firestore
+  public collectionRef: CollectionReference
+  public toDocMapping: IMapping
+  public toObjectMapping: IMapping
 
-  constructor (firestore: Firestore, collectionPath: string, { mapping }: { mapping?: Mapping } = {}) {
+  // tslint:disable-next-line:no-shadowed-variable
+  constructor (firestore: Firestore, collectionPath: string, { mapping }: { mapping?: IMapping } = {}) {
     this.firestore = firestore
     this.collectionRef = this.firestore.collection(collectionPath)
-    this.toDocMapping = (mapping != null) ? mapping : {}
+    this.toDocMapping = (mapping !== undefined) ? mapping : {}
     this.toObjectMapping = FirestoreSimple._createSwapMapping(this.toDocMapping)
   }
 
-  static _createSwapMapping (mapping: Mapping) {
-    let swapMap: Mapping = {}
+  public static _createSwapMapping (mapping: IMapping) {
+    const swapMap: IMapping = {}
     Object.keys(mapping).forEach((key) => {
       swapMap[mapping[key]] = key
     })
     return swapMap
   }
 
-  _toDoc (object: DocObject | DocData ) {
-    let doc: DocData = {}
+  public _toDoc (object: IDocObject | IDocData) {
+    const doc: IDocData = {}
     Object.keys(object).forEach((key) => {
       const toDocKey = this.toDocMapping[key] || key
       doc[toDocKey] = object[key]
@@ -42,8 +47,8 @@ export class FirestoreSimple {
     return doc
   }
 
-  _toObject (docId: string, docData: DocData) {
-    let object: DocObject = { id: docId }
+  public _toObject (docId: string, docData: IDocData) {
+    const object: IDocObject = { id: docId }
     Object.keys(docData).forEach((key) => {
       const toObjectKey = this.toObjectMapping[key] || key
       object[toObjectKey] = docData[key]
@@ -51,9 +56,9 @@ export class FirestoreSimple {
     return object
   }
 
-  async fetchCollection () {
+  public async fetchCollection () {
     const snapshot = await this.collectionRef.get()
-    let arr: DocObject[] = []
+    const arr: IDocObject[] = []
 
     snapshot.forEach((doc: DocumentSnapshot) => {
       arr.push(this._toObject(doc.id, doc.data()))
@@ -61,9 +66,9 @@ export class FirestoreSimple {
     return arr
   }
 
-  async fetchByQuery (query: Query) {
+  public async fetchByQuery (query: Query) {
     const snapshot = await query.get()
-    let arr: DocObject[] = []
+    const arr: IDocObject[] = []
 
     snapshot.forEach((doc: DocumentSnapshot) => {
       arr.push(this._toObject(doc.id, doc.data()))
@@ -71,14 +76,14 @@ export class FirestoreSimple {
     return arr
   }
 
-  async fetchDocument (id: string) {
+  public async fetchDocument (id: string) {
     const snapshot = await this.collectionRef.doc(id).get()
     if (!snapshot.exists) throw new Error(`No document id: ${id}`)
 
     return this._toObject(snapshot.id, snapshot.data())
   }
 
-  async add (object: DocObject | DocData): Promise<DocObject> {
+  public async add (object: IDocObject | IDocData): Promise<IDocObject> {
     const doc = this._toDoc(object)
     const docRef = await this.collectionRef.add(doc)
     return {
@@ -87,7 +92,7 @@ export class FirestoreSimple {
     }
   }
 
-  async set (object: DocObject) {
+  public async set (object: IDocObject) {
     if (!object.id) throw new Error('Argument object must have "id" property')
 
     const docId = object.id
@@ -97,16 +102,16 @@ export class FirestoreSimple {
     return object
   }
 
-  async addOrSet (object: DocObject | DocData) {
-    return (!object.id) ? this.add(object) : this.set(object as DocObject)
+  public async addOrSet (object: IDocObject | IDocData) {
+    return (!object.id) ? this.add(object) : this.set(object as IDocObject)
   }
 
-  async delete (docId: string) {
+  public async delete (docId: string) {
     await this.collectionRef.doc(docId).delete()
     return docId
   }
 
-  async bulkSet (objects: DocObject[]) {
+  public async bulkSet (objects: IDocObject[]) {
     const batch = this.firestore.batch()
 
     objects.forEach((object) => {
@@ -117,7 +122,7 @@ export class FirestoreSimple {
     return batch.commit()
   }
 
-  async bulkDelete (docIds: string[]) {
+  public async bulkDelete (docIds: string[]) {
     const batch = this.firestore.batch()
 
     docIds.forEach((docId: string) => {

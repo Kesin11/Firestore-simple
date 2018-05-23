@@ -8,8 +8,9 @@
     "build:test": "tsc --project test",
     "ava": "ava",
     "test": "npm run build:test && ava dist_test/test/**/*.test.js",
-    "lint": "eslint .",
-    "lint:fix": "eslint --fix ."
+    "lint": "tslint src/**/*.ts test/**/*.ts",
+    "lint:fix": "npm run lint -- --fix",
+    "lint:project": "tslint -p ."
   },
   "devDependencies": {
     "ava": "0.23.0",
@@ -37,6 +38,7 @@
   "homepage": "https://github.com/Kesin11/Firestore-simple#readme",
   "dependencies": {
     "tslint": "5.10.0",
+    "tslint-config-standard": "7.0.0",
     "typescript": "2.8.3"
   }
 }
