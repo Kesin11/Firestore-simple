@@ -4,7 +4,7 @@ import { initFirestore, deleteCollection, createRandomCollectionName } from './u
 
 const firestore = initFirestore()
 const collectionPath = createRandomCollectionName()
-const dao = new FirestoreSimple(firestore, collectionPath)
+const dao = new FirestoreSimple(firestore, collectionPath, {})
 const existsDocId = 'test'
 const existsDoc = {
   title: 'title',
@@ -26,7 +26,7 @@ test.after.always(async t => {
 
 test('where', async t => {
   const queryTitle = 'aaa'
-  const query = dao.collectionRef.where('title', '=', queryTitle)
+  const query = dao.collectionRef.where('title', '==', queryTitle)
   const docs = await dao.fetchByQuery(query)
 
   const actualTitles = docs.map((doc) => doc.title)
@@ -51,7 +51,7 @@ test('limit', async t => {
 test('composition where + limit', async t => {
   const queryTitle = 'aaa'
   const query = dao.collectionRef
-    .where('title', '=', queryTitle)
+    .where('title', '==', queryTitle)
     .limit(1)
 
   const docs = await dao.fetchByQuery(query)
