@@ -4,9 +4,9 @@ import { initFirestore, deleteCollection, createRandomCollectionName } from './u
 
 const firestore = initFirestore()
 const collectionPath = createRandomCollectionName()
-const dao = new FirestoreSimple(firestore, collectionPath, {
+const dao = new FirestoreSimple(firestore, collectionPath, { mapping: {
   bookTitle: "book_title",
-})
+}})
 
 // Delete all documents. (= delete collection)
 test.after.always(async t => {

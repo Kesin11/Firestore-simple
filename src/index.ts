@@ -17,10 +17,10 @@ export class FirestoreSimple {
   toDocMapping: Mapping
   toObjectMapping: Mapping
 
-  constructor (firestore: Firestore, collectionPath: string, mapping: Mapping) {
+  constructor (firestore: Firestore, collectionPath: string, { mapping }: { mapping?: Mapping } = {}) {
     this.firestore = firestore
     this.collectionRef = this.firestore.collection(collectionPath)
-    this.toDocMapping = mapping || {}
+    this.toDocMapping = (mapping != null) ? mapping : {}
     this.toObjectMapping = FirestoreSimple._createSwapMapping(this.toDocMapping)
   }
 

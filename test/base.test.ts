@@ -4,7 +4,7 @@ import { initFirestore, deleteCollection, createRandomCollectionName } from './u
 
 const firestore = initFirestore()
 const collectionPath = createRandomCollectionName()
-const dao = new FirestoreSimple(firestore, collectionPath, {})
+const dao = new FirestoreSimple(firestore, collectionPath)
 const existsDocId = 'test'
 const existsDoc = {
   title: 'title',
