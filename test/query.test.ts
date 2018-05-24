@@ -11,7 +11,7 @@ const existsDoc = {
   url: 'http://example.com',
 }
 
-test.before(async (t) => {
+test.before(async (_t) => {
   await dao.collectionRef.doc(existsDocId).set(existsDoc)
   await dao.collectionRef.add({ title: 'aaa', order: 2 })
   await dao.collectionRef.add({ title: 'aaa', order: 1 })
@@ -20,7 +20,7 @@ test.before(async (t) => {
 })
 
 // Delete all documents. (= delete collection)
-test.after.always(async (t) => {
+test.after.always(async (_t) => {
   await deleteCollection(firestore, collectionPath)
 })
 

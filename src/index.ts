@@ -5,11 +5,11 @@ import {
   Query,
 } from '@google-cloud/firestore'
 
-declare interface IMapping { [key: string]: string }
-interface IDocData {
+export declare interface IMapping { [key: string]: string }
+export declare interface IDocData {
   [extra: string]: any
 }
-interface IDocObject {
+export declare interface IDocObject {
   id: string,
   [extra: string]: any
 }

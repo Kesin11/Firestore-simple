@@ -9,7 +9,7 @@ const dao = new FirestoreSimple(firestore, collectionPath, { mapping: {
 }})
 
 // Delete all documents. (= delete collection)
-test.after.always(async (t) => {
+test.after.always(async (_t) => {
   await deleteCollection(firestore, collectionPath)
 })
 
