@@ -13,8 +13,8 @@
     "lint:project": "tslint -p ."
   },
   "devDependencies": {
-    "ava": "0.23.0",
-    "firebase-admin": "5.6.0",
+    "ava": "0.25.0",
+    "firebase-admin": "5.12.1",
     "tslint": "5.10.0",
     "tslint-config-standard": "7.0.0"
   },

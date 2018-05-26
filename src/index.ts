@@ -61,7 +61,7 @@ export class FirestoreSimple {
     const arr: IDocObject[] = []
 
     snapshot.forEach((doc: DocumentSnapshot) => {
-      arr.push(this._toObject(doc.id, doc.data()))
+      arr.push(this._toObject(doc.id, doc.data() || {}))
     })
     return arr
   }
@@ -71,7 +71,7 @@ export class FirestoreSimple {
     const arr: IDocObject[] = []
 
     snapshot.forEach((doc: DocumentSnapshot) => {
-      arr.push(this._toObject(doc.id, doc.data()))
+      arr.push(this._toObject(doc.id, doc.data() || {}))
     })
     return arr
   }
@@ -80,7 +80,7 @@ export class FirestoreSimple {
     const snapshot = await this.collectionRef.doc(id).get()
     if (!snapshot.exists) throw new Error(`No document id: ${id}`)
 
-    return this._toObject(snapshot.id, snapshot.data())
+    return this._toObject(snapshot.id, snapshot.data() || {})
   }
 
   public async add (object: IDocObject | IDocData): Promise<IDocObject> {
