@@ -20,6 +20,8 @@ npm i firestore-simple
 ```
 
 # Usage
+## nodejs client
+
 ```javascript
 import { FirestoreSimple } from 'firestore-simple'
 import { Firestore } from '@google-cloud/firestore'
@@ -108,6 +110,32 @@ const main = async () => {
 }
 
 main()
+```
+
+## ReactNativeFirebase
+```javascript
+import { FirestoreSimple } from 'firestore-simple'
+import firebase from 'react-native-firebase';
+
+export default class App extends React.Component {
+  // If you try using this code, you have to enable anonymous auth in your firebase console
+  async getFirestore() {
+    await firebase.auth().signInAnonymouslyAndRetrieveData()
+    return firebase.firestore()
+  }
+
+  async componentDidMount() {
+    const firestore = await this.getFirestore()
+    const collectionPath = 'sample_react_native'
+    const dao = new FirestoreSimple(firestore, collectionPath, {
+      mapping: {
+        createdAt: 'created_at'
+      }
+    })
+
+    // ... other usage are same as nodejs client
+  }
+}
 ```
 
 [update](https://cloud.google.com/nodejs/docs/reference/firestore/0.13.x/DocumentReference#update) and [transaction](https://cloud.google.com/nodejs/docs/reference/firestore/0.13.x/Transaction) are not supported yet.
