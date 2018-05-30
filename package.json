@@ -1,10 +1,15 @@
 {
   "name": "firestore-simple",
-  "version": "1.0.0",
+  "version": "0.9.0",
   "description": "A simple wrapper for Firestore",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist/"
+  ],
   "scripts": {
+    "clean": "rm -rf dist dist_test",
+    "prepublish": "npm run clean && npm run clean",
     "build": "tsc --project .",
     "build:test": "tsc --project test",
     "ava": "ava",
@@ -26,7 +31,8 @@
   "keywords": [
     "Firestore"
   ],
-  "author": "",
+  "author": "Kesin11",
+  "email": "kesin1202000@gmail.com",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Kesin11/Firestore-simple/issues"
