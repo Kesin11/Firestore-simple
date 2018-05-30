@@ -1,24 +1,28 @@
 {
   "name": "firestore-simple",
-  "version": "1.0.0",
+  "version": "0.9.1",
   "description": "A simple wrapper for Firestore",
-  "main": "src/index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/"
+  ],
   "scripts": {
+    "clean": "rm -rf dist dist_test",
+    "prepublish": "npm run clean && npm run build",
+    "build": "tsc --project .",
+    "build:test": "tsc --project test",
     "ava": "ava",
-    "test": "ava test/*.test.js",
-    "lint": "eslint .",
-    "lint:fix": "eslint --fix ."
+    "test": "npm run build:test && ava dist_test/test/**/*.test.js",
+    "lint": "tslint src/**/*.ts test/**/*.ts",
+    "lint:fix": "npm run lint -- --fix",
+    "lint:project": "tslint -p ."
   },
   "devDependencies": {
-    "ava": "0.23.0",
-    "eslint": "4.10.0",
-    "eslint-config-standard": "10.2.1",
-    "eslint-plugin-ava": "4.2.2",
-    "eslint-plugin-import": "2.8.0",
-    "eslint-plugin-node": "5.2.1",
-    "eslint-plugin-promise": "3.6.0",
-    "eslint-plugin-standard": "3.0.1",
-    "firebase-admin": "5.6.0"
+    "ava": "0.25.0",
+    "firebase-admin": "5.12.1",
+    "tslint": "5.10.0",
+    "tslint-config-standard": "7.0.0"
   },
   "repository": {
     "type": "git",
@@ -27,10 +31,14 @@
   "keywords": [
     "Firestore"
   ],
-  "author": "",
+  "author": "Kesin11",
+  "email": "kesin1202000@gmail.com",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Kesin11/Firestore-simple/issues"
   },
-  "homepage": "https://github.com/Kesin11/Firestore-simple#readme"
+  "homepage": "https://github.com/Kesin11/Firestore-simple#readme",
+  "dependencies": {
+    "typescript": "2.8.3"
+  }
 }

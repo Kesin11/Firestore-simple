@@ -1,17 +1,17 @@
-const test = require('ava')
-const { FirestoreSimple } = require('../src/index.js')
-const { deleteCollection, createRandomCollectionName, initFirestore } = require('./util')
+import test from 'ava'
+import { FirestoreSimple } from '../src/index'
+import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
 
-const db = initFirestore()
+const firestore = initFirestore()
 const collectionPath = createRandomCollectionName()
-const dao = new FirestoreSimple(db, collectionPath)
+const dao = new FirestoreSimple(firestore, collectionPath)
 const existsDocId = 'test'
 const existsDoc = {
   title: 'title',
   url: 'http://example.com',
 }
 
-test.before(async t => {
+test.before(async (_t) => {
   await dao.collectionRef.doc(existsDocId).set(existsDoc)
   await dao.collectionRef.add({ title: 'aaa', order: 2 })
   await dao.collectionRef.add({ title: 'aaa', order: 1 })
@@ -20,20 +20,20 @@ test.before(async t => {
 })
 
 // Delete all documents. (= delete collection)
-test.after.always(async t => {
-  await deleteCollection(db, collectionPath)
+test.after.always(async (_t) => {
+  await deleteCollection(firestore, collectionPath)
 })
 
-test('where', async t => {
+test('where', async (t) => {
   const queryTitle = 'aaa'
-  const query = dao.collectionRef.where('title', '=', queryTitle)
+  const query = dao.collectionRef.where('title', '==', queryTitle)
   const docs = await dao.fetchByQuery(query)
 
   const actualTitles = docs.map((doc) => doc.title)
   t.deepEqual(actualTitles, [queryTitle, queryTitle], 'where =')
 })
 
-test('order by', async t => {
+test('order by', async (t) => {
   const query = dao.collectionRef.orderBy('order', 'desc')
   const docs = await dao.fetchByQuery(query)
 
@@ -41,17 +41,17 @@ test('order by', async t => {
   t.deepEqual(actualOrders, [4, 3, 2, 1], 'order by desc')
 })
 
-test('limit', async t => {
+test('limit', async (t) => {
   const query = dao.collectionRef.limit(1)
   const docs = await dao.fetchByQuery(query)
 
   t.is(docs.length, 1)
 })
 
-test('composition where + limit', async t => {
+test('composition where + limit', async (t) => {
   const queryTitle = 'aaa'
   const query = dao.collectionRef
-    .where('title', '=', queryTitle)
+    .where('title', '==', queryTitle)
     .limit(1)
 
   const docs = await dao.fetchByQuery(query)
@@ -61,7 +61,7 @@ test('composition where + limit', async t => {
   t.is(doc.title, queryTitle, 'where')
 })
 
-test('composition order + limit', async t => {
+test('composition order + limit', async (t) => {
   const query = dao.collectionRef
     .orderBy('order')
     .limit(2)

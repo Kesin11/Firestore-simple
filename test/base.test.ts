@@ -1,10 +1,10 @@
-const test = require('ava')
-const { FirestoreSimple } = require('../src/index.js')
-const { deleteCollection, createRandomCollectionName, initFirestore } = require('./util')
+import test from 'ava'
+import { FirestoreSimple } from '../src/index'
+import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
 
-const db = initFirestore()
+const firestore = initFirestore()
 const collectionPath = createRandomCollectionName()
-const dao = new FirestoreSimple(db, collectionPath)
+const dao = new FirestoreSimple(firestore, collectionPath)
 const existsDocId = 'test'
 const existsDoc = {
   title: 'title',
@@ -12,7 +12,7 @@ const existsDoc = {
 }
 
 // Add fix id document and random id document
-test.before(async t => {
+test.before(async (_t) => {
   await dao.collectionRef.doc(existsDocId).set(existsDoc)
   await dao.collectionRef.add({
     title: 'before',
@@ -21,24 +21,24 @@ test.before(async t => {
 })
 
 // Delete all documents. (= delete collection)
-test.after.always(async t => {
-  await deleteCollection(db, collectionPath)
+test.after.always(async (_t) => {
+  await deleteCollection(firestore, collectionPath)
 })
 
-test('fetchDocument', async t => {
+test('fetchDocument', async (t) => {
   const doc = await dao.fetchDocument(existsDocId)
-  const expectDoc = Object.assign({}, existsDoc, {id: existsDocId})
+  const expectDoc = Object.assign({}, existsDoc, { id: existsDocId })
 
   t.deepEqual(doc, expectDoc)
 })
 
-test('fetchCollection', async t => {
+test('fetchCollection', async (t) => {
   const docs = await dao.fetchCollection()
 
   t.true(docs.length >= 2)
 })
 
-test('add', async t => {
+test('add', async (t) => {
   const doc = {
     title: 'add',
     url: 'http://example.com/add',
@@ -53,7 +53,7 @@ test('add', async t => {
   t.deepEqual(addedDoc, fetchedDoc, 'fetched object')
 })
 
-test('set', async t => {
+test('set', async (t) => {
   const addedDoc = await dao.collectionRef.add({
     title: 'hogehoge',
     url: 'http://example.com/hogehoge',
@@ -70,16 +70,7 @@ test('set', async t => {
   t.deepEqual(fetchedDoc, setDoc, 'fetched object')
 })
 
-test('set without id', async t => {
-  await t.throws(
-    dao.set({
-      title: 'set',
-      url: 'http://example.com/set',
-    })
-  )
-})
-
-test('addOrSet', async t => {
+test('addOrSet', async (t) => {
   // add
   const doc = {
     title: 'add',
@@ -107,7 +98,7 @@ test('addOrSet', async t => {
   t.deepEqual(fetchedSetDoc, setDoc, 'fetched set object')
 })
 
-test('delete', async t => {
+test('delete', async (t) => {
   const doc = {
     title: 'add',
     url: 'http://example.com/add',

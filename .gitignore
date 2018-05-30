@@ -57,4 +57,9 @@ typings/
 # dotenv environment variables file
 .env
 
+
+# Firebase secret for unittest
 firebase_secret.json
+
+dist/
+dist_test/
