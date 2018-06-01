@@ -56,6 +56,15 @@ const main = async () => {
   //   createdAt: 2018-05-29T13:47:39.762Z
   // }
 
+  doc = await dao.fetchDocument(doc.id)
+  console.log('fetchDocument')
+  // {
+  //   id: 'dQU413MsVLQRJ8elvr3y',
+  //   title: 'title',
+  //   url: 'http://example.com',
+  //   createdAt: 2018-05-29T13:47:39.762Z
+  // }
+
   doc.title = 'fixed_title'
   doc = await dao.set(doc)
   console.log(doc)
@@ -84,10 +93,12 @@ const main = async () => {
   const bulkSetBatch = await dao.bulkSet([
     {
       id: '1',
+      order: 2,
       title: 'bulk_set1'
     },
     {
       id: '2',
+      order: 1,
       title: 'bulk_set2'
     }
   ])
