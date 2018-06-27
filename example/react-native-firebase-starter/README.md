@@ -1,5 +1,7 @@
 # ReactNativeFirebase sample code
-sample code is here [App.js](./App.js)
+firebase-simple sample code is here [App.js](./App.js)
+
+----
 
 # React Native Firebase Starter<a href="https://rnfirebase.io"><img align="left" src="http://i.imgur.com/01XQL0x.png"></a>
 
