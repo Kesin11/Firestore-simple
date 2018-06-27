@@ -4,7 +4,7 @@
 
 A simple wrapper for Firestore.
 
-It support [nodejs](https://cloud.google.com/nodejs/docs/reference/firestore/0.13.x/) and [ReactNativeFirebase](https://rnfirebase.io/).  
+It support [nodejs](https://cloud.google.com/nodejs/docs/reference/firestore/0.13.x/) and [ReactNativeFirebase](https://rnfirebase.io/) and [CloudFunctions](https://firebase.google.com/docs/functions/).  
 I haven't tried [web JavaScript client](https://firebase.google.com/docs/reference/js/firebase.firestore) yet, but I think it maybe works.
 
 # Introduction
@@ -107,7 +107,7 @@ const main = async () => {
   console.log(fetchedDocs)
   // [
   //   { id: '1', title: 'bulk_set1' },
-  //   { id: '2', title: 'bulk_set2' } 
+  //   { id: '2', title: 'bulk_set2' }
   // ]
 
   const query = dao.collectionRef
@@ -150,10 +150,29 @@ export default class App extends React.Component {
 }
 ```
 
-[update](https://cloud.google.com/nodejs/docs/reference/firestore/0.13.x/DocumentReference#update) and [transaction](https://cloud.google.com/nodejs/docs/reference/firestore/0.13.x/Transaction) are not supported yet.
+## CloudFunctions
+```javascript
+const functions = require('firebase-functions');
+const admin = require('firebase-admin')
+const { FirestoreSimple } = require('firestore-simple')
+admin.initializeApp()
+
+exports.helloFirestore = functions.https.onRequest((request, response) => {
+  const firestore = admin.firestore()
+  const dao = new FirestoreSimple(firestore, 'cloud_function')
+  dao.add({ name: 'alice', age: 20}).then(doc => {
+    console.log(doc)
+    return response.send("add { name: " + doc.name + ", age: " + doc.age + "}")
+  })
+})
+```
 
 # TypeScript
 firestore-simple is written by TypeScript and type file is included.
+
+# Not supported Firestore features
+[update](https://cloud.google.com/nodejs/docs/reference/firestore/0.13.x/DocumentReference#update) and [transaction](https://cloud.google.com/nodejs/docs/reference/firestore/0.13.x/Transaction) are not supported yet.
+
 
 # Develop
 Unit tests are using **REAL Firestore(Firebase)**, not mock!
@@ -162,4 +181,3 @@ So if you want to run unit test in your local machine, please put your firebase 
 
 # License
 MIT
-
