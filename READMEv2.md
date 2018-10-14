@@ -74,11 +74,6 @@ const decode = (doc: {id: string, [prop: string]: any}): User => {
 })
 const dao = new FirestoreSimple<User>({firestore, path: 'users', encode, decode})
 
-class UserClass implements User {
-  // コンストラクタも省略した場合、オブジェクトで渡したら自身のプロパティにマッチしてくれるのかな？
-}
-const dao = new FirestoreSimple<User>({firestore, path: 'users', mapToClass: UserClass})
-
 // doc or collection reference
 // decodeを活用してやってほしい。自動でネストを展開してしまうとネストが深いときによきせずメモリ食う可能性があるのであまり積極的にサポートしたくない
 
