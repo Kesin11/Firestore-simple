@@ -79,12 +79,22 @@ class UserClass implements User {
 }
 const dao = new FirestoreSimple<User>({firestore, path: 'users', mapToClass: UserClass})
 
-// refecence
+// doc or collection reference
+// decodeを活用してやってほしい。自動でネストを展開してしまうとネストが深いときによきせずメモリ食う可能性があるのであまり積極的にサポートしたくない
 
 // sub collection
+// 難しそう。docの要素とは別枠扱いなので、コンストラクタでネストさせればできそう？
+const dao = new FirestoreSimple<User>({firestore, path: 'users', subcollection: {
+  books: new FirestoreSimple<Book>({firestore, path: 'users/${id}/books'})
+}})
+dao
+  .find(1) // user
+  .find(2) // book
 
 // on
 
+// class
+// extendsでクラスとして作る方法。dixie.jsを参考にしたい
 
 
 
