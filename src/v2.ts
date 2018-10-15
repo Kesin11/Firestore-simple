@@ -2,29 +2,22 @@ import {
   CollectionReference,
   Firestore,
 } from '@google-cloud/firestore'
+import { Assign } from 'utility-types'
 
-declare interface IDocData {
-  [extra: string]: any
-}
-declare interface IDocObject {
-  id: string,
-  [extra: string]: any
-}
+interface HasId { id: string, [prop: string]: any }
+interface NullableId { id?: string }
 
-// memo: <T, U>としてfirestoreに保存するときのスキーマを指定させてもいいかもしれない
-// memo: Tだけどid?を持っていることは保証したい、という型を付ける
-// memo: IDocDataはidというプロパティを持っていない、という型の表現をしたい
-export class FirestoreSimpleV2<T extends IDocObject> {
+export class FirestoreSimpleV2<T extends HasId> {
   public firestore: Firestore
   public collectionRef: CollectionReference
-  public encode?: (obj: T) => IDocData
-  public decode?: (doc: IDocData) => T
+  public encode?: (obj: T | Assign<T, NullableId>) => FirebaseFirestore.DocumentData
+  public decode?: (doc: HasId) => T
 
   constructor ({ firestore, path, encode, decode }: {
     firestore: Firestore,
     path: string,
-    encode?: (obj: T) => IDocData,
-    decode?: (doc: IDocData) => T,
+    encode?: (obj: T | Assign<T, NullableId>) => FirebaseFirestore.DocumentData
+    decode?: (doc: HasId) => T,
   }) {
     this.firestore = firestore,
     this.collectionRef = this.firestore.collection(path)
@@ -33,30 +26,30 @@ export class FirestoreSimpleV2<T extends IDocObject> {
   }
 
   public toObject (docId: string, docData: FirebaseFirestore.DocumentData): T {
-    // const object: IDocObject = { id: docId }
-    // Object.keys(docData).forEach((key) => {
-    //   object[key] = docData[key]
-    // })
     const obj = { id: docId, ...docData }
     if (!this.decode) return obj as unknown as T
     return this.decode(obj)
   }
 
-  public toDoc (obj: T) {
+  public toDoc (obj: T | Assign<T, NullableId>) {
     const doc = (this.encode) ? this.encode(obj) : Object.assign({}, obj)
-    delete doc.id
+    if (doc.id) delete doc.id
     return doc
   }
 
-  public async fetchDocument (id: string): Promise < T > {
+  public async fetchDocument (id: string): Promise <T> {
     const snapshot = await this.collectionRef.doc(id).get()
     if (!snapshot.exists) throw new Error(`No document id: ${id}`)
 
     return this.toObject(snapshot.id, snapshot.data() || {})
   }
 
-  // TODO: addとsetでidの有無をちゃんと判定する型の定義を書く必要がある
-  // いい感じに計算してTからidだけを取り除いたりできないだろうか？
+  public async add (obj: Assign<T, NullableId>): Promise <T> {
+    const doc = this.toDoc(obj)
+    const docRef = await this.collectionRef.add(doc)
+    return Object.assign(obj, { id: docRef.id }) as unknown as T
+  }
+
   public async set (obj: T) {
     if (!obj.id) throw new Error('Argument object must have "id" property')
 

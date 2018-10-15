@@ -39,6 +39,7 @@
   },
   "homepage": "https://github.com/Kesin11/Firestore-simple#readme",
   "dependencies": {
-    "typescript": "3.1.3"
+    "typescript": "3.1.3",
+    "utility-types": "2.1.0"
   }
 }

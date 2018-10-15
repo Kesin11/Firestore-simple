@@ -16,7 +16,7 @@ interface User {
 }
 const main = async () => {
   const userDao = new FirestoreSimpleV2<User>({ firestore, path: 'user',
-    encode: (user: User) => {
+    encode: (user) => {
       return {
         name: user.name,
         age: user.age,
@@ -35,5 +35,6 @@ const main = async () => {
   const user = await userDao.fetchDocument('z4E1NZdNqH1dbcP53oER')
   console.log(user)
   await userDao.set({ id: '1', age: 20, name: 'bob', createdAt: new Date() })
+  await userDao.add({ id: 'dummy', age: 22, name: 'add', createdAt: new Date() })
 }
 main()
