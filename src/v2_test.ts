@@ -1,4 +1,6 @@
+import { Firestore } from '@google-cloud/firestore'
 import admin, { ServiceAccount } from 'firebase-admin'
+import { Assign } from 'utility-types'
 import serviceAccount from '../firebase_secret.json'
 import { FirestoreSimpleV2 } from './v2'
 
@@ -39,3 +41,35 @@ const main = async () => {
   await userDao.delete(newUser.id)
 }
 main()
+
+interface Book {
+  id: string,
+  name: string,
+  ISBN: number
+}
+class BookDao extends FirestoreSimpleV2<Book> {
+  constructor ({ firestore, path }: {firestore: Firestore, path: string}) {
+    super({ firestore, path })
+  }
+
+  public encode (book: Assign<Book, {id?: string}>) {
+    return {
+      name: book.name,
+      isbn: book.ISBN,
+    }
+  }
+
+  public decode (book: {id: string, [props: string]: any}) {
+    return {
+      id: book.id,
+      name: book.name,
+      ISBN: book.isbn,
+    }
+  }
+}
+
+const main2 = async () => {
+  const bookDao = new BookDao({ firestore, path: 'book' })
+  await bookDao.add({ name: 'book1', ISBN: 1111 })
+}
+main2()

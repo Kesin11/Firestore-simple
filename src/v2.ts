@@ -10,8 +10,8 @@ interface NullableId { id?: string }
 export class FirestoreSimpleV2<T extends HasId> {
   public firestore: Firestore
   public collectionRef: CollectionReference
-  public encode?: (obj: T | Assign<T, NullableId>) => FirebaseFirestore.DocumentData
-  public decode?: (doc: HasId) => T
+  public _encode?: (obj: T | Assign<T, NullableId>) => FirebaseFirestore.DocumentData
+  public _decode?: (doc: HasId) => T
 
   constructor ({ firestore, path, encode, decode }: {
     firestore: Firestore,
@@ -21,18 +21,28 @@ export class FirestoreSimpleV2<T extends HasId> {
   }) {
     this.firestore = firestore,
     this.collectionRef = this.firestore.collection(path)
-    this.encode = encode
-    this.decode = decode
+    this._encode = encode
+    this._decode = decode
+  }
+  // for overwrite in subclass
+  public decode (doc: HasId): T {
+    if (this._decode) return this._decode(doc)
+    return doc as T
   }
 
   public toObject (docId: string, docData: FirebaseFirestore.DocumentData): T {
     const obj = { id: docId, ...docData }
-    if (!this.decode) return obj as unknown as T
     return this.decode(obj)
   }
 
+  // for overwrite in subclass
+  public encode (obj: T | Assign<T, NullableId>) {
+    if (this._encode) return this._encode(obj)
+    return Object.assign({}, obj)
+  }
+
   public toDoc (obj: T | Assign<T, NullableId>) {
-    const doc = (this.encode) ? this.encode(obj) : Object.assign({}, obj)
+    const doc = this.encode(obj)
     if (doc.id) delete doc.id
     return doc
   }
@@ -64,4 +74,5 @@ export class FirestoreSimpleV2<T extends HasId> {
     await this.collectionRef.doc(id).delete()
     return id
   }
+
 }
