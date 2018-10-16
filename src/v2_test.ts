@@ -35,6 +35,7 @@ const main = async () => {
   const user = await userDao.fetchDocument('z4E1NZdNqH1dbcP53oER')
   console.log(user)
   await userDao.set({ id: '1', age: 20, name: 'bob', createdAt: new Date() })
-  await userDao.add({ id: 'dummy', age: 22, name: 'add', createdAt: new Date() })
+  const newUser = await userDao.add({ id: 'dummy', age: 22, name: 'add', createdAt: new Date() })
+  await userDao.delete(newUser.id)
 }
 main()

@@ -59,4 +59,9 @@ export class FirestoreSimpleV2<T extends HasId> {
     await this.collectionRef.doc(docId).set(setDoc)
     return obj
   }
+
+  public async delete (id: string) {
+    await this.collectionRef.doc(id).delete()
+    return id
+  }
 }
