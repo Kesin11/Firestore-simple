@@ -6,6 +6,7 @@ import {
 } from '@google-cloud/firestore'
 
 export declare interface IMapping { [key: string]: string }
+export declare interface ISetOptions { [key: string]: string }
 export declare interface IDocData {
   [extra: string]: any
 }
@@ -92,13 +93,13 @@ export class FirestoreSimple {
     }
   }
 
-  public async set (object: IDocObject) {
+  public async set (object: IDocObject, setOptions?: ISetOptions) {
     if (!object.id) throw new Error('Argument object must have "id" property')
 
     const docId = object.id
     const setDoc = this._toDoc(object)
 
-    await this.collectionRef.doc(docId).set(setDoc)
+    await this.collectionRef.doc(docId).set(setDoc, setOptions)
     return object
   }
 

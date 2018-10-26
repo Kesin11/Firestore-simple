@@ -66,7 +66,7 @@ const main = async () => {
   // }
 
   doc.title = 'fixed_title'
-  doc = await dao.set(doc)
+  doc = await dao.set(doc) // can also pass setOptions object (e.g. `doc = await dao.set(doc, { merge: true })`)
   console.log(doc)
   // {
   //   id: 'dQU413MsVLQRJ8elvr3y',
