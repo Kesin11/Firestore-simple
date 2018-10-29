@@ -1,6 +1,7 @@
 import {
   CollectionReference,
   Firestore,
+  Query,
 } from '@google-cloud/firestore'
 import { Assign } from 'utility-types'
 
@@ -102,4 +103,58 @@ export class FirestoreSimpleV2<T extends HasId> {
     return id
   }
 
+  public fetchByQuery (query: Query) {
+    const snapshot = await query.get()
+    const arr: T[] = []
+
+    snapshot.forEach((doc) => {
+      arr.push(this.toObject(doc.id, doc.data()))
+    })
+    return arr
+  }
+
+  public where (args: any) {
+    const query = new FirestoreSimpleQuery<T>({ firestoreSimple: this })
+    return query.where(args)
+  }
+
+  public orderBy (args: any) {
+    const query = new FirestoreSimpleQuery<T>({ firestoreSimple: this })
+    return query.orderBy(args)
+  }
+
+  public limit (args: any) {
+    const query = new FirestoreSimpleQuery<T>({ firestoreSimple: this })
+    return query.limit(args)
+  }
+}
+
+class FirestoreSimpleQuery<T> {
+  public firestoreSimple: FirestoreSimpleV2<T extends HasId>
+  public query?: Query
+  constructor ({ firestoreSimple }: { firestoreSimple: FirestoreSimpleV2<T extends HasId> }) {
+    this.firestoreSimple = firestoreSimple
+    this.query = undefined
+  }
+
+  public where (args: any) {
+    if (this.query) return this.query.where(args)
+    return this.firestoreSimple.collectionRef.where(args)
+  }
+
+  public orderBy (args: any) {
+    if (this.query) return this.query.orderBy(args)
+    return this.firestoreSimple.collectionRef.orderBy(args)
+  }
+
+  public limit (args: any) {
+    if (this.query) return this.query.limit(args)
+    return this.firestoreSimple.collectionRef.limit(args)
+  }
+
+  async public get () {
+    if (this.query == null) throw new Error('no query statement before get()')
+
+    return this.firestoreSimple.fetchByQuery(this.query)
+  }
 }
