@@ -57,7 +57,7 @@ export class FirestoreSimpleV2<T extends HasId> {
   public async add (obj: Assign<T, NullableId>): Promise <T> {
     const doc = this.toDoc(obj)
     const docRef = await this.collectionRef.add(doc)
-    return Object.assign(obj, { id: docRef.id }) as unknown as T
+    return Object.assign({}, obj, { id: docRef.id }) as unknown as T
   }
 
   public async set (obj: T) {

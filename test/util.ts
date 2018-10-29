@@ -8,7 +8,9 @@ export const initFirestore = () => {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
   })
-  return admin.firestore()
+  const firestore = admin.firestore()
+  firestore.settings({ timestampsInSnapshots: true })
+  return firestore
 }
 
 export const deleteCollection = async (firestore: Firestore, collectionPath: string) => {
