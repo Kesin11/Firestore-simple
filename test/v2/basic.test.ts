@@ -31,18 +31,18 @@ test.after.always(async (_t) => {
   await deleteCollection(firestore, collectionPath)
 })
 
-test('fetchDocument', async (t) => {
-  const doc = await dao.fetchDocument(existsDocId)
+test('fetch', async (t) => {
+  const doc = await dao.fetch(existsDocId)
   const expectDoc = { ...existsDoc, ...{ id: existsDocId } }
 
   t.deepEqual(doc, expectDoc)
 })
 
-// test('fetchCollection', async (t) => {
-//   const docs = await dao.fetchCollection()
+test('fetchAll', async (t) => {
+  const docs = await dao.fetchAll()
 
-//   t.true(docs.length >= 2)
-// })
+  t.true(docs.length >= 2)
+})
 
 test('add', async (t) => {
   const doc = {
@@ -51,10 +51,12 @@ test('add', async (t) => {
   }
   const addedDoc = await dao.add(doc)
   t.truthy(addedDoc.id)
-  t.true(addedDoc.title === doc.title)
-  t.true(addedDoc.url === doc.url)
+  t.deepEqual({...{
+    title: addedDoc.title,
+    url: addedDoc.url,
+  }}, doc, 'return added object')
 
-  const fetchedDoc = await dao.fetchDocument(addedDoc.id)
+  const fetchedDoc = await dao.fetch(addedDoc.id)
   t.deepEqual(addedDoc, fetchedDoc, 'fetched object')
 })
 
@@ -71,37 +73,38 @@ test('set', async (t) => {
   const setedDoc = await dao.set(setDoc)
   t.deepEqual(setedDoc, setDoc, 'return object')
 
-  const fetchedDoc = await dao.fetchDocument(addedDoc.id)
+  const fetchedDoc = await dao.fetch(addedDoc.id)
   t.deepEqual(fetchedDoc, setDoc, 'fetched object')
 })
 
-// test('addOrSet', async (t) => {
-//   // add
-//   const doc = {
-//     title: 'add',
-//     url: 'http://example.com/add',
-//   }
-//   const addedDoc = await dao.addOrSet(doc)
-//   t.deepEqual(Object.assign({}, {
-//     title: addedDoc.title,
-//     url: addedDoc.url,
-//   }), doc, 'return added object')
+test('addOrSet', async (t) => {
+  // add
+  const doc = {
+    title: 'add',
+    url: 'http://example.com/add',
+  }
+  const addedDoc = await dao.addOrSet(doc)
+  t.truthy(addedDoc.id)
+  t.deepEqual({...{
+    title: addedDoc.title,
+    url: addedDoc.url,
+  }}, doc, 'return added object')
 
-//   const fetchedAddDoc = await dao.fetchDocument(addedDoc.id)
-//   t.deepEqual(addedDoc, fetchedAddDoc, 'fetched added object')
+  const fetchedAddDoc = await dao.fetchDocument(addedDoc.id)
+  t.deepEqual(addedDoc, fetchedAddDoc, 'fetched added object')
 
-//   // set
-//   const setDoc = {
-//     id: addedDoc.id,
-//     title: 'set',
-//     url: 'http://example.com/set',
-//   }
-//   const setedDoc = await dao.addOrSet(setDoc)
-//   t.deepEqual(setedDoc, setDoc, 'return seted object')
+  // set
+  const setDoc = {
+    id: addedDoc.id,
+    title: 'set',
+    url: 'http://example.com/set',
+  }
+  const setedDoc = await dao.addOrSet(setDoc)
+  t.deepEqual(setedDoc, setDoc, 'return seted object')
 
-//   const fetchedSetDoc = await dao.fetchDocument(addedDoc.id)
-//   t.deepEqual(fetchedSetDoc, setDoc, 'fetched set object')
-// })
+  const fetchedSetDoc = await dao.fetchDocument(addedDoc.id)
+  t.deepEqual(fetchedSetDoc, setDoc, 'fetched set object')
+})
 
 test('delete', async (t) => {
   const doc = {

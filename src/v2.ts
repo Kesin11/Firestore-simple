@@ -47,11 +47,31 @@ export class FirestoreSimpleV2<T extends HasId> {
     return doc
   }
 
-  public async fetchDocument (id: string): Promise <T> {
+  public async fetch (id: string): Promise <T> {
     const snapshot = await this.collectionRef.doc(id).get()
     if (!snapshot.exists) throw new Error(`No document id: ${id}`)
 
     return this.toObject(snapshot.id, snapshot.data() || {})
+  }
+
+  // for v1 API compatibility
+  public async fetchDocument (id: string): Promise<T> {
+    return this.fetch(id)
+  }
+
+  public async fetchAll (): Promise<T[]> {
+    const snapshot = await this.collectionRef.get()
+    const arr: T[] = []
+
+    snapshot.forEach((doc) => {
+      arr.push(this.toObject(doc.id, doc.data()))
+    })
+    return arr
+  }
+
+  // for v1 API compatibility
+  public async fetchCollection (): Promise<T[]> {
+    return this.fetchAll()
   }
 
   public async add (obj: Assign<T, NullableId>): Promise <T> {
@@ -68,6 +88,13 @@ export class FirestoreSimpleV2<T extends HasId> {
 
     await this.collectionRef.doc(docId).set(setDoc)
     return obj
+  }
+
+  public addOrSet (obj: Assign<T, NullableId> | T) {
+    if ('id' in obj && typeof obj.id === 'string') {
+      return this.set(obj)
+    }
+    return this.add(obj as Assign<T, NullableId>)
   }
 
   public async delete (id: string) {
