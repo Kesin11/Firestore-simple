@@ -103,7 +103,7 @@ export class FirestoreSimpleV2<T extends HasId> {
     return id
   }
 
-  public fetchByQuery (query: Query) {
+  public async fetchByQuery (query: Query) {
     const snapshot = await query.get()
     const arr: T[] = []
 
@@ -113,46 +113,58 @@ export class FirestoreSimpleV2<T extends HasId> {
     return arr
   }
 
-  public where (args: any) {
+  public where (fieldPath: string | FirebaseFirestore.FieldPath, opStr: FirebaseFirestore.WhereFilterOp, value: any) {
     const query = new FirestoreSimpleQuery<T>({ firestoreSimple: this })
-    return query.where(args)
+    return query.where(fieldPath, opStr, value)
   }
 
-  public orderBy (args: any) {
+  public orderBy (fieldPath: string | FirebaseFirestore.FieldPath, directionStr?: FirebaseFirestore.OrderByDirection) {
     const query = new FirestoreSimpleQuery<T>({ firestoreSimple: this })
-    return query.orderBy(args)
+    return query.orderBy(fieldPath, directionStr)
   }
 
-  public limit (args: any) {
+  public limit (limit: number) {
     const query = new FirestoreSimpleQuery<T>({ firestoreSimple: this })
-    return query.limit(args)
+    return query.limit(limit)
   }
 }
 
-class FirestoreSimpleQuery<T> {
-  public firestoreSimple: FirestoreSimpleV2<T extends HasId>
+class FirestoreSimpleQuery<T extends HasId> {
+  public firestoreSimple: FirestoreSimpleV2<T>
   public query?: Query
-  constructor ({ firestoreSimple }: { firestoreSimple: FirestoreSimpleV2<T extends HasId> }) {
+  constructor ({ firestoreSimple }: { firestoreSimple: FirestoreSimpleV2<T> }) {
     this.firestoreSimple = firestoreSimple
     this.query = undefined
   }
 
-  public where (args: any) {
-    if (this.query) return this.query.where(args)
-    return this.firestoreSimple.collectionRef.where(args)
+  public where (fieldPath: string | FirebaseFirestore.FieldPath, opStr: FirebaseFirestore.WhereFilterOp, value: any) {
+    if (!this.query) {
+      this.query = this.firestoreSimple.collectionRef.where(fieldPath, opStr, value)
+    } else {
+      this.query = this.query.where(fieldPath, opStr, value)
+    }
+    return this
   }
 
-  public orderBy (args: any) {
-    if (this.query) return this.query.orderBy(args)
-    return this.firestoreSimple.collectionRef.orderBy(args)
+  public orderBy (fieldPath: string | FirebaseFirestore.FieldPath, directionStr?: FirebaseFirestore.OrderByDirection) {
+    if (!this.query) {
+      this.query = this.firestoreSimple.collectionRef.orderBy(fieldPath, directionStr)
+    } else {
+      this.query = this.query.orderBy(fieldPath, directionStr)
+    }
+    return this
   }
 
-  public limit (args: any) {
-    if (this.query) return this.query.limit(args)
-    return this.firestoreSimple.collectionRef.limit(args)
+  public limit (limit: number) {
+    if (!this.query) {
+      this.query = this.firestoreSimple.collectionRef.limit(limit)
+    } else {
+      this.query = this.query.limit(limit)
+    }
+    return this
   }
 
-  async public get () {
+  public async get () {
     if (this.query == null) throw new Error('no query statement before get()')
 
     return this.firestoreSimple.fetchByQuery(this.query)

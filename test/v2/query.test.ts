@@ -1,6 +1,6 @@
 import test from 'ava'
 import { FirestoreSimpleV2 } from '../../src/v2'
-import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
+import { createRandomCollectionName, deleteCollection, initFirestore } from '../util'
 
 interface TestDoc {
   id: string,
@@ -46,6 +46,18 @@ test('limit', async (t) => {
   t.is(docs.length, limit)
 })
 
+test('composition where + where', async (t) => {
+  const docs = await dao
+    .where('order', '>', 1)
+    .where('order', '<', 4)
+    .get()
+
+  const expectOrders = [2,3]
+  const actualOrders = docs.map((doc) => doc.order)
+
+  t.deepEqual(actualOrders, expectOrders, '1 < order < 4')
+})
+
 test('composition where + limit', async (t) => {
   const queryTitle = 'aaa'
   const limit = 1
@@ -62,11 +74,11 @@ test('composition where + limit', async (t) => {
 
 test('composition order + limit', async (t) => {
   const limit = 2
-  const query = await dao
+  const docs = await dao
     .orderBy('order')
     .limit(limit)
+    .get()
 
-  const docs = await dao.fetchByQuery(query)
   t.is(docs.length, limit, 'limit')
 
   const actualOrders = docs.map((doc) => doc.order)
