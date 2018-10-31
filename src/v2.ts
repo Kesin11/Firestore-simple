@@ -103,6 +103,26 @@ export class FirestoreSimpleV2<T extends HasId> {
     return id
   }
 
+  public async bulkSet (objects: T[]) {
+    const batch = this.firestore.batch()
+
+    objects.forEach((obj) => {
+      const docId = obj.id
+      const setDoc = this.toDoc(obj)
+      batch.set(this.collectionRef.doc(docId), setDoc)
+    })
+    return batch.commit()
+  }
+
+  public async bulkDelete (docIds: string[]) {
+    const batch = this.firestore.batch()
+
+    docIds.forEach((docId) => {
+      batch.delete(this.collectionRef.doc(docId))
+    })
+    return batch.commit()
+  }
+
   public async fetchByQuery (query: Query) {
     const snapshot = await query.get()
     const arr: T[] = []
