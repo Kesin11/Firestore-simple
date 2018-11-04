@@ -1,6 +1,6 @@
 import test from 'ava'
-import { FirestoreSimpleV2 } from '../../src/v2'
-import { createRandomCollectionName, deleteCollection, initFirestore } from '../util'
+import { FirestoreSimpleV2 } from '../src/v2'
+import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
 
 interface Book {
   id: string,

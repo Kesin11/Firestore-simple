@@ -1,10 +1,16 @@
 import test from 'ava'
-import { FirestoreSimple } from '../src/index'
+import { FirestoreSimpleV2 } from '../src/v2'
 import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
+
+interface TestDoc {
+  id: string,
+  title: string,
+  url: string
+}
 
 const firestore = initFirestore()
 const collectionPath = createRandomCollectionName()
-const dao = new FirestoreSimple(firestore, collectionPath)
+const dao = new FirestoreSimpleV2<TestDoc>({ firestore, path: collectionPath })
 const existsDocId = 'test'
 const existsDoc = {
   title: 'title',
@@ -25,15 +31,15 @@ test.after.always(async (_t) => {
   await deleteCollection(firestore, collectionPath)
 })
 
-test('fetchDocument', async (t) => {
-  const doc = await dao.fetchDocument(existsDocId)
-  const expectDoc = Object.assign({}, existsDoc, { id: existsDocId })
+test('fetch', async (t) => {
+  const doc = await dao.fetch(existsDocId)
+  const expectDoc = { ...existsDoc, ...{ id: existsDocId } }
 
   t.deepEqual(doc, expectDoc)
 })
 
-test('fetchCollection', async (t) => {
-  const docs = await dao.fetchCollection()
+test('fetchAll', async (t) => {
+  const docs = await dao.fetchAll()
 
   t.true(docs.length >= 2)
 })
@@ -44,12 +50,13 @@ test('add', async (t) => {
     url: 'http://example.com/add',
   }
   const addedDoc = await dao.add(doc)
-  t.deepEqual(Object.assign({}, {
+  t.truthy(addedDoc.id)
+  t.deepEqual({...{
     title: addedDoc.title,
     url: addedDoc.url,
-  }), doc, 'return object')
+  }}, doc, 'return added object')
 
-  const fetchedDoc = await dao.fetchDocument(addedDoc.id)
+  const fetchedDoc = await dao.fetch(addedDoc.id)
   t.deepEqual(addedDoc, fetchedDoc, 'fetched object')
 })
 
@@ -66,7 +73,7 @@ test('set', async (t) => {
   const setedDoc = await dao.set(setDoc)
   t.deepEqual(setedDoc, setDoc, 'return object')
 
-  const fetchedDoc = await dao.fetchDocument(addedDoc.id)
+  const fetchedDoc = await dao.fetch(addedDoc.id)
   t.deepEqual(fetchedDoc, setDoc, 'fetched object')
 })
 
@@ -77,10 +84,11 @@ test('addOrSet', async (t) => {
     url: 'http://example.com/add',
   }
   const addedDoc = await dao.addOrSet(doc)
-  t.deepEqual(Object.assign({}, {
+  t.truthy(addedDoc.id)
+  t.deepEqual({...{
     title: addedDoc.title,
     url: addedDoc.url,
-  }), doc, 'return added object')
+  }}, doc, 'return added object')
 
   const fetchedAddDoc = await dao.fetchDocument(addedDoc.id)
   t.deepEqual(addedDoc, fetchedAddDoc, 'fetched added object')
