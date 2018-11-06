@@ -32,36 +32,38 @@ test.after.always(async (_t) => {
   await deleteCollection(firestore, collectionPath)
 })
 
-test.beforeEach(async (t) => {
+test('add with encode/decode', async (t) => {
   const doc = {
     bookTitle: 'add',
     created: now,
   }
-  const addedDoc = await dao.add(doc)
-  t.context.existId = addedDoc.id
-  t.context.existDoc = doc
-})
+  const addedBook = await dao.add(doc)
 
-test('add with encode/decode', async (t) => {
-  const fetchedDoc = await dao.fetch(t.context.existId)
+  const fetchedBook = await dao.fetch(addedBook.id)
   t.deepEqual(
-    fetchedDoc,
+    fetchedBook,
     {
-      id: t.context.existId,
-      bookTitle: t.context.existDoc.bookTitle,
-      created: t.context.existDoc.created,
+      id: addedBook.id,
+      bookTitle: doc.bookTitle,
+      created: doc.created,
     }, 'fetched object')
 })
 
 test('set with encode/decode', async (t) => {
+  const doc = {
+    book_title: 'exists_book',
+    created: now,
+  }
+  const docRef = await dao.collectionRef.add(doc)
+
   const title = 'set'
-  const setDoc = {
-    id: t.context.existId,
-    created: t.context.existDoc.created,
+  const setBook = {
+    id: docRef.id,
+    created: doc.created,
     bookTitle: title,
   }
-  await dao.set(setDoc)
+  await dao.set(setBook)
 
-  const fetchedDoc = await dao.fetch(setDoc.id)
-  t.deepEqual(fetchedDoc, setDoc, 'fetched object')
+  const fetchedBook = await dao.fetch(setBook.id)
+  t.deepEqual(fetchedBook, setBook, 'fetched object')
 })
