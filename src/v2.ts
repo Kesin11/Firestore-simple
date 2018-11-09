@@ -1,7 +1,9 @@
 import {
   CollectionReference,
+  DocumentSnapshot,
   Firestore,
   Query,
+  QuerySnapshot,
 } from '@google-cloud/firestore'
 import { Assign } from 'utility-types'
 
@@ -31,8 +33,8 @@ export class FirestoreSimpleV2<T extends HasId> {
     return doc as T
   }
 
-  public toObject (docId: string, docData: FirebaseFirestore.DocumentData): T {
-    const obj = { id: docId, ...docData }
+  public toObject (documentSnapshot: DocumentSnapshot): T {
+    const obj = { id: documentSnapshot.id, ...documentSnapshot.data() }
     return this.decode(obj)
   }
 
@@ -52,7 +54,7 @@ export class FirestoreSimpleV2<T extends HasId> {
     const snapshot = await this.collectionRef.doc(id).get()
     if (!snapshot.exists) throw new Error(`No document id: ${id}`)
 
-    return this.toObject(snapshot.id, snapshot.data() || {})
+    return this.toObject(snapshot)
   }
 
   // for v1 API compatibility
@@ -64,8 +66,8 @@ export class FirestoreSimpleV2<T extends HasId> {
     const snapshot = await this.collectionRef.get()
     const arr: T[] = []
 
-    snapshot.forEach((doc) => {
-      arr.push(this.toObject(doc.id, doc.data()))
+    snapshot.forEach((documentSnapshot) => {
+      arr.push(this.toObject(documentSnapshot))
     })
     return arr
   }
@@ -127,8 +129,8 @@ export class FirestoreSimpleV2<T extends HasId> {
     const snapshot = await query.get()
     const arr: T[] = []
 
-    snapshot.forEach((doc) => {
-      arr.push(this.toObject(doc.id, doc.data()))
+    snapshot.forEach((documentSnapshot) => {
+      arr.push(this.toObject(documentSnapshot))
     })
     return arr
   }
@@ -146,6 +148,15 @@ export class FirestoreSimpleV2<T extends HasId> {
   public limit (limit: number) {
     const query = new FirestoreSimpleQuery<T>({ firestoreSimple: this })
     return query.limit(limit)
+  }
+
+  public onSnapshot (callback: (
+    querySnapshot: QuerySnapshot,
+    toObject: (documentSnapshot: DocumentSnapshot) => T,
+    ) => void) {
+    return this.collectionRef.onSnapshot((_querySnapshot) => {
+      callback(_querySnapshot, this.toObject.bind(this))
+    })
   }
 }
 
@@ -188,5 +199,12 @@ class FirestoreSimpleQuery<T extends HasId> {
     if (this.query == null) throw new Error('no query statement before get()')
 
     return this.firestoreSimple.fetchByQuery(this.query)
+  }
+
+  public onSnapshot (callback: (
+    querySnapshot: QuerySnapshot,
+    toObject: (documentSnapshot: DocumentSnapshot) => T,
+    ) => void) {
+    return this.firestoreSimple.onSnapshot(callback)
   }
 }

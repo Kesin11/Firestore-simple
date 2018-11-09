@@ -13,7 +13,7 @@
     "build": "tsc --project .",
     "build:test": "tsc --project test",
     "ava": "ava",
-    "test": "npm run build:test && ava --verbose dist_test/test/*.test.js",
+    "test": "rm -rf dist_test && npm run build:test && ava --timeout=10s --verbose dist_test/test/*.test.js",
     "lint": "tslint src/**/*.ts test/**/*.ts",
     "lint:fix": "npm run lint -- --fix",
     "lint:project": "tslint -p ."
