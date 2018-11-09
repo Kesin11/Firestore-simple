@@ -31,11 +31,17 @@ test.after.always(async (_t) => {
   await deleteCollection(firestore, collectionPath)
 })
 
-test('fetch', async (t) => {
+test('fetch with exists document', async (t) => {
   const doc = await dao.fetch(existsDocId)
   const expectDoc = { ...existsDoc, ...{ id: existsDocId } }
 
   t.deepEqual(doc, expectDoc)
+})
+
+test('fetch with not exists document', async (t) => {
+  const doc = await dao.fetch('not_exists_document_id')
+
+  t.is(doc, undefined)
 })
 
 test('fetchAll', async (t) => {

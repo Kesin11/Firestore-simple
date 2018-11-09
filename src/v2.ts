@@ -50,15 +50,15 @@ export class FirestoreSimpleV2<T extends HasId> {
     return doc
   }
 
-  public async fetch (id: string): Promise <T> {
+  public async fetch (id: string): Promise <T | undefined> {
     const snapshot = await this.collectionRef.doc(id).get()
-    if (!snapshot.exists) throw new Error(`No document id: ${id}`)
+    if (!snapshot.exists) return undefined
 
     return this.toObject(snapshot)
   }
 
   // for v1 API compatibility
-  public async fetchDocument (id: string): Promise<T> {
+  public async fetchDocument (id: string): Promise<T | undefined> {
     return this.fetch(id)
   }
 
