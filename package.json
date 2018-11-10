@@ -13,14 +13,17 @@
     "build": "tsc --project .",
     "build:test": "tsc --project test",
     "ava": "ava",
-    "test": "rm -rf dist_test && npm run build:test && ava --timeout=10s --verbose dist_test/test/*.test.js",
+    "test": "rm -rf dist_test && npm run build:test && nyc ava --timeout=10s --verbose dist_test/test/*.test.js",
     "lint": "tslint src/**/*.ts test/**/*.ts",
     "lint:fix": "npm run lint -- --fix",
-    "lint:project": "tslint -p ."
+    "lint:project": "tslint -p .",
+    "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov"
   },
   "devDependencies": {
     "ava": "0.25.0",
+    "codecov": "3.1.0",
     "firebase-admin": "6.0.0",
+    "nyc": "13.1.0",
     "tslint": "5.11.0",
     "tslint-config-standard": "8.0.1"
   },
