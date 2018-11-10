@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "clean": "rm -rf dist dist_test",
-    "prepublish": "npm run clean && npm run build",
+    "prepare": "npm run clean && npm run build",
     "build": "tsc --project .",
     "build:test": "tsc --project test",
     "ava": "ava",
