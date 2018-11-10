@@ -3,120 +3,114 @@ import {
   DocumentSnapshot,
   Firestore,
   Query,
+  QuerySnapshot,
 } from '@google-cloud/firestore'
+import { Assign } from 'utility-types'
 
-export declare interface IMapping { [key: string]: string }
-export declare interface IDocData {
-  [extra: string]: any
-}
-export declare interface IDocObject {
-  id: string,
-  [extra: string]: any
-}
-// declare type DocObject = { id: string, [extra: string]: any}
+interface HasId { id: string, [prop: string]: any }
+interface NullableId { id?: string }
 
-export class FirestoreSimple {
+export class FirestoreSimple<T extends HasId> {
   public firestore: Firestore
   public collectionRef: CollectionReference
-  public toDocMapping: IMapping
-  public toObjectMapping: IMapping
+  public _encode?: (obj: T | Assign<T, NullableId>) => FirebaseFirestore.DocumentData
+  public _decode?: (doc: HasId) => T
 
-  // tslint:disable-next-line:no-shadowed-variable
-  constructor (firestore: Firestore, collectionPath: string, { mapping }: { mapping?: IMapping } = {}) {
-    this.firestore = firestore
-    this.collectionRef = this.firestore.collection(collectionPath)
-    this.toDocMapping = (mapping !== undefined) ? mapping : {}
-    this.toObjectMapping = FirestoreSimple._createSwapMapping(this.toDocMapping)
+  constructor ({ firestore, path, encode, decode }: {
+    firestore: Firestore,
+    path: string,
+    encode?: (obj: T | Assign<T, NullableId>) => FirebaseFirestore.DocumentData
+    decode?: (doc: HasId) => T,
+  }) {
+    this.firestore = firestore,
+    this.collectionRef = this.firestore.collection(path)
+    this._encode = encode
+    this._decode = decode
+  }
+  // for overwrite in subclass
+  public decode (doc: HasId): T {
+    if (this._decode) return this._decode(doc)
+    return doc as T
   }
 
-  public static _createSwapMapping (mapping: IMapping) {
-    const swapMap: IMapping = {}
-    Object.keys(mapping).forEach((key) => {
-      swapMap[mapping[key]] = key
-    })
-    return swapMap
+  public toObject (documentSnapshot: DocumentSnapshot): T {
+    const obj = { id: documentSnapshot.id, ...documentSnapshot.data() }
+    return this.decode(obj)
   }
 
-  public _toDoc (object: IDocObject | IDocData) {
-    const doc: IDocData = {}
-    Object.keys(object).forEach((key) => {
-      const toDocKey = this.toDocMapping[key] || key
-      doc[toDocKey] = object[key]
-    })
-    delete doc.id
+  // for overwrite in subclass
+  public encode (obj: T | Assign<T, NullableId>) {
+    if (this._encode) return this._encode(obj)
+    return Object.assign({}, obj)
+  }
+
+  public toDoc (obj: T | Assign<T, NullableId>) {
+    const doc = this.encode(obj)
+    if (doc.id) delete doc.id
     return doc
   }
 
-  public _toObject (docId: string, docData: IDocData) {
-    const object: IDocObject = { id: docId }
-    Object.keys(docData).forEach((key) => {
-      const toObjectKey = this.toObjectMapping[key] || key
-      object[toObjectKey] = docData[key]
-    })
-    return object
-  }
-
-  public async fetchCollection () {
-    const snapshot = await this.collectionRef.get()
-    const arr: IDocObject[] = []
-
-    snapshot.forEach((doc: DocumentSnapshot) => {
-      arr.push(this._toObject(doc.id, doc.data() || {}))
-    })
-    return arr
-  }
-
-  public async fetchByQuery (query: Query) {
-    const snapshot = await query.get()
-    const arr: IDocObject[] = []
-
-    snapshot.forEach((doc: DocumentSnapshot) => {
-      arr.push(this._toObject(doc.id, doc.data() || {}))
-    })
-    return arr
-  }
-
-  public async fetchDocument (id: string) {
+  public async fetch (id: string): Promise <T | undefined> {
     const snapshot = await this.collectionRef.doc(id).get()
-    if (!snapshot.exists) throw new Error(`No document id: ${id}`)
+    if (!snapshot.exists) return undefined
 
-    return this._toObject(snapshot.id, snapshot.data() || {})
+    return this.toObject(snapshot)
   }
 
-  public async add (object: IDocObject | IDocData): Promise<IDocObject> {
-    const doc = this._toDoc(object)
+  // for v1 API compatibility
+  public async fetchDocument (id: string): Promise<T | undefined> {
+    return this.fetch(id)
+  }
+
+  public async fetchAll (): Promise<T[]> {
+    const snapshot = await this.collectionRef.get()
+    const arr: T[] = []
+
+    snapshot.forEach((documentSnapshot) => {
+      arr.push(this.toObject(documentSnapshot))
+    })
+    return arr
+  }
+
+  // for v1 API compatibility
+  public async fetchCollection (): Promise<T[]> {
+    return this.fetchAll()
+  }
+
+  public async add (obj: Assign<T, NullableId>): Promise <T> {
+    const doc = this.toDoc(obj)
     const docRef = await this.collectionRef.add(doc)
-    return {
-      id: docRef.id,
-      ...object,
-    }
+    return Object.assign({}, obj, { id: docRef.id }) as unknown as T
   }
 
-  public async set (object: IDocObject) {
-    if (!object.id) throw new Error('Argument object must have "id" property')
+  public async set (obj: T) {
+    if (!obj.id) throw new Error('Argument object must have "id" property')
 
-    const docId = object.id
-    const setDoc = this._toDoc(object)
+    const docId = obj.id
+    const setDoc = this.toDoc(obj)
 
     await this.collectionRef.doc(docId).set(setDoc)
-    return object
+    return obj
   }
 
-  public async addOrSet (object: IDocObject | IDocData) {
-    return (!object.id) ? this.add(object) : this.set(object as IDocObject)
+  public addOrSet (obj: Assign<T, NullableId> | T) {
+    if ('id' in obj && typeof obj.id === 'string') {
+      return this.set(obj)
+    }
+    return this.add(obj as Assign<T, NullableId>)
   }
 
-  public async delete (docId: string) {
-    await this.collectionRef.doc(docId).delete()
-    return docId
+  public async delete (id: string) {
+    await this.collectionRef.doc(id).delete()
+    return id
   }
 
-  public async bulkSet (objects: IDocObject[]) {
+  public async bulkSet (objects: T[]) {
     const batch = this.firestore.batch()
 
-    objects.forEach((object) => {
-      const docId = object.id
-      const setDoc = this._toDoc(object)
+    objects.forEach((obj) => {
+      const docId = obj.id
+      const setDoc = this.toDoc(obj)
       batch.set(this.collectionRef.doc(docId), setDoc)
     })
     return batch.commit()
@@ -125,9 +119,92 @@ export class FirestoreSimple {
   public async bulkDelete (docIds: string[]) {
     const batch = this.firestore.batch()
 
-    docIds.forEach((docId: string) => {
+    docIds.forEach((docId) => {
       batch.delete(this.collectionRef.doc(docId))
     })
     return batch.commit()
+  }
+
+  public async fetchByQuery (query: Query) {
+    const snapshot = await query.get()
+    const arr: T[] = []
+
+    snapshot.forEach((documentSnapshot) => {
+      arr.push(this.toObject(documentSnapshot))
+    })
+    return arr
+  }
+
+  public where (fieldPath: string | FirebaseFirestore.FieldPath, opStr: FirebaseFirestore.WhereFilterOp, value: any) {
+    const query = new FirestoreSimpleQuery<T>({ firestoreSimple: this })
+    return query.where(fieldPath, opStr, value)
+  }
+
+  public orderBy (fieldPath: string | FirebaseFirestore.FieldPath, directionStr?: FirebaseFirestore.OrderByDirection) {
+    const query = new FirestoreSimpleQuery<T>({ firestoreSimple: this })
+    return query.orderBy(fieldPath, directionStr)
+  }
+
+  public limit (limit: number) {
+    const query = new FirestoreSimpleQuery<T>({ firestoreSimple: this })
+    return query.limit(limit)
+  }
+
+  public onSnapshot (callback: (
+    querySnapshot: QuerySnapshot,
+    toObject: (documentSnapshot: DocumentSnapshot) => T,
+    ) => void) {
+    return this.collectionRef.onSnapshot((_querySnapshot) => {
+      callback(_querySnapshot, this.toObject.bind(this))
+    })
+  }
+}
+
+class FirestoreSimpleQuery<T extends HasId> {
+  public firestoreSimple: FirestoreSimple<T>
+  public query?: Query
+  constructor ({ firestoreSimple }: { firestoreSimple: FirestoreSimple<T> }) {
+    this.firestoreSimple = firestoreSimple
+    this.query = undefined
+  }
+
+  public where (fieldPath: string | FirebaseFirestore.FieldPath, opStr: FirebaseFirestore.WhereFilterOp, value: any) {
+    if (!this.query) {
+      this.query = this.firestoreSimple.collectionRef.where(fieldPath, opStr, value)
+    } else {
+      this.query = this.query.where(fieldPath, opStr, value)
+    }
+    return this
+  }
+
+  public orderBy (fieldPath: string | FirebaseFirestore.FieldPath, directionStr?: FirebaseFirestore.OrderByDirection) {
+    if (!this.query) {
+      this.query = this.firestoreSimple.collectionRef.orderBy(fieldPath, directionStr)
+    } else {
+      this.query = this.query.orderBy(fieldPath, directionStr)
+    }
+    return this
+  }
+
+  public limit (limit: number) {
+    if (!this.query) {
+      this.query = this.firestoreSimple.collectionRef.limit(limit)
+    } else {
+      this.query = this.query.limit(limit)
+    }
+    return this
+  }
+
+  public async get () {
+    if (this.query == null) throw new Error('no query statement before get()')
+
+    return this.firestoreSimple.fetchByQuery(this.query)
+  }
+
+  public onSnapshot (callback: (
+    querySnapshot: QuerySnapshot,
+    toObject: (documentSnapshot: DocumentSnapshot) => T,
+    ) => void) {
+    return this.firestoreSimple.onSnapshot(callback)
   }
 }

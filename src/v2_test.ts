@@ -1,8 +1,8 @@
 import { Firestore } from '@google-cloud/firestore'
 import admin, { ServiceAccount } from 'firebase-admin'
 import { Assign } from 'utility-types'
+import { FirestoreSimple } from '.'
 import serviceAccount from '../firebase_secret.json'
-import { FirestoreSimpleV2 } from './v2'
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount as ServiceAccount),
@@ -17,7 +17,7 @@ interface User {
   createdAt: Date
 }
 const main = async () => {
-  const userDao = new FirestoreSimpleV2<User>({ firestore, path: 'user',
+  const userDao = new FirestoreSimple<User>({ firestore, path: 'user',
     encode: (user) => {
       return {
         name: user.name,
@@ -47,7 +47,7 @@ interface Book {
   name: string,
   ISBN: number
 }
-class BookDao extends FirestoreSimpleV2<Book> {
+class BookDao extends FirestoreSimple<Book> {
   constructor ({ firestore, path }: {firestore: Firestore, path: string}) {
     super({ firestore, path })
   }

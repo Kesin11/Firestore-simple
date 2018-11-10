@@ -1,6 +1,6 @@
 import admin, { ServiceAccount } from 'firebase-admin'
+import { FirestoreSimple } from '.'
 import serviceAccount from '../firebase_secret.json'
-import { FirestoreSimpleV2 } from './v2'
 
 interface User {
   id: string
@@ -15,7 +15,7 @@ admin.initializeApp({
 const firestore = admin.firestore()
 firestore.settings({ timestampsInSnapshots: true })
 
-const userDao = new FirestoreSimpleV2<User>({ firestore, path: 'user' })
+const userDao = new FirestoreSimple<User>({ firestore, path: 'user' })
 
 const docObserver = userDao.collectionRef.doc('1').onSnapshot((docSnapshot) => {
   console.log('Received doc snapshot: ', docSnapshot.data())

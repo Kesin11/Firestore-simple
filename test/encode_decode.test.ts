@@ -1,5 +1,5 @@
 import test from 'ava'
-import { FirestoreSimpleV2 } from '../src/v2'
+import { FirestoreSimple } from '../src'
 import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
 
 interface Book {
@@ -10,7 +10,7 @@ interface Book {
 
 const firestore = initFirestore()
 const collectionPath = createRandomCollectionName()
-const dao = new FirestoreSimpleV2<Book>({firestore, path: collectionPath,
+const dao = new FirestoreSimple<Book>({firestore, path: collectionPath,
   encode: (book) => {
     return {
       book_title: book.bookTitle,

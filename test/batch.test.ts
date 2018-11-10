@@ -1,5 +1,5 @@
 import test from 'ava'
-import { FirestoreSimpleV2 } from '../src/v2'
+import { FirestoreSimple } from '../src'
 import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
 
 interface TestDoc {
@@ -9,7 +9,7 @@ interface TestDoc {
 
 const firestore = initFirestore()
 const collectionPath = createRandomCollectionName()
-const dao = new FirestoreSimpleV2<TestDoc>({ firestore, path: collectionPath })
+const dao = new FirestoreSimple<TestDoc>({ firestore, path: collectionPath })
 
 // Delete all documents. (= delete collection)
 test.after.always(async (_t) => {

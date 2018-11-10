@@ -1,6 +1,6 @@
 import { Firestore } from '@google-cloud/firestore'
 import test from 'ava'
-import { FirestoreSimpleV2 } from '../src/v2'
+import { FirestoreSimple } from '../src'
 import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
 
 interface Book {
@@ -10,7 +10,7 @@ interface Book {
 }
 
 // class based dao
-class BookDao extends FirestoreSimpleV2<Book> {
+class BookDao extends FirestoreSimple<Book> {
   constructor ({ firestore, path }: {firestore: Firestore, path: string}) {
     super({ firestore, path })
   }
