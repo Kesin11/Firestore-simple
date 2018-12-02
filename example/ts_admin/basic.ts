@@ -12,96 +12,70 @@ interface User {
   id: string,
   name: string,
   age: number,
-  created: Date
 }
 
 const main = async () => {
   // declaration
-  const dao = new FirestoreSimple<User>({ firestore, path: 'example/ts_admin/user',
-    decode: (doc) => {
-      return {
-        id: doc.id,
-        name: doc.name,
-        age: doc.age,
-        created: doc.created.toDate(),
-      }
-    },
-  })
+  const dao = new FirestoreSimple<User>({ firestore, path: 'example/ts_admin/user' })
 
   // create
-  const user = await dao.add({ name: 'bob', age: 20, created: new Date() })
-  console.log('add', user)
-  const userId = user.id
+  const user: User = await dao.add({ name: 'bob', age: 20 })
+  console.log(user)
+  // { name: 'bob', age: 20, id: '3Y5jwT8pB4cMqS1n3maj' }
 
-  // single fetch
-  let bob = await dao.fetch(userId)
-  console.log('fetch', user)
+  // fetch
+  let bob: User | undefined = await dao.fetch(user.id)
+  console.log(bob)
+  // { id: '3Y5jwT8pB4cMqS1n3maj', age: 20, name: 'bob' }
   if (!bob) return
 
   // update
   bob.age = 30
   bob = await dao.set(bob)
 
-  // delete
-  const _deletedId = await dao.delete(bob.id)
-
   // add or set
-  let alice = await dao.addOrSet({ name: 'alice', age: 22, created: new Date() })
-  console.log('addOrSer', alice)
+  // same as 'add' when id is not given
+  let alice: User = await dao.addOrSet({ name: 'alice', age: 22 })
+  console.log(alice)
+  // { name: 'alice', age: 22, id: 'YdfB2rkXoid603nKRX65' }
+
   alice.age = 30
   alice = await dao.addOrSet(alice)
+  console.log(alice)
+  // { name: 'alice', age: 30, id: 'YdfB2rkXoid603nKRX65' }
+
+  // delete
+  const deletedId = await dao.delete(bob.id)
+  console.log(deletedId)
+  // 3Y5jwT8pB4cMqS1n3maj
+
+  await dao.delete(alice.id)
 
   // multi set
+  // `bulkSet` and `bulkDelete` are wrapper for WriteBatch
   const _bulkSetBatch = await dao.bulkSet([
-    { id: '1', name: 'foo', age: 1, created: new Date() },
-    { id: '2', name: 'bar', age: 2, created: new Date() },
+    { id: '1', name: 'foo', age: 1 },
+    { id: '2', name: 'bar', age: 2 },
   ])
 
   // multi fetch
-  const users = await dao.fetchAll()
-  console.log('fetchAll', users)
+  const users: User[] = await dao.fetchAll()
+  console.log(users)
+  // [
+  //   { id: '1', name: 'foo', age: 1 },
+  //   { id: '2', age: 2, name: 'bar' },
+  // ]
 
   // fetch by query
-  const _fetchedByQueryUser = await dao.where('age', '>=', '20')
+  const fetchedByQueryUser: User[] = await dao.where('age', '>=', 1)
                                 .orderBy('age')
                                 .limit(1)
                                 .get()
+  console.log(fetchedByQueryUser)
+  // [ { id: '1', name: 'foo', age: 1 } ]
 
   // multi delete
   const _deletedDocBatch = await dao.bulkDelete(users.map((user) => user.id))
-
-//   // convert before store to firestore
-//   const encode = (obj: User): {[props: string]: any} => {
-//     return {
-//       id: doc.id,
-//       name: doc.name,
-//       age: doc.age + 10, // fix value
-//       created_at: doc.created_at, // convert key name
-//     }
-//   })
-//   // convert after fetch from firestore
-//   const decode = (doc: {id: string, [prop: string]: any}): User => {
-//     return {
-//       id: doc.id,
-//       name: doc.name,
-//       age: doc.age - 10, // fix value
-//       createdAt: doc.created_at, // convert key name
-//     }
-//   })
-//   const dao = new FirestoreSimple<User>({ firestore, path: 'users', encode, decode })
-
-//   // doc or collection reference
-//   // decodeを活用してやってほしい。自動でネストを展開してしまうとネストが深いときによきせずメモリ食う可能性があるのであまり積極的にサポートしたくない
-
-//   // sub collection
-//   // 難しそう。docの要素とは別枠扱いなので、コンストラクタでネストさせればできそう？
-//   const dao = new FirestoreSimple<User>({firestore, path: 'users', subcollection: {
-//     books: new FirestoreSimple<Book>({ firestore, path: 'users/${id}/books' }),
-//   }})
-//   dao
-//     .find(1) // user
-//     .find(2) // book
-// }
 }
 
 main()
