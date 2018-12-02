@@ -10,7 +10,7 @@ It supports [Web](https://firebase.google.com/docs/reference/js/firebase.firesto
 Blog posts (sorry Japanese only)
 
 - [Firestoreをもっと手軽に使えるfirestore-simpleを作った](http://kesin.hatenablog.com/entry/2018/06/12/095020)
-- [http://kesin.hatenablog.com/entry/firestore_simple_v2](Firestoreをもっと手軽に使えるfirestore-simpleがバージョン2になりました)
+- [Firestoreをもっと手軽に使えるfirestore-simpleがバージョン2になりました](http://kesin.hatenablog.com/entry/firestore_simple_v2)
 
 # Introduction
 Firestore is very convenient data store for web/native client.
