@@ -1,14 +1,16 @@
 import { Firestore } from '@google-cloud/firestore'
 import crypto from 'crypto'
-import admin from 'firebase-admin'
+import admin, { ServiceAccount } from 'firebase-admin'
 // because this file path will be dist_test/test/util.js after tsc
-import serviceAccount from '../../firebase_secret.json'
+import serviceAccount from '../firebase_secret.json'
 
 export const initFirestore = () => {
   admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
+    credential: admin.credential.cert(serviceAccount as ServiceAccount),
   })
-  return admin.firestore()
+  const firestore = admin.firestore()
+  firestore.settings({ timestampsInSnapshots: true })
+  return firestore
 }
 
 export const deleteCollection = async (firestore: Firestore, collectionPath: string) => {

@@ -63,3 +63,6 @@ firebase_secret.json
 
 dist/
 dist_test/
+
+# codecov
+coverage.lcov

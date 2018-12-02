@@ -7,7 +7,10 @@
     "jsRules": {},
     "rules": {
         "object-literal-sort-keys": false,
-        "trailing-comma": [true, {"multiline": "always"}]
+        "trailing-comma": [true, {"multiline": "always"}],
+        "interface-name": false,
+        "no-shadowed-variable": false,
+        "max-classes-per-file": false
     },
     "rulesDirectory": []
 }

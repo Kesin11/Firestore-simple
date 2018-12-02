@@ -1,12 +1,15 @@
 import test from 'ava'
-import { FirestoreSimple } from '../src/index'
+import { FirestoreSimple } from '../src'
 import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
+
+interface TestDoc {
+  id: string,
+  title: string,
+}
 
 const firestore = initFirestore()
 const collectionPath = createRandomCollectionName()
-const dao = new FirestoreSimple(firestore, collectionPath, { mapping: {
-  bookTitle: 'book_title',
-}})
+const dao = new FirestoreSimple<TestDoc>({ firestore, path: collectionPath })
 
 // Delete all documents. (= delete collection)
 test.after.always(async (_t) => {
@@ -15,9 +18,9 @@ test.after.always(async (_t) => {
 
 test('bulkSet', async (t) => {
   const docs = [
-    { id: 'test1', bookTitle: 'aaa' },
-    { id: 'test2', bookTitle: 'bbb' },
-    { id: 'test3', bookTitle: 'ccc' },
+    { id: 'test1', title: 'aaa' },
+    { id: 'test2', title: 'bbb' },
+    { id: 'test3', title: 'ccc' },
   ]
   await dao.bulkSet(docs)
 
@@ -27,9 +30,9 @@ test('bulkSet', async (t) => {
 
 test('bulkDelete', async (t) => {
   const docs = [
-    { id: 'test1', bookTitle: 'aaa' },
-    { id: 'test2', bookTitle: 'bbb' },
-    { id: 'test3', bookTitle: 'ccc' },
+    { id: 'test1', title: 'aaa' },
+    { id: 'test2', title: 'bbb' },
+    { id: 'test3', title: 'ccc' },
   ]
   await dao.set(docs[0])
   await dao.set(docs[1])

@@ -9,8 +9,13 @@ node_js:
   - '8'
   - '9'
   - '10'
+  - '11'
+matrix:
+  allow_failures:
+    - node_js: '11'
 before_install:
   - openssl aes-256-cbc -K $encrypted_f5265da104af_key -iv $encrypted_f5265da104af_iv -in firebase_secret.json.enc -out firebase_secret.json -d
 script:
   - npm run lint
   - npm test
+after_success: npm run coverage
