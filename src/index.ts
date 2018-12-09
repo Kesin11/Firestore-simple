@@ -81,8 +81,12 @@ export class FirestoreSimpleCollection<T extends HasId> {
     return doc
   }
 
+  public docRef (id: string) {
+    return this.collectionRef.doc(id)
+  }
+
   public async fetch (id: string): Promise <T | undefined> {
-    const docRef = this.collectionRef.doc(id)
+    const docRef = this.docRef(id)
     const snapshot = (this.context.tx)
       ? await this.context.tx.get(docRef)
       : await docRef.get()
@@ -122,7 +126,7 @@ export class FirestoreSimpleCollection<T extends HasId> {
   public async set (obj: T) {
     if (!obj.id) throw new Error('Argument object must have "id" property')
 
-    const docRef = this.collectionRef.doc(obj.id)
+    const docRef = this.docRef(obj.id)
     const setDoc = this.toDoc(obj)
 
     if (this.context.tx) {
@@ -141,7 +145,7 @@ export class FirestoreSimpleCollection<T extends HasId> {
   }
 
   public async delete (id: string) {
-    const docRef = this.collectionRef.doc(id)
+    const docRef = this.docRef(id)
     if (this.context.tx) {
       await this.context.tx.delete(docRef)
     } else {
