@@ -9,6 +9,8 @@ import { Assign } from 'utility-types'
 
 interface HasId { id: string, [prop: string]: any }
 interface NullableId { id?: string }
+type Encodable<T extends HasId> = (obj: T | Assign<T, NullableId>) => FirebaseFirestore.DocumentData
+type Decodable<T> = (doc: HasId) => T
 
 interface Context {
   firestore: Firestore,
@@ -22,8 +24,8 @@ export class FirestoreSimple {
   }
   public collection<T extends HasId> ({ path, encode, decode }: {
     path: string,
-    encode?: (obj: T | Assign<T, NullableId>) => FirebaseFirestore.DocumentData,
-    decode?: (doc: HasId) => T,
+    encode?: Encodable<T>,
+    decode?: Decodable<T>,
   }) {
     return new FirestoreSimpleCollection<T>({
       context: this.context,
@@ -44,14 +46,14 @@ export class FirestoreSimple {
 export class FirestoreSimpleCollection<T extends HasId> {
   public context: Context
   public collectionRef: CollectionReference
-  public _encode?: (obj: T | Assign<T, NullableId>) => FirebaseFirestore.DocumentData
-  public _decode?: (doc: HasId) => T
+  public _encode?: Encodable<T>
+  public _decode?: Decodable<T>
 
   constructor ({ context, path, encode, decode }: {
     context: Context
     path: string,
-    encode?: (obj: T | Assign<T, NullableId>) => FirebaseFirestore.DocumentData
-    decode?: (doc: HasId) => T,
+    encode?: Encodable<T>,
+    decode?: Decodable<T>,
   }) {
     this.context = context
     this.collectionRef = context.firestore.collection(path)
