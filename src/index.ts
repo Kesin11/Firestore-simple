@@ -60,6 +60,23 @@ export class FirestoreSimpleCollection<T extends HasId> {
     this._encode = encode
     this._decode = decode
   }
+
+  public subCollection<U extends HasId> ({ parent, path, encode, decode }: {
+    parent: string,
+    path: string,
+    encode?: Encodable<U>,
+    decode?: Decodable<U>,
+  }) {
+    const parentDocRef = this.docRef(parent)
+    const subCollectionPath = parentDocRef.collection(path).path
+    return new FirestoreSimpleCollection<U>({
+      context: this.context,
+      path: subCollectionPath,
+      encode,
+      decode,
+    })
+  }
+
   // for overwrite in subclass
   public decode (doc: HasId): T {
     if (this._decode) return this._decode(doc)
