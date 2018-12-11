@@ -15,10 +15,17 @@ interface User {
 }
 
 interface UserFriend {
+  id: string,
   name: string,
   created: Date,
   ref: FirebaseFirestore.DocumentReference
 }
+
+// interface UserFriendLog {
+//   id: string
+//   event: 'coop' | 'battle'
+//   created: Date
+// }
 
 interface FriendRequest {
   id: string,
@@ -45,10 +52,10 @@ class FriendRequestUsecase {
   }
 
   // フレンド申請を出す
-  public async request (tx: FirebaseFirestore.Transaction, fromUserId: string, toUserId: string) {
+  public async request (fromUserId: string, toUserId: string) {
     // 相手が既にフレンドかどうかをチェック
-    const friend = await tx.get(this.userDao.docRef(fromUserId).collection('friends').doc(toUserId))
-    if (friend.exists) throw new Error('Already friends!!')
+    const friend = await this.userDao.subCollection<UserFriend>({ parent: fromUserId, path: 'friends' }).fetch(toUserId)
+    if (friend) throw new Error('Already friends!!')
 
     // 2ユーザーの順番に依存しないようなユニークなidを生成
     const requestId = [fromUserId, toUserId].sort().join('_')
@@ -72,18 +79,18 @@ class FriendRequestUsecase {
   }
 
   // 受理したときにトランザクションのステータスを変更してupdatedも更新、
-  public async accept (tx: FirebaseFirestore.Transaction, friendRequest: FriendRequest) {
+  public async accept (friendRequest: FriendRequest) {
     await this.friendRequestDao.set({ ...friendRequest, status: 'accepted', updated: new Date() })
 
     // お互いの/user/:userId/friends/にいつフレンドになったのかと、idを入れる
     const fromRef = this.userDao.docRef(friendRequest.from)
-    const fromUserFriend: UserFriend = { name: friendRequest.from, created: new Date(), ref: fromRef }
+    const fromUserFriend = { id: friendRequest.from, name: friendRequest.from, created: new Date(), ref: fromRef }
     const toRef = this.userDao.docRef(friendRequest.to)
-    const toUserFriend: UserFriend = { name: friendRequest.to, created: new Date(), ref: toRef }
+    const toUserFriend = { id: friendRequest.to, name: friendRequest.to, created: new Date(), ref: toRef }
 
     // fromのfriendにはto, toのfriendにはfromとお互いのフレンドリストに追加
-    await tx.set(fromRef.collection('friends').doc(toRef.id), toUserFriend)
-    await tx.set(toRef.collection('friends').doc(fromRef.id), fromUserFriend)
+    this.userDao.subCollection<UserFriend>({ parent: fromRef.id, path: 'friends' }).set(toUserFriend)
+    this.userDao.subCollection<UserFriend>({ parent: toRef.id, path: 'friends' }).set(fromUserFriend)
   }
 }
 
@@ -111,6 +118,34 @@ const main = async () => {
   await userDao.docRef('alice').collection('friends').doc('bob').delete()
   await userDao.docRef('bob').collection('friends').doc('alice').delete()
 
+  // 素直に作るパターン
+  // encode/decodeが必要なときに毎回作る必要があるのがいけていない
+  // が、実装は楽そうなのでまずはこれから作ってみようか
+  await userDao.subCollection<FriendRequest>({ parent: 'alice', path: 'friends' }).delete('bob')
+
+  // 最初にサブコレクションを定義しておくパターン
+  // 最初に作るのがダルいが、定義しておけばGenericsもencode/decodeも再度指定する必要がない
+  // const subcollectionDao = firestoreSimple.collection<User>({ path: 'user',
+  //   subCollection: {
+  //     friends: firestoreSimple.subCollection<Friends>({ path: 'friends',
+  //       // サブコレクションのネストもできるようにしておく必要がある
+  //       subCollection: {
+  //         logs: firestoreSimple.subCollection<UserFriendLog>({
+  //           path: 'logs',
+  //           decode: (doc) => {
+  //             return {
+  //               event: doc.event,
+  //               created: doc.created.toDate(),
+  //             }
+  //           },
+  //         }),
+  //       },
+  //     }),
+  //   },
+  // })
+  // subcollectionDao.subCollection.friends('alice').delete('bob')
+  // subcollectionDao.subCollection.friends('alice').subCollection.logs(1).delete('bob')
+
   // ここから開始
   const bob = await userDao.set({ id: 'bob', name: 'bob' })
   const alice = await userDao.set({ id: 'alice', name: 'alice' })
@@ -120,18 +155,18 @@ const main = async () => {
   // トランザクション処理中に他のトランザクションによってデータが更新されていた場合は、全ての処理が最初からやり直しになる
   // トランザクション内ではreadは必ずwriteより前に全て行っておく必要があり、write後にreadした場合はトランザクション失敗となる
   // batchはtransactionに似ているが、readに関して保証してくれないのでしっかり使い所を分ける必要がある
-  await firestoreSimple.runTransaction(async (tx) => {
-    await friendRequestUsecase.request(tx, bob.id, alice.id)
+  await firestoreSimple.runTransaction(async (_tx) => {
+    await friendRequestUsecase.request(bob.id, alice.id)
   })
   // トランザクション終了
 
   // 別のトランザクション開始
   // aliceがフレンド申請を確認する
-  await firestoreSimple.runTransaction(async (tx) => {
+  await firestoreSimple.runTransaction(async (_tx) => {
     const request = await friendRequestUsecase.getPendingRequest(alice.id)
     if (!request) return
 
-    await friendRequestUsecase.accept(tx, request)
+    await friendRequestUsecase.accept(request)
   })
   // トランザクション終了
 }
