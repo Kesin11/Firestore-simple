@@ -10,7 +10,8 @@ export interface TestDoc {
 
 const firestore = initFirestore()
 const collectionPath = createRandomCollectionName()
-const dao = new FirestoreSimple<TestDoc>({ firestore, path: collectionPath })
+const firestoreSimple = new FirestoreSimple(firestore)
+const dao = firestoreSimple.collection<TestDoc>({ path: collectionPath })
 
 test.before(async (_t) => {
   await dao.collectionRef.add({ title: 'aaa', order: 2 })
@@ -26,14 +27,14 @@ test.after.always(async (_t) => {
 
 test('where', async (t) => {
   const queryTitle = 'aaa'
-  const docs = await dao.where('title', '==', queryTitle).get()
+  const docs = await dao.where('title', '==', queryTitle).fetch()
 
   const actualTitles = docs.map((doc) => doc.title)
   t.deepEqual(actualTitles, [queryTitle, queryTitle], 'where =')
 })
 
 test('order by', async (t) => {
-  const docs = await dao.orderBy('order', 'desc').get()
+  const docs = await dao.orderBy('order', 'desc').fetch()
 
   const actualOrders = docs.map((doc) => doc.order)
   t.deepEqual(actualOrders, [4, 3, 2, 1], 'order by desc')
@@ -41,7 +42,7 @@ test('order by', async (t) => {
 
 test('limit', async (t) => {
   const limit = 1
-  const docs = await dao.limit(limit).get()
+  const docs = await dao.limit(limit).fetch()
 
   t.is(docs.length, limit)
 })
@@ -50,7 +51,7 @@ test('composition where + where', async (t) => {
   const docs = await dao
     .where('order', '>', 1)
     .where('order', '<', 4)
-    .get()
+    .fetch()
 
   const expectOrders = [2,3]
   const actualOrders = docs.map((doc) => doc.order)
@@ -64,7 +65,7 @@ test('composition where + limit', async (t) => {
   const docs = await dao
     .where('title', '==', queryTitle)
     .limit(limit)
-    .get()
+    .fetch()
 
   t.is(docs.length, limit, 'limit')
 
@@ -77,7 +78,7 @@ test('composition order + limit', async (t) => {
   const docs = await dao
     .orderBy('order')
     .limit(limit)
-    .get()
+    .fetch()
 
   t.is(docs.length, limit, 'limit')
 

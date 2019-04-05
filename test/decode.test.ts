@@ -9,7 +9,8 @@ interface Book {
 
 const firestore = initFirestore()
 const collectionPath = createRandomCollectionName()
-const dao = new FirestoreSimple<Book>({firestore, path: collectionPath,
+const firestoreSimple = new FirestoreSimple(firestore)
+const dao = firestoreSimple.collection<Book>({path: collectionPath,
   decode: (doc) => {
     return {
       id: doc.id,
@@ -39,6 +40,6 @@ test('where with decode', async (t) => {
     book_title: title,
   })
 
-  const fetchedDoc = await dao.where('book_title', '==', title).get()
+  const fetchedDoc = await dao.where('book_title', '==', title).fetch()
   t.deepEqual(fetchedDoc, [{ id: docRef.id, bookTitle: title }], 'fetched object')
 })

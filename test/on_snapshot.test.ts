@@ -10,7 +10,8 @@ interface Book {
 
 const firestore = initFirestore()
 const collectionPath = createRandomCollectionName()
-const dao = new FirestoreSimple<Book>({firestore, path: collectionPath,
+const firestoreSimple = new FirestoreSimple(firestore)
+const dao = firestoreSimple.collection<Book>({path: collectionPath,
   encode: (book) => {
     return {
       book_title: book.bookTitle,

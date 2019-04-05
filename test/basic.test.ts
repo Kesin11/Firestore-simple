@@ -10,7 +10,8 @@ interface TestDoc {
 
 const firestore = initFirestore()
 const collectionPath = createRandomCollectionName()
-const dao = new FirestoreSimple<TestDoc>({ firestore, path: collectionPath })
+const firestoreSimple = new FirestoreSimple(firestore)
+const dao = firestoreSimple.collection<TestDoc>({ path: collectionPath })
 const existsDocId = 'test'
 const existsDoc = {
   title: 'title',
