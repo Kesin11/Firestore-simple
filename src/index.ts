@@ -9,10 +9,10 @@ import { Assign } from 'utility-types'
 
 interface HasId { id: string, [prop: string]: any }
 interface NullableId { id?: string }
-type Encodable<T extends HasId> = (obj: T | Assign<T, NullableId>) => FirebaseFirestore.DocumentData
-type Decodable<T> = (doc: HasId) => T
+export type Encodable<T extends HasId> = (obj: T | Assign<T, NullableId>) => FirebaseFirestore.DocumentData
+export type Decodable<T> = (doc: HasId) => T
 
-interface Context {
+export interface Context {
   firestore: Firestore,
   tx?: FirebaseFirestore.Transaction
 }
@@ -34,6 +34,7 @@ export class FirestoreSimple {
       decode,
     })
   }
+
   public async runTransaction (updateFunction: (tx: FirebaseFirestore.Transaction) => Promise<any>) {
     await this.context.firestore.runTransaction(async (tx) => {
       this.context.tx = tx
@@ -59,22 +60,6 @@ export class FirestoreSimpleCollection<T extends HasId> {
     this.collectionRef = context.firestore.collection(path)
     this._encode = encode
     this._decode = decode
-  }
-
-  public subCollection<U extends HasId> ({ parent, path, encode, decode }: {
-    parent: string,
-    path: string,
-    encode?: Encodable<U>,
-    decode?: Decodable<U>,
-  }) {
-    const parentDocRef = this.docRef(parent)
-    const subCollectionPath = parentDocRef.collection(path).path
-    return new FirestoreSimpleCollection<U>({
-      context: this.context,
-      path: subCollectionPath,
-      encode,
-      decode,
-    })
   }
 
   // for overwrite in subclass

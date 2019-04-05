@@ -1,7 +1,6 @@
-import { Firestore } from '@google-cloud/firestore'
 import admin, { ServiceAccount } from 'firebase-admin'
 import serviceAccount from '../firebase_secret.json' // your firebase secret json
-import { FirestoreSimple, FirestoreSimpleCollection } from './'
+import { FirestoreSimple, FirestoreSimpleCollection } from '../src'
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount as ServiceAccount),
@@ -21,12 +20,6 @@ interface UserFriend {
   ref: FirebaseFirestore.DocumentReference
 }
 
-// interface UserFriendLog {
-//   id: string
-//   event: 'coop' | 'battle'
-//   created: Date
-// }
-
 interface FriendRequest {
   id: string,
   from: string,
@@ -37,24 +30,25 @@ interface FriendRequest {
 }
 
 class FriendRequestUsecase {
+  public firestoreSimple: FirestoreSimple
   public userDao: FirestoreSimpleCollection<User>
   public friendRequestDao: FirestoreSimpleCollection<FriendRequest>
-  public firestore: Firestore
 
-  constructor ({ userDao, friendRequestDao, firestore }: {
-    userDao: FirestoreSimpleCollection<User>,
+  constructor ({ firestoreSimple, userDao, friendRequestDao }: {
+    firestoreSimple: FirestoreSimple,
+    userDao: FirestoreSimpleCollection<User>
     friendRequestDao: FirestoreSimpleCollection<FriendRequest>,
-    firestore: Firestore,
   }) {
+    this.firestoreSimple = firestoreSimple
     this.userDao = userDao
     this.friendRequestDao = friendRequestDao
-    this.firestore = firestore
   }
 
   // フレンド申請を出す
   public async request (fromUserId: string, toUserId: string) {
     // 相手が既にフレンドかどうかをチェック
-    const friend = await this.userDao.subCollection<UserFriend>({ parent: fromUserId, path: 'friends' }).fetch(toUserId)
+    const friendDao = this.firestoreSimple.collection<UserFriend>({ path: `user/${fromUserId}/friends`})
+    const friend = await friendDao.fetch(toUserId)
     if (friend) throw new Error('Already friends!!')
 
     // 2ユーザーの順番に依存しないようなユニークなidを生成
@@ -89,25 +83,16 @@ class FriendRequestUsecase {
     const toUserFriend = { id: friendRequest.to, name: friendRequest.to, created: new Date(), ref: toRef }
 
     // fromのfriendにはto, toのfriendにはfromとお互いのフレンドリストに追加
-    this.userDao.subCollection<UserFriend>({ parent: fromRef.id, path: 'friends' }).set(toUserFriend)
-    this.userDao.subCollection<UserFriend>({ parent: toRef.id, path: 'friends' }).set(fromUserFriend)
+    const toUserFriendDao = this.firestoreSimple.collection<UserFriend>({ path: `user/${toUserFriend}/friends`})
+    const fromUserFriendDao = this.firestoreSimple.collection<UserFriend>({ path: `user/${fromUserFriend}/friends`})
+    await fromUserFriendDao.set(toUserFriend)
+    await toUserFriendDao.set(fromUserFriend)
   }
 }
 
-// クラスベースの場合は外からfirestoreSimpleのインスタンスをもらう
-// 継承するクラスは、firestoreSimple.collection<User>が返すインスタンスのクラスである
-// class SubClass extends FirestoreSimpleCollection<User> {
-//   constructor (firestoreSimple) {
-//     super({ firestoreSimple, path: 'user' })
-//   }
-
-//   public encode () { }
-//   public decode () { }
-// }
-
 const main = async () => {
   const firestoreSimple = new FirestoreSimple(firestore)
-  const userDao = firestoreSimple.collection<User>({ path: 'user' })
+  const userDao = firestoreSimple.collection<User>({ path: 'user'})
   const friendRequestDao = firestoreSimple.collection<FriendRequest>({ path: 'request_friend' })
 
   // 前回の結果を初期化
@@ -118,39 +103,11 @@ const main = async () => {
   await userDao.docRef('alice').collection('friends').doc('bob').delete()
   await userDao.docRef('bob').collection('friends').doc('alice').delete()
 
-  // 素直に作るパターン
-  // encode/decodeが必要なときに毎回作る必要があるのがいけていない
-  // が、実装は楽そうなのでまずはこれから作ってみようか
-  await userDao.subCollection<FriendRequest>({ parent: 'alice', path: 'friends' }).delete('bob')
-
-  // 最初にサブコレクションを定義しておくパターン
-  // 最初に作るのがダルいが、定義しておけばGenericsもencode/decodeも再度指定する必要がない
-  // const subcollectionDao = firestoreSimple.collection<User>({ path: 'user',
-  //   subCollection: {
-  //     friends: firestoreSimple.subCollection<Friends>({ path: 'friends',
-  //       // サブコレクションのネストもできるようにしておく必要がある
-  //       subCollection: {
-  //         logs: firestoreSimple.subCollection<UserFriendLog>({
-  //           path: 'logs',
-  //           decode: (doc) => {
-  //             return {
-  //               event: doc.event,
-  //               created: doc.created.toDate(),
-  //             }
-  //           },
-  //         }),
-  //       },
-  //     }),
-  //   },
-  // })
-  // subcollectionDao.subCollection.friends('alice').delete('bob')
-  // subcollectionDao.subCollection.friends('alice').subCollection.logs(1).delete('bob')
-
   // ここから開始
   const bob = await userDao.set({ id: 'bob', name: 'bob' })
   const alice = await userDao.set({ id: 'alice', name: 'alice' })
 
-  const friendRequestUsecase = new FriendRequestUsecase({ userDao, friendRequestDao, firestore })
+  const friendRequestUsecase = new FriendRequestUsecase({ firestoreSimple, userDao, friendRequestDao })
   // トランザクション開始
   // トランザクション処理中に他のトランザクションによってデータが更新されていた場合は、全ての処理が最初からやり直しになる
   // トランザクション内ではreadは必ずwriteより前に全て行っておく必要があり、write後にreadした場合はトランザクション失敗となる
