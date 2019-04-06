@@ -41,7 +41,7 @@ test.serial('observe add change', async (t) => {
 
   const promise = new Promise((resolve) => {
     dao.onSnapshot((querySnapshot, toObject) => {
-      querySnapshot.docChanges.forEach((change) => {
+      querySnapshot.docChanges().forEach((change) => {
         if (change.type === 'added') {
           const changedDoc = toObject(change.doc)
 
@@ -61,7 +61,7 @@ test.serial('observe add change', async (t) => {
 test.serial.skip('observe set change', async (t) => {
   const promise = new Promise((resolve) => {
     dao.onSnapshot((querySnapshot, toObject) => {
-      querySnapshot.docChanges.forEach((change) => {
+      querySnapshot.docChanges().forEach((change) => {
         if (change.type === 'modified') {
           const changedDoc = toObject(change.doc)
 
@@ -91,7 +91,7 @@ test.serial.skip('observe set change', async (t) => {
 test.serial.skip('observe delete change', async (t) => {
   const promise = new Promise((resolve) => {
     dao.onSnapshot((querySnapshot, toObject) => {
-      querySnapshot.docChanges.forEach((change) => {
+      querySnapshot.docChanges().forEach((change) => {
         if (change.type === 'removed') {
           const changedDoc = toObject(change.doc)
 
@@ -123,7 +123,7 @@ test.serial('observe add change with query', async (t) => {
   const promise = new Promise((resolve) => {
     dao.where('book_title', '==', 'add')
       .onSnapshot((querySnapshot, toObject) => {
-        querySnapshot.docChanges.forEach((change) => {
+        querySnapshot.docChanges().forEach((change) => {
           if (change.type === 'added') {
             const changedDoc = toObject(change.doc)
 
