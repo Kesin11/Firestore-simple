@@ -143,7 +143,7 @@ export class FirestoreSimpleCollection<T extends HasId> {
 
   public addOrSet (obj: Assign<T, NullableId> | T) {
     if ('id' in obj && typeof obj.id === 'string') {
-      return this.set(obj)
+      return this.set(obj as T)
     }
     return this.add(obj as Assign<T, NullableId>)
   }
