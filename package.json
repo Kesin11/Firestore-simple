@@ -13,7 +13,7 @@
     "build": "tsc --project .",
     "build:test": "tsc --project test",
     "ava": "ava",
-    "test": "rm -rf dist_test && npm run build:test && nyc ava --timeout=10s --verbose dist_test/test/*.test.js",
+    "test": "jest",
     "lint": "tslint src/**/*.ts test/**/*.ts",
     "lint:fix": "npm run lint -- --fix",
     "lint:project": "tslint -p .",
@@ -42,6 +42,9 @@
   },
   "homepage": "https://github.com/Kesin11/Firestore-simple#readme",
   "dependencies": {
+    "@types/jest": "24.0.11",
+    "jest": "24.7.1",
+    "ts-jest": "24.0.2",
     "typescript": "3.4.2",
     "utility-types": "3.5.0"
   }
