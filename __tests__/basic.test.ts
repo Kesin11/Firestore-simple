@@ -10,9 +10,9 @@ interface TestDoc {
 const firestore = initFirestore()
 const collectionPath = createRandomCollectionName()
 const firestoreSimple = new FirestoreSimple(firestore)
-const dao = firestoreSimple.collection<TestDoc>({ path: collectionPath })
 
 describe('Basic', () => {
+  const dao = firestoreSimple.collection<TestDoc>({ path: collectionPath })
   const existsDocId = 'test'
   const existsDoc = {
     title: 'title',
@@ -28,7 +28,7 @@ describe('Basic', () => {
   })
 
   // Delete all documents. (= delete collection)
-  afterAll(async () => {
+  afterEach(async () => {
     await deleteCollection(firestore, collectionPath)
   })
 
@@ -88,7 +88,7 @@ describe('Basic', () => {
     expect(fetchedDoc).toEqual(setDoc)
   })
 
-  describe('addOrSet', async () => {
+  describe('addOrSet', () => {
     it('add', async () => {
       const doc = {
         title: 'add',
