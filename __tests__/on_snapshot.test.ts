@@ -40,94 +40,80 @@ describe('on_snapshot test', () => {
     await deleteCollection(firestore, collectionPath)
   })
 
-  it('observe add change', (done) => {
+  it('observe add change', async () => {
     const doc = {
       bookTitle: 'add',
       created: new Date(),
     }
 
-    dao.onSnapshot((querySnapshot, toObject) => {
-      querySnapshot.docChanges().forEach((change) => {
-        if (change.type === 'added' && change.doc.data().book_title === doc.bookTitle) {
-          const changedDoc = toObject(change.doc)
+    const promise = new Promise((resolve) => {
+      dao.onSnapshot((querySnapshot, toObject) => {
+        querySnapshot.docChanges().forEach((change) => {
+          if (change.type === 'added' && change.doc.data().book_title === doc.bookTitle) {
+            const changedDoc = toObject(change.doc)
 
-          expect(changedDoc).toEqual({
-            ...doc,
-            id: expect.anything()
-          })
-          done()
-        }
+            expect(changedDoc).toEqual({
+              ...doc,
+              id: expect.anything()
+            })
+            resolve()
+          }
+        })
       })
     })
 
-    dao.add(doc)
+    await new Promise((resolve) => setTimeout(resolve, 100)) // for async stability
+    await dao.add(doc)
+    await promise
   })
 
-  it('observe set changes', (done) => {
+  it('observe set changes', async () => {
     const doc = {
       ...existsDoc!,
       bookTitle: 'set'
     }
 
-    dao.onSnapshot((querySnapshot, toObject) => {
-      querySnapshot.docChanges().forEach((change) => {
-        if (change.type === 'modified') {
-          const changedDoc = toObject(change.doc)
+    const promise = new Promise((resolve) => {
+      dao.onSnapshot((querySnapshot, toObject) => {
+        querySnapshot.docChanges().forEach((change) => {
+          if (change.type === 'modified') {
+            const changedDoc = toObject(change.doc)
 
-          expect(changedDoc).toEqual(doc)
-          done()
-        }
+            expect(changedDoc).toEqual(doc)
+            resolve()
+          }
+        })
       })
     })
 
-    dao.set(doc)
+    await new Promise((resolve) => setTimeout(resolve, 100)) // for async stability
+    await dao.set(doc)
+    await promise
   })
 
-  it('observe delete change', (done) => {
-    dao.onSnapshot((querySnapshot, toObject) => {
-      querySnapshot.docChanges().forEach((change) => {
-        if (change.type === 'removed') {
-          const changedDoc = toObject(change.doc)
+  it('observe delete change', async () => {
+    // prepare specific doc for delete onSnapshot()
+    // because onSnapshot() also triggerd deleteCollection() events and it will be confilict.
+    const deletedDoc = await dao.add({
+      bookTitle: 'deleted',
+      created: new Date(),
+    })
 
-          expect(changedDoc).toEqual(existsDoc)
-          done()
-        }
+    const promise = new Promise((resolve) => {
+      dao.onSnapshot((querySnapshot, toObject) => {
+        querySnapshot.docChanges().forEach((change) => {
+          if (change.type === 'removed' && change.doc.data().book_title === deletedDoc.bookTitle) {
+            const changedDoc = toObject(change.doc)
+
+            expect(changedDoc).toEqual(deletedDoc)
+            resolve()
+          }
+        })
       })
     })
 
-    dao.delete(existsDoc.id)
+    await new Promise((resolve) => setTimeout(resolve, 100)) // for async stability
+    await dao.delete(deletedDoc.id)
+    await promise
   })
-
-  // it('observe add change with query', (done) => {
-  //   const addedDoc = {
-  //     bookTitle: 'add_query',
-  //     created: new Date()
-  //   }
-
-  //   firestore.collection(collectionPath).where('book_title', '==', addedDoc.bookTitle)
-  //     .onSnapshot((querySnapshot) => {
-  //       querySnapshot.docChanges().forEach((change) => {
-  //         if (change.type === 'added') {
-  //           expect(change.doc.data()).toEqual(addedDoc)
-  //           done()
-  //         }
-  //       })
-  //     })
-    // dao.where('book_title', '==', addedDoc.bookTitle)
-    //   .onSnapshot((querySnapshot, toObject) => {
-    //     querySnapshot.docChanges().forEach((change) => {
-    //       if (change.type === 'added') {
-    //         const changedDoc = toObject(change.doc)
-
-    //         expect(changedDoc).toEqual({
-    //           ...addedDoc,
-    //           id: expect.anything(),
-    //         })
-    //         done()
-    //       }
-    //     })
-    //   })
-
-  //   dao.add(addedDoc)
-  // })
 })
