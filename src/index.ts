@@ -191,17 +191,17 @@ export class FirestoreSimpleCollection<T extends HasId> {
   }
 
   public where (fieldPath: string | FirebaseFirestore.FieldPath, opStr: FirebaseFirestore.WhereFilterOp, value: any) {
-    const query = new FirestoreSimpleQuery<T>({ firestoreSimple: this })
+    const query = new FirestoreSimpleQuery<T>(this)
     return query.where(fieldPath, opStr, value)
   }
 
   public orderBy (fieldPath: string | FirebaseFirestore.FieldPath, directionStr?: FirebaseFirestore.OrderByDirection) {
-    const query = new FirestoreSimpleQuery<T>({ firestoreSimple: this })
+    const query = new FirestoreSimpleQuery<T>(this)
     return query.orderBy(fieldPath, directionStr)
   }
 
   public limit (limit: number) {
-    const query = new FirestoreSimpleQuery<T>({ firestoreSimple: this })
+    const query = new FirestoreSimpleQuery<T>(this)
     return query.limit(limit)
   }
 
@@ -216,16 +216,12 @@ export class FirestoreSimpleCollection<T extends HasId> {
 }
 
 class FirestoreSimpleQuery<T extends HasId> {
-  public firestoreSimple: FirestoreSimpleCollection<T>
-  public query?: Query
-  constructor ({ firestoreSimple }: { firestoreSimple: FirestoreSimpleCollection<T> }) {
-    this.firestoreSimple = firestoreSimple
-    this.query = undefined
-  }
+  public query?: Query = undefined
+  constructor (public collection: FirestoreSimpleCollection<T>) { }
 
   public where (fieldPath: string | FirebaseFirestore.FieldPath, opStr: FirebaseFirestore.WhereFilterOp, value: any) {
     if (!this.query) {
-      this.query = this.firestoreSimple.collectionRef.where(fieldPath, opStr, value)
+      this.query = this.collection.collectionRef.where(fieldPath, opStr, value)
     } else {
       this.query = this.query.where(fieldPath, opStr, value)
     }
@@ -234,7 +230,7 @@ class FirestoreSimpleQuery<T extends HasId> {
 
   public orderBy (fieldPath: string | FirebaseFirestore.FieldPath, directionStr?: FirebaseFirestore.OrderByDirection) {
     if (!this.query) {
-      this.query = this.firestoreSimple.collectionRef.orderBy(fieldPath, directionStr)
+      this.query = this.collection.collectionRef.orderBy(fieldPath, directionStr)
     } else {
       this.query = this.query.orderBy(fieldPath, directionStr)
     }
@@ -243,7 +239,7 @@ class FirestoreSimpleQuery<T extends HasId> {
 
   public limit (limit: number) {
     if (!this.query) {
-      this.query = this.firestoreSimple.collectionRef.limit(limit)
+      this.query = this.collection.collectionRef.limit(limit)
     } else {
       this.query = this.query.limit(limit)
     }
@@ -251,18 +247,18 @@ class FirestoreSimpleQuery<T extends HasId> {
   }
 
   public async fetch () {
-    if (this.query == null) throw new Error('no query statement before fetch()')
+    if (!this.query) throw new Error('no query statement before fetch()')
 
-    return this.firestoreSimple.fetchByQuery(this.query)
+    return this.collection.fetchByQuery(this.query)
   }
 
   public onSnapshot (callback: (
     querySnapshot: QuerySnapshot,
     toObject: (documentSnapshot: DocumentSnapshot) => T,
     ) => void) {
-    if (!this.query) return
+    if (!this.query) throw new Error('no query statement before onSnapshot()')
     return this.query.onSnapshot((_querySnapshot) => {
-      callback(_querySnapshot, this.firestoreSimple.toObject.bind(this.firestoreSimple))
+      callback(_querySnapshot, this.collection.toObject.bind(this.collection))
     })
   }
 }
