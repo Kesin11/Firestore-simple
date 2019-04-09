@@ -260,6 +260,9 @@ class FirestoreSimpleQuery<T extends HasId> {
     querySnapshot: QuerySnapshot,
     toObject: (documentSnapshot: DocumentSnapshot) => T,
     ) => void) {
-    return this.firestoreSimple.onSnapshot(callback)
+    if (!this.query) return
+    return this.query.onSnapshot((_querySnapshot) => {
+      callback(_querySnapshot, this.firestoreSimple.toObject.bind(this.firestoreSimple))
+    })
   }
 }
