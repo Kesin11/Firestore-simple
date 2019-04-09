@@ -8,11 +8,10 @@
     "dist/"
   ],
   "scripts": {
-    "clean": "rm -rf dist dist_test",
+    "clean": "rm -rf dist",
     "prepare": "npm run clean && npm run build",
     "build": "tsc --project .",
     "build:test": "tsc --project test",
-    "ava": "ava",
     "test": "jest",
     "lint": "tslint src/**/*.ts test/**/*.ts",
     "lint:fix": "npm run lint -- --fix",
@@ -20,7 +19,6 @@
     "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov"
   },
   "devDependencies": {
-    "ava": "1.4.1",
     "codecov": "3.3.0",
     "firebase-admin": "7.2.0",
     "nyc": "13.3.0",

@@ -1,7 +1,6 @@
 import { Firestore } from '@google-cloud/firestore'
 import crypto from 'crypto'
 import admin, { ServiceAccount } from 'firebase-admin'
-// because this file path will be dist_test/test/util.js after tsc
 import serviceAccount from '../firebase_secret.json'
 
 export const initFirestore = () => {
