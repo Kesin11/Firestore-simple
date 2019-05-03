@@ -27,9 +27,20 @@ export class FirestoreSimple {
     encode?: Encodable<T>,
     decode?: Decodable<T>,
   }) {
-    return new FirestoreSimpleCollection<T>({
+    const factory = new FirestoreSimpleCollectionFactory<T>({
       context: this.context,
-      path,
+      encode,
+      decode,
+    })
+    return factory.create(path)
+  }
+
+  public collectionFactory<T extends HasId> ({ encode, decode }: {
+    encode?: Encodable<T>,
+    decode?: Decodable<T>,
+  }) {
+    return new FirestoreSimpleCollectionFactory<T>({
+      context: this.context,
       encode,
       decode,
     })
@@ -41,6 +52,31 @@ export class FirestoreSimple {
       await updateFunction(tx)
     })
     this.context.tx = undefined
+  }
+}
+
+class FirestoreSimpleCollectionFactory<T extends HasId> {
+  public context: Context
+  public _encode?: Encodable<T>
+  public _decode?: Decodable<T>
+
+  constructor ({ context, encode, decode }: {
+    context: Context
+    encode?: Encodable<T>,
+    decode?: Decodable<T>,
+  }) {
+    this.context = context
+    this._encode = encode
+    this._decode = decode
+  }
+
+  public create (path: string) {
+    return new FirestoreSimpleCollection<T>({
+      context: this.context,
+      path,
+      encode: this._encode,
+      decode: this._decode,
+    })
   }
 }
 
