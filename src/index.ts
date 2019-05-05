@@ -7,10 +7,11 @@ import {
 } from '@google-cloud/firestore'
 import { Assign } from 'utility-types'
 
-interface HasId { id: string, [prop: string]: any }
-interface NullableId { id?: string }
+type HasId = { id: string }
+type HasIdObject = { id: string, [key: string]: any }
+type NullableId = { id?: string }
 export type Encodable<T extends HasId> = (obj: T | Assign<T, NullableId>) => FirebaseFirestore.DocumentData
-export type Decodable<T> = (doc: HasId) => T
+export type Decodable<T> = (doc: HasIdObject) => T
 
 interface Context {
   firestore: Firestore,
@@ -98,7 +99,7 @@ export class FirestoreSimpleCollection<T extends HasId> {
     this.decode = decode
   }
 
-  private _decode (doc: HasId): T {
+  private _decode (doc: HasIdObject): T {
     if (this.decode) return this.decode(doc)
     return doc as T
   }
