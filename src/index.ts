@@ -57,8 +57,8 @@ export class FirestoreSimple {
 
 class CollectionFactory<T extends HasId> {
   public context: Context
-  public _encode?: Encodable<T>
-  public _decode?: Decodable<T>
+  public encode?: Encodable<T>
+  public decode?: Decodable<T>
 
   constructor ({ context, encode, decode }: {
     context: Context
@@ -66,16 +66,16 @@ class CollectionFactory<T extends HasId> {
     decode?: Decodable<T>,
   }) {
     this.context = context
-    this._encode = encode
-    this._decode = decode
+    this.encode = encode
+    this.decode = decode
   }
 
   public create (path: string) {
     return new FirestoreSimpleCollection<T>({
       context: this.context,
       path,
-      encode: this._encode,
-      decode: this._decode,
+      encode: this.encode,
+      decode: this.decode,
     })
   }
 }
@@ -83,8 +83,8 @@ class CollectionFactory<T extends HasId> {
 export class FirestoreSimpleCollection<T extends HasId> {
   public context: Context
   public collectionRef: CollectionReference
-  public _encode?: Encodable<T>
-  public _decode?: Decodable<T>
+  public encode?: Encodable<T>
+  public decode?: Decodable<T>
 
   constructor ({ context, path, encode, decode }: {
     context: Context
@@ -94,29 +94,27 @@ export class FirestoreSimpleCollection<T extends HasId> {
   }) {
     this.context = context
     this.collectionRef = context.firestore.collection(path)
-    this._encode = encode
-    this._decode = decode
+    this.encode = encode
+    this.decode = decode
   }
 
-  // for overwrite in subclass
-  public decode (doc: HasId): T {
-    if (this._decode) return this._decode(doc)
+  private _decode (doc: HasId): T {
+    if (this.decode) return this.decode(doc)
     return doc as T
+  }
+
+  private _encode (obj: T | Assign<T, NullableId>) {
+    if (this.encode) return this.encode(obj)
+    return Object.assign({}, obj)
   }
 
   public toObject (documentSnapshot: DocumentSnapshot): T {
     const obj = { id: documentSnapshot.id, ...documentSnapshot.data() }
-    return this.decode(obj)
-  }
-
-  // for overwrite in subclass
-  public encode (obj: T | Assign<T, NullableId>) {
-    if (this._encode) return this._encode(obj)
-    return Object.assign({}, obj)
+    return this._decode(obj)
   }
 
   public toDoc (obj: T | Assign<T, NullableId>) {
-    const doc = this.encode(obj)
+    const doc = this._encode(obj)
     if (doc.id) delete doc.id
     return doc
   }

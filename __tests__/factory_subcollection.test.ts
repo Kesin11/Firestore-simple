@@ -38,7 +38,7 @@ describe('Factory and Subcollection', () => {
         encode: encodeFunc,
       })
 
-      expect(factory._encode).toBe(encodeFunc)
+      expect(factory.encode).toBe(encodeFunc)
     })
 
     it('should has same decode function', async () => {
@@ -46,7 +46,7 @@ describe('Factory and Subcollection', () => {
         decode: decodeFunc,
       })
 
-      expect(factory._decode).toBe(decodeFunc)
+      expect(factory.decode).toBe(decodeFunc)
     })
   })
 
@@ -75,11 +75,11 @@ describe('Factory and Subcollection', () => {
     })
 
     it('should has same encode function', async () => {
-      expect(dao._encode).toBe(encodeFunc)
+      expect(dao.encode).toBe(encodeFunc)
     })
 
     it('should has same decode function', async () => {
-      expect(dao._decode).toBe(decodeFunc)
+      expect(dao.decode).toBe(decodeFunc)
     })
 
     it('set with encode/decode by created dao', async () => {
