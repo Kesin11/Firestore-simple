@@ -12,7 +12,7 @@ interface NullableId { id?: string }
 export type Encodable<T extends HasId> = (obj: T | Assign<T, NullableId>) => FirebaseFirestore.DocumentData
 export type Decodable<T> = (doc: HasId) => T
 
-export interface Context {
+interface Context {
   firestore: Firestore,
   tx?: FirebaseFirestore.Transaction
 }
@@ -27,7 +27,7 @@ export class FirestoreSimple {
     encode?: Encodable<T>,
     decode?: Decodable<T>,
   }) {
-    const factory = new FirestoreSimpleCollectionFactory<T>({
+    const factory = new CollectionFactory<T>({
       context: this.context,
       encode,
       decode,
@@ -39,7 +39,7 @@ export class FirestoreSimple {
     encode?: Encodable<T>,
     decode?: Decodable<T>,
   }) {
-    return new FirestoreSimpleCollectionFactory<T>({
+    return new CollectionFactory<T>({
       context: this.context,
       encode,
       decode,
@@ -55,7 +55,7 @@ export class FirestoreSimple {
   }
 }
 
-class FirestoreSimpleCollectionFactory<T extends HasId> {
+class CollectionFactory<T extends HasId> {
   public context: Context
   public _encode?: Encodable<T>
   public _decode?: Decodable<T>
