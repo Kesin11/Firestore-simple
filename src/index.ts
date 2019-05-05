@@ -108,15 +108,15 @@ export class FirestoreSimpleCollection<T extends HasId> {
     return Object.assign({}, obj)
   }
 
-  public toObject (documentSnapshot: DocumentSnapshot): T {
-    const obj = { id: documentSnapshot.id, ...documentSnapshot.data() }
-    return this._decode(obj)
-  }
-
-  public toDoc (obj: T | Assign<T, NullableId>) {
+  private _toDoc (obj: T | Assign<T, NullableId>) {
     const doc = this._encode(obj)
     if (doc.id) delete doc.id
     return doc
+  }
+
+  public toObject (documentSnapshot: DocumentSnapshot): T {
+    const obj = { id: documentSnapshot.id, ...documentSnapshot.data() }
+    return this._decode(obj)
   }
 
   public docRef (id: string) {
@@ -134,6 +134,7 @@ export class FirestoreSimpleCollection<T extends HasId> {
   }
 
   // for v1 API compatibility
+  // @deprecated
   public async fetchDocument (id: string): Promise<T | undefined> {
     return this.fetch(id)
   }
@@ -151,12 +152,13 @@ export class FirestoreSimpleCollection<T extends HasId> {
   }
 
   // for v1 API compatibility
+  // @deprecated
   public async fetchCollection (): Promise<T[]> {
     return this.fetchAll()
   }
 
   public async add (obj: Assign<T, NullableId>): Promise <T> {
-    const doc = this.toDoc(obj)
+    const doc = this._toDoc(obj)
     const docRef = await this.collectionRef.add(doc)
     return Object.assign({}, obj, { id: docRef.id }) as unknown as T
   }
@@ -165,7 +167,7 @@ export class FirestoreSimpleCollection<T extends HasId> {
     if (!obj.id) throw new Error('Argument object must have "id" property')
 
     const docRef = this.docRef(obj.id)
-    const setDoc = this.toDoc(obj)
+    const setDoc = this._toDoc(obj)
 
     if (this.context.tx) {
       await this.context.tx.set(docRef, setDoc)
@@ -197,7 +199,7 @@ export class FirestoreSimpleCollection<T extends HasId> {
 
     objects.forEach((obj) => {
       const docId = obj.id
-      const setDoc = this.toDoc(obj)
+      const setDoc = this._toDoc(obj)
       batch.set(this.collectionRef.doc(docId), setDoc)
     })
     return batch.commit()
