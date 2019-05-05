@@ -1,4 +1,4 @@
-import { FirestoreSimple, FirestoreSimpleCollection } from '../src'
+import { FirestoreSimple, FirestoreSimpleCollection, Encodable, Decodable } from '../src'
 import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
 
 interface TestDoc {
@@ -17,14 +17,13 @@ describe('Factory and Subcollection', () => {
     await deleteCollection(firestore, collectionPath)
   })
 
-  // TODO: ここのobjの型をTestDocにするとコンパイルできないのは何か変。補完を効かせるために許容したい
-  const encodeFunc = (obj: any) => {
+  const encodeFunc: Encodable<TestDoc> = (obj) => {
     return {
       title: obj.title,
       created_at: obj.createdAt,
     }
   }
-  const decodeFunc = (doc: any) => {
+  const decodeFunc: Decodable<TestDoc> = (doc) => {
     return {
       id: doc.id,
       title: doc.title,

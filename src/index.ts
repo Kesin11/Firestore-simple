@@ -10,8 +10,8 @@ import { Assign } from 'utility-types'
 type HasId = { id: string }
 type HasIdObject = { id: string, [key: string]: any }
 type NullableId = { id?: string }
-export type Encodable<T extends HasId> = (obj: T | Assign<T, NullableId>) => FirebaseFirestore.DocumentData
-export type Decodable<T> = (doc: HasIdObject) => T
+export type Encodable<T extends HasId> = (obj: Assign<T, NullableId>) => FirebaseFirestore.DocumentData
+export type Decodable<T extends HasId> = (doc: HasIdObject) => T
 
 interface Context {
   firestore: Firestore,
