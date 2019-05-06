@@ -2,11 +2,12 @@ import admin, { ServiceAccount } from 'firebase-admin'
 import serviceAccount from '../../firebase_secret.json' // your firebase secret json
 import { FirestoreSimple } from '../../src'
 
+const ROOT_PATH = 'example/ts_admin_subcollection'
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount as ServiceAccount),
 })
 const firestore = admin.firestore()
-firestore.settings({ timestampsInSnapshots: true })
 
 interface User {
   id: string,
@@ -21,12 +22,12 @@ interface UserFriend {
 
 const main = async () => {
   const firestoreSimple = new FirestoreSimple(firestore)
-  // root collection
-  const userDao = firestoreSimple.collection<User>({ path: 'user'})
+  // Root collection
+  const userDao = firestoreSimple.collection<User>({ path: `${ROOT_PATH}/user`})
   await userDao.set({ id: 'one', name: 'one'})
   const user = await userDao.fetch('one')
 
-  // subcollection dao factory
+  // Create factory with define decode function for subcollection
   const userFriendFactory = firestoreSimple.collectionFactory<UserFriend>({
     decode: (doc) => {
       return {
@@ -37,8 +38,8 @@ const main = async () => {
     }
   })
 
-  // subcollection
-  const userFriendDao = userFriendFactory.create(`user/${user!.id}/friend`)
+  // Create subcollection dao that has decode function previously defined in factory
+  const userFriendDao = userFriendFactory.create(`${ROOT_PATH}/user/${user!.id}/friend`)
 
   await userFriendDao.set({ id: 'alice', name: 'alice', created: new Date() })
   const friend = await userFriendDao.fetch('alice')

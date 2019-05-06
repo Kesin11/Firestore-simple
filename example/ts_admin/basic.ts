@@ -2,11 +2,12 @@ import admin, { ServiceAccount } from 'firebase-admin'
 import serviceAccount from '../../firebase_secret.json'
 import { FirestoreSimple } from '../../src'
 
+const ROOT_PATH = 'example/ts_admin_basic'
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount as ServiceAccount),
 })
 const firestore = admin.firestore()
-firestore.settings({ timestampsInSnapshots: true })
 
 interface User {
   id: string,
@@ -16,14 +17,15 @@ interface User {
 
 const main = async () => {
   // declaration
-  const dao = new FirestoreSimple<User>({ firestore, path: 'example/ts_admin/user' })
+  const firestoreSimple = new FirestoreSimple(firestore)
+  const dao = firestoreSimple.collection<User>({ path: `${ROOT_PATH}/user` })
 
-  // create
+  // add
   const user: User = await dao.add({ name: 'bob', age: 20 })
   console.log(user)
   // { name: 'bob', age: 20, id: '3Y5jwT8pB4cMqS1n3maj' }
 
-  // fetch
+  // fetch(get)
   let bob: User | undefined = await dao.fetch(user.id)
   console.log(bob)
   // { id: '3Y5jwT8pB4cMqS1n3maj', age: 20, name: 'bob' }
@@ -63,14 +65,14 @@ const main = async () => {
   console.log(users)
   // [
   //   { id: '1', name: 'foo', age: 1 },
-  //   { id: '2', age: 2, name: 'bar' },
+  //   { id: '2', name: 'bar', age: 2 },
   // ]
 
   // fetch by query
   const fetchedByQueryUser: User[] = await dao.where('age', '>=', 1)
                                 .orderBy('age')
                                 .limit(1)
-                                .get()
+                                .fetch()
   console.log(fetchedByQueryUser)
   // [ { id: '1', name: 'foo', age: 1 } ]
 
