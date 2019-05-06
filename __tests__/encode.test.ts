@@ -29,9 +29,9 @@ describe('encode', () => {
     const doc = {
       bookTitle: title,
     }
-    const addedDoc = await dao.add(doc)
+    const addedId = await dao.add(doc)
 
-    const fetchedDoc = await dao.collectionRef.doc(addedDoc.id).get()
+    const fetchedDoc = await dao.collectionRef.doc(addedId).get()
     expect(fetchedDoc.data()).toEqual({ book_title: title })
   })
 

@@ -59,15 +59,14 @@ describe('Basic', () => {
       url: 'http://example.com/add',
     }
 
-    const addedDoc = await dao.add(doc)
-    expect(addedDoc.id).toBeTruthy()
-    expect(doc).toEqual({...{
-      title: addedDoc.title,
-      url: addedDoc.url,
-    }})
+    const addedId = await dao.add(doc)
 
-    const fetchedDoc = await dao.fetch(addedDoc.id)
-    expect(fetchedDoc).toEqual(addedDoc)
+    const fetchedDoc = await dao.fetch(addedId)
+    expect(fetchedDoc).toEqual({
+      id: expect.anything(),
+      title: doc.title,
+      url: doc.url,
+    })
   })
 
   it('set', async () => {
@@ -81,10 +80,9 @@ describe('Basic', () => {
       url: 'http://example.com/set',
     }
 
-    const setedDoc = await dao.set(setDoc)
-    expect(setedDoc).toEqual(setDoc)
+    const setedId = await dao.set(setDoc)
 
-    const fetchedDoc = await dao.fetch(addedDoc.id)
+    const fetchedDoc = await dao.fetch(setedId)
     expect(fetchedDoc).toEqual(setDoc)
   })
 
@@ -95,15 +93,15 @@ describe('Basic', () => {
         url: 'http://example.com/add',
       }
 
-      const addedDoc = await dao.addOrSet(doc)
-      expect(addedDoc.id).toBeTruthy()
-      expect(doc).toEqual({
-        title: addedDoc.title,
-        url: addedDoc.url,
-      })
+      const addedId = await dao.addOrSet(doc)
+      expect(addedId).toBeTruthy()
 
-      const fetchedAddDoc = await dao.fetchDocument(addedDoc.id)
-      expect(fetchedAddDoc).toEqual(addedDoc)
+      const fetchedAddDoc = await dao.fetchDocument(addedId)
+      expect(fetchedAddDoc).toEqual({
+        id: expect.anything(),
+        title: doc.title,
+        url: doc.url,
+      })
     })
 
     it('set', async () => {
@@ -113,8 +111,8 @@ describe('Basic', () => {
         title: 'set',
         url: 'http://example.com/set',
       }
-      const setedDoc = await dao.addOrSet(setDoc)
-      expect(setedDoc).toEqual(setDoc)
+      const setedId = await dao.addOrSet(setDoc)
+      expect(setedId).toEqual(docId)
 
       const fetchedSetDoc = await dao.fetchDocument(docId)
       expect(fetchedSetDoc).toEqual(setDoc)
@@ -126,10 +124,10 @@ describe('Basic', () => {
       title: 'delete',
       url: 'http://example.com/delete',
     }
-    const addedDoc = await dao.add(doc)
+    const addedId = await dao.add(doc)
 
-    await dao.delete(addedDoc.id)
-    const snapshot = await dao.collectionRef.doc(addedDoc.id).get()
+    await dao.delete(addedId)
+    const snapshot = await dao.collectionRef.doc(addedId).get()
 
     expect(snapshot.exists).toBeFalsy()
   })

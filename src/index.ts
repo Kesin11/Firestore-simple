@@ -158,10 +158,10 @@ export class FirestoreSimpleCollection<T extends HasId> {
     return this.fetchAll()
   }
 
-  public async add (obj: Assign<T, NullableId>): Promise <T> {
+  public async add (obj: Assign<T, NullableId>) {
     const doc = this._toDoc(obj)
     const docRef = await this.collectionRef.add(doc)
-    return Object.assign({}, obj, { id: docRef.id }) as unknown as T
+    return docRef.id
   }
 
   public async set (obj: T) {
@@ -175,7 +175,7 @@ export class FirestoreSimpleCollection<T extends HasId> {
     } else {
       await docRef.set(setDoc)
     }
-    return obj
+    return obj.id
   }
 
   public addOrSet (obj: Assign<T, NullableId> | T) {

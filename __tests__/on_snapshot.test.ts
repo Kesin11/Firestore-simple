@@ -30,10 +30,15 @@ describe('on_snapshot test', () => {
   let existsDoc: Book
 
   beforeEach(async () => {
-    existsDoc = await dao.add({
+    const addedDoc = {
       bookTitle: 'exists',
       created: new Date(),
-    })
+    }
+    const addedId = await dao.add(addedDoc)
+    existsDoc = {
+      ...addedDoc,
+      id: addedId,
+    }
   })
 
   afterEach(async () => {
@@ -69,7 +74,7 @@ describe('on_snapshot test', () => {
 
   it('observe set changes', async () => {
     const doc = {
-      ...existsDoc!,
+      ...existsDoc,
       bookTitle: 'set'
     }
 
@@ -94,10 +99,11 @@ describe('on_snapshot test', () => {
   it('observe delete change', async () => {
     // prepare specific doc for delete onSnapshot()
     // because onSnapshot() also triggerd deleteCollection() events and it will be confilict.
-    const deletedDoc = await dao.add({
+    const deletedDoc = {
       bookTitle: 'deleted',
       created: new Date(),
-    })
+    }
+    const deletedId = await dao.add(deletedDoc)
 
     const promise = new Promise((resolve) => {
       dao.onSnapshot((querySnapshot, toObject) => {
@@ -105,7 +111,11 @@ describe('on_snapshot test', () => {
           if (change.type === 'removed' && change.doc.data().book_title === deletedDoc.bookTitle) {
             const changedDoc = toObject(change.doc)
 
-            expect(changedDoc).toEqual(deletedDoc)
+            expect(changedDoc).toEqual({
+              id: expect.anything(),
+              bookTitle: deletedDoc.bookTitle,
+              created: deletedDoc.created,
+            })
             resolve()
           }
         })
@@ -113,7 +123,7 @@ describe('on_snapshot test', () => {
     })
 
     await new Promise((resolve) => setTimeout(resolve, 100)) // for async stability
-    await dao.delete(deletedDoc.id)
+    await dao.delete(deletedId)
     await promise
   })
 })

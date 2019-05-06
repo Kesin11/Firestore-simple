@@ -33,11 +33,16 @@ describe('query on_snapshot test', () => {
   let existsDoc: Book
 
   beforeEach(async () => {
-    existsDoc = await dao.add({
+    const addedDoc = {
       bookTitle: 'exists',
       created: new Date(),
-      bookId: 1
-    })
+      bookId: 1,
+    }
+    const addedId = await dao.add(addedDoc)
+    existsDoc = {
+      ...addedDoc,
+      id: addedId,
+    }
   })
 
   afterEach(async () => {

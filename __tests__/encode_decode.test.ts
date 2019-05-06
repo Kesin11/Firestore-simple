@@ -39,11 +39,11 @@ describe('encode and decode', () => {
       bookTitle: 'add',
       created: now,
     }
-    const addedBook = await dao.add(doc)
+    const addedBookId = await dao.add(doc)
 
-    const fetchedBook = await dao.fetch(addedBook.id)
+    const fetchedBook = await dao.fetch(addedBookId)
     expect(fetchedBook).toEqual({
-      id: addedBook.id,
+      id: addedBookId,
       bookTitle: doc.bookTitle,
       created: doc.created,
     })
