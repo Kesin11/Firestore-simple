@@ -89,6 +89,8 @@ describe('transaction', () => {
       await txFirestoreSimple.runTransaction(async () => {
         await txDao.set(updatedDoc)
 
+        // Firestore throw error READ after WRITE in same transaction.
+        // To show txDao.fetch() is inside transaction, assert transaction error.
         await expect(txDao.fetch(doc.id)).rejects.toThrow(
           'Firestore transactions require all reads to be executed before all writes.'
         )
@@ -103,7 +105,27 @@ describe('transaction', () => {
       await txFirestoreSimple.runTransaction(async () => {
         await txDao.set(updatedDoc)
 
+        // Firestore throw error READ after WRITE in same transaction.
+        // To show txDao.fetchAll() is inside transaction, assert transaction error.
         await expect(txDao.fetchAll()).rejects.toThrow(
+          'Firestore transactions require all reads to be executed before all writes.'
+        )
+      })
+    })
+
+    it('query after set in transaction should be error', async () => {
+      const doc = { id: 'test1', title: 'aaa' }
+      const updatedDoc = { id: 'test1', title: 'bbb' }
+      await dao.set(doc)
+
+      await txFirestoreSimple.runTransaction(async () => {
+        await txDao.set(updatedDoc)
+
+        // Firestore throw error READ after WRITE in same transaction.
+        // To show txDao.where().fetch() is inside transaction, assert transaction error.
+        await expect(
+          txDao.where('title', '==', 'bbb').fetch()
+         ).rejects.toThrow(
           'Firestore transactions require all reads to be executed before all writes.'
         )
       })
