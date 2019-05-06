@@ -17,5 +17,5 @@ before_install:
   - openssl aes-256-cbc -K $encrypted_f5265da104af_key -iv $encrypted_f5265da104af_iv -in firebase_secret.json.enc -out firebase_secret.json -d
 script:
   - npm run lint
-  - npm run test -- --forceExit
+  - npm run test -- --forceExit --coverage
 after_success: npm run coverage
