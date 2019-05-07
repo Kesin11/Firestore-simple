@@ -41,26 +41,35 @@ const main = async () => {
 
   let user: User | undefined
   // add
-  user = await dao.add({ name: 'bob', created: new Date() })
-  console.log(user)
-  // TODO after fix return value of add()
+  const userId = await dao.add({ name: 'bob', created: new Date() })
 
   // fetch
-  user = await dao.fetch(user.id)
+  // 'updated' is added automatically.
+  user = await dao.fetch(userId)
   console.log(user)
+  // User {
+  //   id: 'bSaICakQ59u62Qhsn2wA',
+  //   name: 'bob',
+  //   created: 2019-05-07T15:24:46.562Z,
+  //   updated: 2019-05-07T15:24:47.185Z }
   if (!user) return
 
-  // update
+  // set
   user.name = 'alice'
-  user = await dao.set(user)
-  console.log(user)
+  await dao.set(user)
 
   // fetch
-  user = await dao.fetch(user.id)
+  // 'updated' is updated automatically.
+  user = await dao.fetch(userId)
   console.log(user)
+  // User {
+  //   id: 'bSaICakQ59u62Qhsn2wA',
+  //   name: 'alice',
+  //   created: 2019-05-07T15:24:46.562Z,
+  //   updated: 2019-05-07T15:24:47.627Z }
   if (!user) return
 
-  await dao.delete(user.id)
+  await dao.delete(userId)
 }
 
 main()

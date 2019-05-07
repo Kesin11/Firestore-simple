@@ -21,37 +21,40 @@ const main = async () => {
   const dao = firestoreSimple.collection<User>({ path: `${ROOT_PATH}/user` })
 
   // add
-  const user: User = await dao.add({ name: 'bob', age: 20 })
-  console.log(user)
-  // { name: 'bob', age: 20, id: '3Y5jwT8pB4cMqS1n3maj' }
+  const bobId = await dao.add({ name: 'bob', age: 20 })
 
   // fetch(get)
-  let bob: User | undefined = await dao.fetch(user.id)
+  const bob: User | undefined = await dao.fetch(bobId)
   console.log(bob)
   // { id: '3Y5jwT8pB4cMqS1n3maj', age: 20, name: 'bob' }
   if (!bob) return
 
   // update
-  bob.age = 30
-  bob = await dao.set(bob)
+  await dao.set({
+    id: bobId,
+    name: 'bob',
+    age: 30, // update 20 -> 30
+  })
 
   // add or set
   // same as 'add' when id is not given
-  let alice: User = await dao.addOrSet({ name: 'alice', age: 22 })
-  console.log(alice)
-  // { name: 'alice', age: 22, id: 'YdfB2rkXoid603nKRX65' }
-
-  alice.age = 30
-  alice = await dao.addOrSet(alice)
+  const aliceId = await dao.addOrSet({ name: 'alice', age: 22 })
+  // same as 'set' when id is given
+  await dao.addOrSet({
+    id: aliceId,
+    name: 'alice',
+    age: 30, // update 22 -> 30
+  })
+  const alice: User | undefined = await dao.fetch(aliceId)
   console.log(alice)
   // { name: 'alice', age: 30, id: 'YdfB2rkXoid603nKRX65' }
 
   // delete
-  const deletedId = await dao.delete(bob.id)
+  const deletedId = await dao.delete(bobId)
   console.log(deletedId)
   // 3Y5jwT8pB4cMqS1n3maj
 
-  await dao.delete(alice.id)
+  await dao.delete(aliceId)
 
   // multi set
   // `bulkSet` and `bulkDelete` are wrapper for WriteBatch

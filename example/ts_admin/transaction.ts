@@ -106,21 +106,21 @@ const main = async () => {
   await userDao.docRef('bob').collection('friends').doc('alice').delete()
 
   // Setup two user data
-  const bob = await userDao.set({ id: 'bob', name: 'bob' })
-  const alice = await userDao.set({ id: 'alice', name: 'alice' })
+  const bobId = await userDao.set({ id: 'bob', name: 'bob' })
+  const aliceId = await userDao.set({ id: 'alice', name: 'alice' })
 
   const friendRequestUsecase = new FriendRequestUsecase({ firestoreSimple, userDao, friendRequestDao })
   // Start transaction
   // Bob send friend request to alice
   await firestoreSimple.runTransaction(async (_tx) => {
-    await friendRequestUsecase.request(bob.id, alice.id)
+    await friendRequestUsecase.request(bobId, aliceId)
   })
   // End transaction
 
   // Start transaction
   // Alice check friend request and accept.
   await firestoreSimple.runTransaction(async (_tx) => {
-    const request = await friendRequestUsecase.getPendingRequest(alice.id)
+    const request = await friendRequestUsecase.getPendingRequest(aliceId)
     if (!request) return
 
     await friendRequestUsecase.accept(request)
