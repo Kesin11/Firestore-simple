@@ -16,7 +16,9 @@
     "lint": "tslint src/**/*.ts test/**/*.ts",
     "lint:fix": "npm run lint -- --fix",
     "lint:project": "tslint -p .",
-    "coverage": "codecov"
+    "coverage": "codecov",
+    "publish:beta": "npm publish --tag beta"
+
   },
   "devDependencies": {
     "codecov": "3.3.0",
