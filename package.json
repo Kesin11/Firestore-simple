@@ -18,7 +18,9 @@
     "lint:project": "tslint -p .",
     "coverage": "codecov",
     "publish:beta": "npm publish --tag beta"
-
+  },
+  "dependencies": {
+    "utility-types": "3.7.0"
   },
   "devDependencies": {
     "codecov": "3.3.0",
@@ -28,8 +30,7 @@
     "@types/jest": "24.0.12",
     "jest": "24.8.0",
     "ts-jest": "24.0.2",
-    "typescript": "3.4.5",
-    "utility-types": "3.6.1"
+    "typescript": "3.4.5"
   },
   "repository": {
     "type": "git",
