@@ -1,12 +1,13 @@
 import admin, { ServiceAccount } from 'firebase-admin'
-import serviceAccount from '../../firebase_secret.json'
+import serviceAccount from '../../firebase_secret.json' // prepare your firebase secret json before exec example
 import { FirestoreSimple } from '../../src'
+
+const ROOT_PATH = 'example/ts_admin_basic'
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount as ServiceAccount),
 })
 const firestore = admin.firestore()
-firestore.settings({ timestampsInSnapshots: true })
 
 interface User {
   id: string,
@@ -16,40 +17,44 @@ interface User {
 
 const main = async () => {
   // declaration
-  const dao = new FirestoreSimple<User>({ firestore, path: 'example/ts_admin/user' })
+  const firestoreSimple = new FirestoreSimple(firestore)
+  const dao = firestoreSimple.collection<User>({ path: `${ROOT_PATH}/user` })
 
-  // create
-  const user: User = await dao.add({ name: 'bob', age: 20 })
-  console.log(user)
-  // { name: 'bob', age: 20, id: '3Y5jwT8pB4cMqS1n3maj' }
+  // add
+  const bobId = await dao.add({ name: 'bob', age: 20 })
 
-  // fetch
-  let bob: User | undefined = await dao.fetch(user.id)
+  // fetch(get)
+  const bob: User | undefined = await dao.fetch(bobId)
   console.log(bob)
   // { id: '3Y5jwT8pB4cMqS1n3maj', age: 20, name: 'bob' }
   if (!bob) return
 
   // update
-  bob.age = 30
-  bob = await dao.set(bob)
+  await dao.set({
+    id: bobId,
+    name: 'bob',
+    age: 30, // update 20 -> 30
+  })
 
   // add or set
   // same as 'add' when id is not given
-  let alice: User = await dao.addOrSet({ name: 'alice', age: 22 })
-  console.log(alice)
-  // { name: 'alice', age: 22, id: 'YdfB2rkXoid603nKRX65' }
-
-  alice.age = 30
-  alice = await dao.addOrSet(alice)
+  const aliceId = await dao.addOrSet({ name: 'alice', age: 22 })
+  // same as 'set' when id is given
+  await dao.addOrSet({
+    id: aliceId,
+    name: 'alice',
+    age: 30, // update 22 -> 30
+  })
+  const alice: User | undefined = await dao.fetch(aliceId)
   console.log(alice)
   // { name: 'alice', age: 30, id: 'YdfB2rkXoid603nKRX65' }
 
   // delete
-  const deletedId = await dao.delete(bob.id)
+  const deletedId = await dao.delete(bobId)
   console.log(deletedId)
   // 3Y5jwT8pB4cMqS1n3maj
 
-  await dao.delete(alice.id)
+  await dao.delete(aliceId)
 
   // multi set
   // `bulkSet` and `bulkDelete` are wrapper for WriteBatch
@@ -63,14 +68,14 @@ const main = async () => {
   console.log(users)
   // [
   //   { id: '1', name: 'foo', age: 1 },
-  //   { id: '2', age: 2, name: 'bar' },
+  //   { id: '2', name: 'bar', age: 2 },
   // ]
 
   // fetch by query
   const fetchedByQueryUser: User[] = await dao.where('age', '>=', 1)
                                 .orderBy('age')
                                 .limit(1)
-                                .get()
+                                .fetch()
   console.log(fetchedByQueryUser)
   // [ { id: '1', name: 'foo', age: 1 } ]
 

@@ -10,7 +10,11 @@
         "trailing-comma": [true, {"multiline": "always"}],
         "interface-name": false,
         "no-shadowed-variable": false,
-        "max-classes-per-file": false
+        "max-classes-per-file": false,
+        "no-namespace": false,
+        "max-line-length": false,
+        "interface-over-type-literal": false,
+        "member-ordering": [ false ]
     },
     "rulesDirectory": []
 }

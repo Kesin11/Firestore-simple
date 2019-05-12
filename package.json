@@ -1,6 +1,6 @@
 {
   "name": "firestore-simple",
-  "version": "2.0.1",
+  "version": "3.0.0-beta.1",
   "description": "A simple wrapper for Firestore",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -8,24 +8,29 @@
     "dist/"
   ],
   "scripts": {
-    "clean": "rm -rf dist dist_test",
+    "clean": "rm -rf dist",
     "prepare": "npm run clean && npm run build",
     "build": "tsc --project .",
     "build:test": "tsc --project test",
-    "ava": "ava",
-    "test": "rm -rf dist_test && npm run build:test && nyc ava --timeout=10s --verbose dist_test/test/*.test.js",
+    "test": "jest",
     "lint": "tslint src/**/*.ts test/**/*.ts",
     "lint:fix": "npm run lint -- --fix",
     "lint:project": "tslint -p .",
-    "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov"
+    "coverage": "codecov",
+    "publish:beta": "npm publish --tag beta"
+  },
+  "dependencies": {
+    "utility-types": "3.7.0"
   },
   "devDependencies": {
-    "ava": "0.25.0",
-    "codecov": "3.1.0",
-    "firebase-admin": "6.0.0",
-    "nyc": "13.1.0",
-    "tslint": "5.11.0",
-    "tslint-config-standard": "8.0.1"
+    "codecov": "3.3.0",
+    "firebase-admin": "7.3.0",
+    "tslint": "5.16.0",
+    "tslint-config-standard": "8.0.1",
+    "@types/jest": "24.0.12",
+    "jest": "24.8.0",
+    "ts-jest": "24.0.2",
+    "typescript": "3.4.5"
   },
   "repository": {
     "type": "git",
@@ -40,9 +45,5 @@
   "bugs": {
     "url": "https://github.com/Kesin11/Firestore-simple/issues"
   },
-  "homepage": "https://github.com/Kesin11/Firestore-simple#readme",
-  "dependencies": {
-    "typescript": "3.1.3",
-    "utility-types": "2.1.0"
-  }
+  "homepage": "https://github.com/Kesin11/Firestore-simple#readme"
 }

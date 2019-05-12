@@ -3,22 +3,26 @@
 [![Build Status](https://travis-ci.org/Kesin11/Firestore-simple.svg?branch=master)](https://travis-ci.org/Kesin11/Firestore-simple)
 [![codecov](https://codecov.io/gh/Kesin11/Firestore-simple/branch/master/graph/badge.svg)](https://codecov.io/gh/Kesin11/Firestore-simple)
 
-A simple wrapper for js Firestore.
+More simple, powerful and TypeScript friendly Firestore wrapper.
 
-It supports [Web](https://firebase.google.com/docs/reference/js/firebase.firestore?hl=ja), [Node.js](https://cloud.google.com/nodejs/docs/reference/firestore/latest) and [Cloud Functions](https://firebase.google.com/docs/reference/functions/functions.firestore?hl=ja).
+- **More simple API:** Original Firestore only provide a slightly complicated low-level API. firestore-simple provide a simple and easy to use API.
+- **TypeScript friendly:** firestore-simple helps you type the document. You no longer need to cast after getting a document from Firestore.
+- **Encoding and decoding:** Convert js object <-> firestore document every time? You need define to convert function just only one time.
+- **Easy and safe transaction:** firestore-simple allow same CRUD API in `runTransaction`. No longer need to worry about transaction context.
+- **A lot of test:** Test many of the Firestore features using **REAL** Firestore instead of an emulator.
+
+|Support Firestore SDK|
+|----|
+|[Web](https://firebase.google.com/docs/reference/js/firebase.firestore)|
+|[Node.js](https://firebase.google.com/docs/reference/node/firebase.firestore)|
+|[admin](https://firebase.google.com/docs/reference/functions/functions.firestore)|
+|[Cloud Functions](https://firebase.google.com/docs/reference/admin/node/admin.firestore)|
+
 
 Blog posts (sorry Japanese only)
 
 - [Firestoreをもっと手軽に使えるfirestore-simpleを作った](http://kesin.hatenablog.com/entry/2018/06/12/095020)
 - [Firestoreをもっと手軽に使えるfirestore-simpleがバージョン2になりました](http://kesin.hatenablog.com/entry/firestore_simple_v2)
-
-# Introduction
-Firestore is very convenient data store for web/native client.
-But I feel original API is little complicated using with JavaScript/TypeScript.
-
-firestore-simple provides more simple and useful API that also familiar with **JavaScript pure object**. It helps convert fetched Firestore object to pure object or easy to mapping to some class instance.
-
-And firestore-simple also support TypeScript. You will no longer need to add type to fetched document from Firestore yourself.
 
 # Install
 ```
@@ -31,14 +35,15 @@ Use with Node.js admin SDK sample.
 ```javascript
 // TypeScript
 import admin, { ServiceAccount } from 'firebase-admin'
-import serviceAccount from './firebase_secret.json' // your firebase secret json
+import serviceAccount from '../../firebase_secret.json' // prepare your firebase secret json before exec example
 import { FirestoreSimple } from 'firestore-simple'
+
+const ROOT_PATH = 'example/usage'
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount as ServiceAccount),
 })
 const firestore = admin.firestore()
-firestore.settings({ timestampsInSnapshots: true })
 
 interface User {
   id: string,
@@ -48,40 +53,44 @@ interface User {
 
 const main = async () => {
   // declaration
-  const dao = new FirestoreSimple<User>({ firestore, path: 'example/ts_admin/user' })
+  const firestoreSimple = new FirestoreSimple(firestore)
+  const dao = firestoreSimple.collection<User>({ path: `${ROOT_PATH}/user` })
 
-  // create
-  const user: User = await dao.add({ name: 'bob', age: 20 })
-  console.log(user)
-  // { name: 'bob', age: 20, id: '3Y5jwT8pB4cMqS1n3maj' }
+  // add
+  const bobId = await dao.add({ name: 'bob', age: 20 })
 
-  // fetch
-  let bob: User | undefined = await dao.fetch(user.id)
+  // fetch(get)
+  const bob: User | undefined = await dao.fetch(bobId)
   console.log(bob)
   // { id: '3Y5jwT8pB4cMqS1n3maj', age: 20, name: 'bob' }
   if (!bob) return
 
   // update
-  bob.age = 30
-  bob = await dao.set(bob)
+  await dao.set({
+    id: bobId,
+    name: 'bob',
+    age: 30, // update 20 -> 30
+  })
 
   // add or set
   // same as 'add' when id is not given
-  let alice: User = await dao.addOrSet({ name: 'alice', age: 22 })
-  console.log(alice)
-  // { name: 'alice', age: 22, id: 'YdfB2rkXoid603nKRX65' }
-
-  alice.age = 30
-  alice = await dao.addOrSet(alice)
+  const aliceId = await dao.addOrSet({ name: 'alice', age: 22 })
+  // same as 'set' when id is given
+  await dao.addOrSet({
+    id: aliceId,
+    name: 'alice',
+    age: 30, // update 22 -> 30
+  })
+  const alice: User | undefined = await dao.fetch(aliceId)
   console.log(alice)
   // { name: 'alice', age: 30, id: 'YdfB2rkXoid603nKRX65' }
 
   // delete
-  const deletedId = await dao.delete(bob.id)
+  const deletedId = await dao.delete(bobId)
   console.log(deletedId)
   // 3Y5jwT8pB4cMqS1n3maj
 
-  await dao.delete(alice.id)
+  await dao.delete(aliceId)
 
   // multi set
   // `bulkSet` and `bulkDelete` are wrapper for WriteBatch
@@ -95,14 +104,14 @@ const main = async () => {
   console.log(users)
   // [
   //   { id: '1', name: 'foo', age: 1 },
-  //   { id: '2', age: 2, name: 'bar' },
+  //   { id: '2', name: 'bar', age: 2 },
   // ]
 
   // fetch by query
   const fetchedByQueryUser: User[] = await dao.where('age', '>=', 1)
                                 .orderBy('age')
                                 .limit(1)
-                                .get()
+                                .fetch()
   console.log(fetchedByQueryUser)
   // [ { id: '1', name: 'foo', age: 1 } ]
 
@@ -113,48 +122,79 @@ const main = async () => {
 main()
 ```
 
-# encode/decode
-You can hook and convert object that will post to Firestore when before post. And also same as after fetch from Firestore. `encode` called before post and `decode` called after fetch.
+# Auto typing document data
+firestore-simple automatically types document data retrieved from a collection by TypeScript generics, you need to pass type arguments when creating a FirestoreSimpleCollection object.
 
-It useful for example change property name, convert value, map to model class.
-
-```javascript
-class Book {
-  public id: string
-  public title: string
-  public created: Date
-
-  constructor ({ title, created }: { title: string, created: Date }) {
-    this.id = title
-    this.title = title
-    this.created = created
-  }
+```js
+interface User {
+  id: string, // Must need `id: string` property
+  name: string,
+  age: number,
 }
-const dao = new FirestoreSimple<Book>({ firestore, path: 'book',
-  encode: (book) => {
+
+const firestoreSimple = new FirestoreSimple(firestore)
+const dao = firestoreSimple.collection<User>({ path: `user` })
+```
+
+After that, type of document obtained from FirestoreSimpleCollection will be `User`.
+
+```js
+// fetch(get)
+const bob: User | undefined = await dao.fetch(bobId)
+```
+
+**NOTICE:** The type passed to the type argument **MUST** have an `id` property. The reason is that firestore-simple treats `id` as firestore document id and relies on this limitation to provide a simple API(ex: `fetch`, `set`).
+
+# encode/decode
+You can hook and convert object before post to firestore and after fetch from firestore. 
+`encode` is called before post, and `decode` is called after fetch.
+
+It useful for common usecase, for example change property name, convert value, map to class instances and so on.
+
+Here is example code to realize following these features.
+
+- encode
+  - Map `User` class each property to firestore document key/value before post
+  - Update `updated` property using Firebase server timestamp when update document
+- decode
+  - Map document data fetched from firestore to `User` class instance
+  - Convert firebase timestamp object to javascript Date object
+
+```js
+class User {
+  constructor(
+    public id: string,
+    public name: string,
+    public created: Date,
+    public updated?: Date,
+  ) { }
+}
+
+const firestoreSimple = new FirestoreSimple(firestore)
+const dao = firestoreSimple.collection<User>({
+  path: `user`,
+  encode: (user) => {
     return {
-      id: book.id, // `id` is Optional
-      book_title: book.title, // save as `book_title` in Firestore
-      created: book.created,
+      name: user.name,
+      created: user.created,
+      updated: admin.firestore.FieldValue.serverTimestamp() // Using Firebase server timestamp when set document
     }
   },
   decode: (doc) => {
-    return new Book({ // map to `Book` class instance
-      title: doc.book_title, // restore to `title`
-      created: doc.created.toDate(), // convert Firestore.Timestamp to Date
-    })
-  },
+    return new User(
+      doc.id,
+      doc.name,
+      doc.created.toDate(), // Convert Firebase timestamp to js date object
+      doc.updated.toDate()
+    )
+  }
 })
-
-const book = new Book({ title: 'foobar', created: new Date() })
-await dao.set(book)
-const fetchedBook = await dao.fetch(book.id) // fetchedBook is instance of Book class
 ```
 
 # onSnapshot
-firestore-simple supports `onSnapshot` partially. You can use `toObject()` for `decode` Firestore document to your object.
+firestore-simple partially supports `onSnapshot`. You can map raw document data to an object with `decode` by using `toObject() `.
 
-```javascript
+```js
 dao.where('age', '>=', 20)
   .onSnapshot((querySnapshot, toObject) => {
     querySnapshot.docChanges.forEach((change) => {
@@ -165,51 +205,116 @@ dao.where('age', '>=', 20)
   })
 ```
 
-# Create a Subclass
-You can define specify collection class extends FirestoreSimple instead of create FirestoreSimple instance. Here is subclass way of sample code appear in `encode/docode` section.
+# Subcollection
+firestore-simple does not provide API that direct manipulate subcollection. But `collectionFactory` is useful for subcollection.
 
-```javascript
-class Book {
-  public id: string
-  public title: string
-  public created: Date
+It can define `encode` and `decode` but not `path`. You can create FirestoreSimpleCollection from this factory with `path` and both `encode` and `decode` are inherited from the factory.
 
-  constructor ({ title, created }: { title: string, created: Date }) {
-    this.id = title
-    this.title = title
-    this.created = created
-  }
+This is example using `collectionFactory` for subcollection.
+
+```js
+// Subcollection user/${user.id}/friend
+interface UserFriend {
+  id: string,
+  name: string,
+  created: Date,
 }
 
-class BookDao extends FirestoreSimple<Book> {
-  constructor ({ firestore }: { firestore: Firestore }) {
-    super({ firestore, path: 'book' })
-  }
-  // override
-  public encode (book: Book) {
-    return {
-      id: book.id,
-      book_title: book.title,
-      created: book.created,
+const userNames = ['alice', 'bob', 'john']
+
+const main = async () => {
+  const firestoreSimple = new FirestoreSimple(firestore)
+
+  // Create factory with define decode function for subcollection
+  const userFriendFactory = firestoreSimple.collectionFactory<UserFriend>({
+    decode: (doc) => {
+      return {
+        id: doc.id,
+        name: doc.name,
+        created: doc.created.toDate()
+      }
     }
-  }
-  // override
-  public decode (doc: {id: string, [props: string]: any}) {
-    return new Book({
-      title: doc.book_title,
-      created: doc.created.toDate(),
-    })
-  }
-}
+  })
 
-const bookDao = new BookDao({ firestore })
+  const users = await userDao.fetchAll()
+  for (const user of users) {
+    // Create subcollection dao that inherited decode function defined in factory
+    const userFriendDao = userFriendFactory.create(`user/${user.id}/friend`)
+
+    const friends = await userFriendDao.fetchAll()
+  }
 ```
 
-# Currently not supported these Firestore features
-- transaction (maybe support in next version)
-- reference
-- subcollection
-- update
+# Transaction
+When using `runTransaction` with the original firestore, some methods like `get()`, `set()` and `delete()` need to be called from the `transaction` object. This is complicated and not easy to use.  
+
+firestore-simple allows you to use the same API in transactions. This way, you don't have to change your code depending on whether inside `runTransaction` block or not.
+
+```js
+interface User {
+  id: string,
+  name: string,
+}
+const docId = 'alice'
+
+// Original firestore transaction
+const collection = firestore.collection(`${ROOT_PATH}/user`)
+await firestore.runTransaction(async (transaction) => {
+  const docRef = collection.doc(docId)
+  // Get document lock
+  await transaction.get(docRef)
+
+  // Update document
+  transaction.set(docRef, { name: docId })
+})
+
+// firestore-simple transaction
+const firestoreSimple = new FirestoreSimple(firestore)
+const dao = firestoreSimple.collection<User>({ path: `${ROOT_PATH}/user` })
+await firestoreSimple.runTransaction(async (_tx) => {
+  await dao.fetch(docId)
+
+  await dao.set({ id: docId, name: docId })
+})
+```
+
+If you want to see more transaction example, please check [example code](./example) and [test code](./__tests__).
+
+
+# Fallback to use original firestore
+Unfortunately firestore-simple does not support all the features of Firestore, so sometimes you may want to use raw collection references or document references.
+
+In this case, you can get raw collection reference from FirestoreSimpleCollection using `collectionRef` also document reference using `docRef(docId)`.
+
+```js
+const firestoreSimple = new FirestoreSimple(firestore)
+const dao = firestoreSimple.collection<User>({ path: `user` })
+
+// Same as firestore.collection('user')
+const collectionRef = dao.collectionRef
+
+// Same as firestore.collection('user').doc('documentId')
+const docRef = dao.docRef('documentId')
+```
+
+# More example
+You can find more example from [example directory](./example). Also [test code](./__tests__) maybe as good sample.
+
+# API document
+Sorry not yet. Please check [source code](./src) or look interface using your IDE.
+
+# Feature works
+- [ ] Support new feature of firestore
+  - incrementValue, collectionGroup, etc...
+- [ ] Support [pagenation](https://firebase.google.com/docs/firestore/query-data/query-cursors)
+- [ ] API document
+- [ ] Test and example using other than admin SDK
+- [ ] Lint with eslint
+- [ ] Continuous upgrade and test new firestore SDK using with [Renovate](https://renovatebot.com/)(or similar other tool)
+
+# Contribution
+Patches are welcome!  
+Olso welcome fixing english documentation.
 
 # Development
 Unit tests are using **REAL Firestore(Firebase)**, not mock!
