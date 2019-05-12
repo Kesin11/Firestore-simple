@@ -1,5 +1,5 @@
 import admin, { ServiceAccount } from 'firebase-admin'
-import serviceAccount from '../../firebase_secret.json'
+import serviceAccount from '../../firebase_secret.json' // prepare your firebase secret json before exec example
 import { FirestoreSimple } from '../../src'
 
 const ROOT_PATH = 'example/ts_admin_basic'
