@@ -23,7 +23,7 @@
     "utility-types": "3.7.0"
   },
   "devDependencies": {
-    "codecov": "3.3.0",
+    "codecov": "3.5.0",
     "firebase-admin": "7.3.0",
     "tslint": "5.16.0",
     "tslint-config-standard": "8.0.1",
