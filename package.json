@@ -27,7 +27,7 @@
     "firebase-admin": "7.3.0",
     "tslint": "5.16.0",
     "tslint-config-standard": "8.0.1",
-    "@types/jest": "24.0.12",
+    "@types/jest": "24.0.13",
     "jest": "24.8.0",
     "ts-jest": "24.0.2",
     "typescript": "3.4.5"
