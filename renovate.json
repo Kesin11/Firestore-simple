@@ -16,6 +16,9 @@
     "postUpdateOptions": [
       "npmDedupe"
     ],
+    "lockFileMaintenance": {
+      "enabled": true
+    },
     "packageRules": [
       {
         "groupName": "Exclude check ESLint and TSLint update",
