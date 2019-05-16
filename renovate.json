@@ -1,5 +1,39 @@
 {
   "extends": [
-    "config:base"
-  ]
+    ":ignoreModulesAndTests",
+    ":label(renovate)",
+    ":prConcurrentLimit10",
+    ":prNotPending",
+    ":timezone(Asia/Tokyo)"
+  ],
+  "npm": {
+    "extends": [
+      ":automergePatch",
+      ":unpublishSafe",
+      "@teppeis:semanticPrefixFixDepsPeerChoreOthers"
+    ],
+    "rangeStrategy": "bump",
+    "postUpdateOptions": [
+      "npmDedupe"
+    ],
+    "packageRules": [
+      {
+        "groupName": "Exclude check ESLint and TSLint update",
+        "excludePackageNames": ["eslint", "tslint"],
+        "excludePackagePatterns": ["^eslint-config-", "^eslint-plugin-", "^tslint-config-"]
+      },
+      {
+        "description": "automerge minor updates of widely used libraries in devDeps",
+        "updateTypes": ["minor"],
+        "depTypeList": ["devDependencies"],
+        "automerge": true,
+        "packageNames": ["codecov", "jest", "ts-jest", "typescript"]
+      },
+      {
+        "description": "automerge type utility module",
+        "automerge": true,
+        "packageNames": ["utility-types"]
+      }
+    ]
+  }
 }
