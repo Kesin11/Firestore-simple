@@ -81,6 +81,24 @@ describe('transaction', () => {
       expect(fetched).toBeUndefined()
     })
 
+    it('add', async () => {
+      let newId: string | undefined
+      const doc = { title: 'aaa' }
+
+      await txFirestoreSimple.runTransaction(async () => {
+        newId = await txDao.add(doc)
+
+        // Added document can't see outside transaction
+        const outTxFetched = await dao.fetch(newId)
+        expect(outTxFetched).toBeUndefined()
+      })
+
+      if (!newId) return
+      // Added document can see after transaction
+      const fetched = await dao.fetch(newId)
+      expect(fetched).not.toBeUndefined()
+    })
+
     it('fetch after set in transaction should be error', async () => {
       const doc = { id: 'test1', title: 'aaa' }
       const updatedDoc = { id: 'test1', title: 'bbb' }

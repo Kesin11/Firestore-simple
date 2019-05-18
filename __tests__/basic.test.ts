@@ -131,4 +131,20 @@ describe('Basic', () => {
 
     expect(snapshot.exists).toBeFalsy()
   })
+
+  describe('docRef', () => {
+    it('with no argument should return new document ref', async () => {
+      const docRef = dao.docRef()
+
+      const fetchedDoc = await dao.fetch(docRef.id)
+      expect(fetchedDoc).toBeUndefined()
+    })
+
+    it('with id argument should return exists document ref', async () => {
+      const docRef = dao.docRef(existsDocId)
+
+      const fetchedDoc = await dao.fetch(docRef.id)
+      expect(fetchedDoc).not.toBeUndefined()
+    })
+  })
 })
