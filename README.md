@@ -266,6 +266,10 @@ await firestore.runTransaction(async (transaction) => {
 
   // Update document
   transaction.set(docRef, { name: docId })
+
+  // Add new document
+  const newDocRef = collection.doc()
+  transaction.set(newDocRef, { name: newDocRef.id })
 })
 
 // firestore-simple transaction
@@ -275,6 +279,8 @@ await firestoreSimple.runTransaction(async (_tx) => {
   await dao.fetch(docId)
 
   await dao.set({ id: docId, name: docId })
+
+  await dao.add({ name: 'new doc' })
 })
 ```
 

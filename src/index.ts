@@ -1,5 +1,6 @@
 import {
   CollectionReference,
+  DocumentReference,
   DocumentSnapshot,
   Firestore,
   Query,
@@ -120,8 +121,9 @@ export class FirestoreSimpleCollection<T extends HasId> {
     return this._decode(obj)
   }
 
-  public docRef (id: string) {
-    return this.collectionRef.doc(id)
+  public docRef (id?: string) {
+    if (id) return this.collectionRef.doc(id)
+    return this.collectionRef.doc()
   }
 
   public async fetch (id: string): Promise <T | undefined> {
@@ -159,8 +161,15 @@ export class FirestoreSimpleCollection<T extends HasId> {
   }
 
   public async add (obj: Assign<T, NullableId>) {
+    let docRef: DocumentReference
     const doc = this._toDoc(obj)
-    const docRef = await this.collectionRef.add(doc)
+
+    if (this.context.tx) {
+      docRef = this.docRef()
+      await this.context.tx.set(docRef, doc)
+    } else {
+      docRef = await this.collectionRef.add(doc)
+    }
     return docRef.id
   }
 
