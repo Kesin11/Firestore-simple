@@ -54,12 +54,12 @@ describe('transaction', () => {
       await txFirestoreSimple.runTransaction(async () => {
         await txDao.set(updatedDoc)
 
-        // updated can't see outside transaction
+        // Set document can't see outside transaction
         const outTxFetched = await dao.fetch(doc.id)
         expect(outTxFetched).toEqual(doc)
       })
 
-      // updated can see after transaction
+      // Set document can see after transaction
       const fetched = await dao.fetch(doc.id)
       expect(fetched).toEqual(updatedDoc)
     })
@@ -71,12 +71,12 @@ describe('transaction', () => {
       await txFirestoreSimple.runTransaction(async () => {
         await txDao.delete(doc.id)
 
-        // updated can't see outside transaction
+        // Deleted document can't see outside transaction
         const outTxFetched = await dao.fetch(doc.id)
         expect(outTxFetched).toEqual(doc)
       })
 
-      // updated can see after transaction
+      // Deleted document can see after transaction
       const fetched = await dao.fetch(doc.id)
       expect(fetched).toBeUndefined()
     })
@@ -184,14 +184,14 @@ describe('transaction', () => {
         await txDao.set(updatedDoc)
         await txAnotherDao.set(updatedAnotherDoc)
 
-        // updated can't see outside transaction
+        // Updated document can't see outside transaction
         const outTxFetched = await dao.fetch(doc.id)
         expect(outTxFetched).toEqual(doc)
         const outTxAnotherFetched = await anotherDao.fetch(anotherDoc.id)
         expect(outTxAnotherFetched).toEqual(anotherDoc)
       })
 
-      // updated can see after transaction
+      // Updated document can see after transaction
       const fetched = await dao.fetch(doc.id)
       expect(fetched).toEqual(updatedDoc)
       const anotherFetched = await anotherDao.fetch(anotherDoc.id)
