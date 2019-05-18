@@ -1,10 +1,10 @@
 import {
   CollectionReference,
+  DocumentReference,
   DocumentSnapshot,
   Firestore,
   Query,
   QuerySnapshot,
-  DocumentReference,
 } from '@google-cloud/firestore'
 import { Assign } from 'utility-types'
 
