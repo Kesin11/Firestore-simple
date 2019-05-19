@@ -65,3 +65,6 @@ dist/
 
 # codecov
 coverage.lcov
+
+# My sandbox scripts dir
+sandbox/
