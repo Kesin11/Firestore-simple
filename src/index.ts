@@ -136,8 +136,10 @@ export class FirestoreSimpleCollection<T extends HasId> {
     return this.toObject(snapshot)
   }
 
-  // for v1 API compatibility
-  // @deprecated
+  /**
+   * for v1 API compatibility
+   * @deprecated 3.0 Use {@link FirestoreSimpleCollection#fetch} instead.
+   */
   public async fetchDocument (id: string): Promise<T | undefined> {
     return this.fetch(id)
   }
@@ -154,8 +156,10 @@ export class FirestoreSimpleCollection<T extends HasId> {
     return arr
   }
 
-  // for v1 API compatibility
-  // @deprecated
+  /**
+   * for v1 API compatibility
+   * @deprecated 3.0 Use {@link FirestoreSimpleCollection#fetchAll} instead.
+   */
   public async fetchCollection (): Promise<T[]> {
     return this.fetchAll()
   }
