@@ -296,6 +296,34 @@ class FirestoreSimpleQuery<T extends HasId> {
     return this
   }
 
+  public startAt (...fieldValues: any[]) {
+    if (!this.query) throw new Error('no query statement before startAt()')
+
+    this.query = this.query.startAt(...fieldValues)
+    return this
+  }
+
+  public startAfter (...fieldValues: any[]) {
+    if (!this.query) throw new Error('no query statement before startAfter()')
+
+    this.query = this.query.startAfter(...fieldValues)
+    return this
+  }
+
+  public endAt (...fieldValues: any[]) {
+    if (!this.query) throw new Error('no query statement before endAt()')
+
+    this.query = this.query.endAt(...fieldValues)
+    return this
+  }
+
+  public endBefore (...fieldValues: any[]) {
+    if (!this.query) throw new Error('no query statement before endBefore()')
+
+    this.query = this.query.endBefore(...fieldValues)
+    return this
+  }
+
   public async fetch () {
     if (!this.query) throw new Error('no query statement before fetch()')
 
