@@ -257,7 +257,7 @@ export class FirestoreSimpleCollection<T extends HasId> {
 
   public onSnapshot (callback: (
     querySnapshot: QuerySnapshot,
-    toObject: (documentSnapshot: DocumentSnapshot) => T,
+    toObject: (documentSnapshot: DocumentSnapshot) => T
     ) => void) {
     return this.collectionRef.onSnapshot((_querySnapshot) => {
       callback(_querySnapshot, this.toObject.bind(this))
@@ -368,7 +368,7 @@ class FirestoreSimpleQuery<T extends HasId> {
 
   public onSnapshot (callback: (
     querySnapshot: QuerySnapshot,
-    toObject: (documentSnapshot: DocumentSnapshot) => T,
+    toObject: (documentSnapshot: DocumentSnapshot) => T
     ) => void) {
     if (!this.query) throw new Error('no query statement before onSnapshot()')
     return this.query.onSnapshot((_querySnapshot) => {
