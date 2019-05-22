@@ -48,11 +48,27 @@ describe('pagination', () => {
 
       expect(actual).toEqual({ id: '3', title: 'b', order: 3 })
     })
+
+    it('with DocumentSnapshot', async () => {
+      const snapshot = await dao.docRef('3').get()
+      const fetched = await dao.orderBy('title').startAt(snapshot).fetch()
+      const actual = fetched[0]
+
+      expect(actual).toEqual({ id: '3', title: 'b', order: 3 })
+    })
   })
 
   describe('startAfter', () => {
     it('with field value', async () => {
       const fetched = await dao.orderBy('title').startAfter('b').fetch()
+      const actual = fetched[0]
+
+      expect(actual).toEqual({ id: '4', title: 'c', order: 4 })
+    })
+
+    it('with DocumentSnapshot', async () => {
+      const snapshot = await dao.docRef('3').get()
+      const fetched = await dao.orderBy('title').startAfter(snapshot).fetch()
       const actual = fetched[0]
 
       expect(actual).toEqual({ id: '4', title: 'c', order: 4 })
@@ -66,11 +82,27 @@ describe('pagination', () => {
 
       expect(actual).toEqual({ id: '6', title: 'd', order: 6 })
     })
+
+    it('with DocumentSnapshot', async () => {
+      const snapshot = await dao.docRef('6').get()
+      const fetched = await dao.orderBy('title').endAt(snapshot).fetch()
+      const actual = fetched[fetched.length - 1]
+
+      expect(actual).toEqual({ id: '6', title: 'd', order: 6 })
+    })
   })
 
   describe('endBefore', () => {
     it('with field value', async () => {
       const fetched = await dao.orderBy('title').endBefore('e').fetch()
+      const actual = fetched[fetched.length - 1]
+
+      expect(actual).toEqual({ id: '6', title: 'd', order: 6 })
+    })
+
+    it('with DocumentSnapshot', async () => {
+      const snapshot = await dao.docRef('7').get()
+      const fetched = await dao.orderBy('title').endBefore(snapshot).fetch()
       const actual = fetched[fetched.length - 1]
 
       expect(actual).toEqual({ id: '6', title: 'd', order: 6 })
