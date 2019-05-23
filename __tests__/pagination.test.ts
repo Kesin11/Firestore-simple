@@ -8,7 +8,8 @@ export interface TestDoc {
 }
 
 const firestore = initFirestore()
-const collectionPath = createRandomCollectionName()
+// Set specific collection name because random name collection can not handle composit index
+const collectionPath = createRandomCollectionName() + '/test/test_pagination'
 const firestoreSimple = new FirestoreSimple(firestore)
 
 describe('pagination', () => {
@@ -39,7 +40,7 @@ describe('pagination', () => {
       expect(actual).toEqual({ id: '2', title: 'b', order: 2 })
     })
 
-    it.skip('with multiple field values. Skip reason: multiple orderBy need composit index, but test collection can not create composit index.', async () => {
+    it('with multiple field values', async () => {
       const fetched = await dao
         .orderBy('title').orderBy('order')
         .startAt('b', 3)
