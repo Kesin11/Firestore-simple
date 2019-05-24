@@ -257,7 +257,7 @@ export class FirestoreSimpleCollection<T extends HasId> {
 
   public onSnapshot (callback: (
     querySnapshot: QuerySnapshot,
-    toObject: (documentSnapshot: DocumentSnapshot) => T,
+    toObject: (documentSnapshot: DocumentSnapshot) => T
     ) => void) {
     return this.collectionRef.onSnapshot((_querySnapshot) => {
       callback(_querySnapshot, this.toObject.bind(this))
@@ -296,6 +296,70 @@ class FirestoreSimpleQuery<T extends HasId> {
     return this
   }
 
+  public startAt (snapshot: DocumentSnapshot): FirestoreSimpleQuery<T>
+  public startAt (...fieldValues: any[]): FirestoreSimpleQuery<T>
+  public startAt (
+    snapshotOrValue: DocumentSnapshot | unknown,
+    ...fieldValues: unknown[]
+  ) {
+    if (!this.query) throw new Error('no query statement before startAt()')
+
+    if (snapshotOrValue instanceof DocumentSnapshot) {
+      this.query = this.query.startAt(snapshotOrValue)
+    } else {
+      this.query = this.query.startAt(snapshotOrValue, ...fieldValues)
+    }
+    return this
+  }
+
+  public startAfter (snapshot: DocumentSnapshot): FirestoreSimpleQuery<T>
+  public startAfter (...fieldValues: any[]): FirestoreSimpleQuery<T>
+  public startAfter (
+    snapshotOrValue: DocumentSnapshot | unknown,
+    ...fieldValues: unknown[]
+  ) {
+    if (!this.query) throw new Error('no query statement before startAfter()')
+
+    if (snapshotOrValue instanceof DocumentSnapshot) {
+      this.query = this.query.startAfter(snapshotOrValue)
+    } else {
+      this.query = this.query.startAfter(snapshotOrValue, ...fieldValues)
+    }
+    return this
+  }
+
+  public endAt (snapshot: DocumentSnapshot): FirestoreSimpleQuery<T>
+  public endAt (...fieldValues: any[]): FirestoreSimpleQuery<T>
+  public endAt (
+    snapshotOrValue: DocumentSnapshot | unknown,
+    ...fieldValues: unknown[]
+  ) {
+    if (!this.query) throw new Error('no query statement before endAt()')
+
+    if (snapshotOrValue instanceof DocumentSnapshot) {
+      this.query = this.query.endAt(snapshotOrValue)
+    } else {
+      this.query = this.query.endAt(snapshotOrValue, ...fieldValues)
+    }
+    return this
+  }
+
+  public endBefore (snapshot: DocumentSnapshot): FirestoreSimpleQuery<T>
+  public endBefore (...fieldValues: any[]): FirestoreSimpleQuery<T>
+  public endBefore (
+    snapshotOrValue: DocumentSnapshot | unknown,
+    ...fieldValues: unknown[]
+  ) {
+    if (!this.query) throw new Error('no query statement before endBefore()')
+
+    if (snapshotOrValue instanceof DocumentSnapshot) {
+      this.query = this.query.endBefore(snapshotOrValue)
+    } else {
+      this.query = this.query.endBefore(snapshotOrValue, ...fieldValues)
+    }
+    return this
+  }
+
   public async fetch () {
     if (!this.query) throw new Error('no query statement before fetch()')
 
@@ -304,7 +368,7 @@ class FirestoreSimpleQuery<T extends HasId> {
 
   public onSnapshot (callback: (
     querySnapshot: QuerySnapshot,
-    toObject: (documentSnapshot: DocumentSnapshot) => T,
+    toObject: (documentSnapshot: DocumentSnapshot) => T
     ) => void) {
     if (!this.query) throw new Error('no query statement before onSnapshot()')
     return this.query.onSnapshot((_querySnapshot) => {

@@ -312,11 +312,11 @@ Sorry not yet. Please check [source code](./src) or look interface using your ID
 # Feature works
 - [ ] Support new feature of firestore
   - incrementValue, collectionGroup, etc...
-- [ ] Support [pagenation](https://firebase.google.com/docs/firestore/query-data/query-cursors)
+- [x] Support [pagination](https://firebase.google.com/docs/firestore/query-data/query-cursors)
 - [ ] API document
 - [ ] Test and example using other than admin SDK
 - [ ] Lint with eslint
-- [ ] Continuous upgrade and test new firestore SDK using with [Renovate](https://renovatebot.com/)(or similar other tool)
+- [x] Continuous upgrade and test new firestore SDK using with [Renovate](https://renovatebot.com/)(or similar other tool)
 
 # Contribution
 Patches are welcome!  
