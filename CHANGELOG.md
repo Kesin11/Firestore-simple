@@ -8,6 +8,15 @@ The versioning follows [Semantic Versioning](http://semver.org/):
 > 2. MINOR version when you add functionality in a backwards-compatible manner, and
 > 3. PATCH version when you make backwards-compatible bug fixes.
 
+## v3.1.0 2019/05/25
+https://github.com/Kesin11/Firestore-simple/compare/v3.0.0..v3.1.0
+
+- **Change almost API.**
+- **Unsupport sub class way introduced from v2.0.1**
+- #18 Support add() inside runTransaction(). This is firestore-simple original feature.
+- #19 Support pagination method: startAt, startAfter, endAt, endBefore
+- Bump some dependencies
+
 ## v3.0.0 2019/05/13
 https://github.com/Kesin11/Firestore-simple/compare/v2.0.1..v3.0.0
 
