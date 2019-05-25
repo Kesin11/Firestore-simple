@@ -11,9 +11,7 @@ The versioning follows [Semantic Versioning](http://semver.org/):
 ## v3.1.0 2019/05/25
 https://github.com/Kesin11/Firestore-simple/compare/v3.0.0..v3.1.0
 
-- **Change almost API.**
-- **Unsupport sub class way introduced from v2.0.1**
-- #18 Support add() inside runTransaction(). This is firestore-simple original feature.
+- #17 Support add() inside runTransaction(). This is firestore-simple original feature.
 - #19 Support pagination method: startAt, startAfter, endAt, endBefore
 - Bump some dependencies
 
