@@ -2,16 +2,20 @@ import {
   CollectionReference,
   DocumentReference,
   DocumentSnapshot,
+  FieldValue,
   Firestore,
   Query,
   QuerySnapshot,
 } from '@google-cloud/firestore'
-import { Assign } from 'utility-types'
+import { Optional } from 'utility-types'
 
 type HasId = { id: string }
 type HasIdObject = { id: string, [key: string]: any }
-type NullableId = { id?: string }
-export type Encodable<T extends HasId> = (obj: Assign<T, NullableId>) => FirebaseFirestore.DocumentData
+// Accpet original type and Firestore.FieldValue without 'id' property
+type Storable<T> = { [P in keyof T]: P extends 'id' ? T[P] : T[P] | FieldValue }
+// Convert 'id' property to optional type
+type OptionalIdStorable<T extends HasId> = Optional<Storable<T>, 'id'>
+export type Encodable<T extends HasId> = (obj: OptionalIdStorable<T>) => FirebaseFirestore.DocumentData
 export type Decodable<T extends HasId> = (doc: HasIdObject) => T
 
 interface Context {
@@ -105,12 +109,12 @@ export class FirestoreSimpleCollection<T extends HasId> {
     return doc as T
   }
 
-  private _encode (obj: T | Assign<T, NullableId>) {
+  private _encode (obj: OptionalIdStorable<T>) {
     if (this.encode) return this.encode(obj)
     return Object.assign({}, obj)
   }
 
-  private _toDoc (obj: T | Assign<T, NullableId>) {
+  private _toDoc (obj: OptionalIdStorable<T>) {
     const doc = this._encode(obj)
     if (doc.id) delete doc.id
     return doc
@@ -164,7 +168,7 @@ export class FirestoreSimpleCollection<T extends HasId> {
     return this.fetchAll()
   }
 
-  public async add (obj: Assign<T, NullableId>) {
+  public async add (obj: OptionalIdStorable<T>) {
     let docRef: DocumentReference
     const doc = this._toDoc(obj)
 
@@ -177,7 +181,7 @@ export class FirestoreSimpleCollection<T extends HasId> {
     return docRef.id
   }
 
-  public async set (obj: T) {
+  public async set (obj: Storable<T>) {
     if (!obj.id) throw new Error('Argument object must have "id" property')
 
     const docRef = this.docRef(obj.id)
@@ -191,11 +195,11 @@ export class FirestoreSimpleCollection<T extends HasId> {
     return obj.id
   }
 
-  public addOrSet (obj: Assign<T, NullableId> | T) {
-    if ('id' in obj && typeof obj.id === 'string') {
-      return this.set(obj as T)
+  public addOrSet (obj: OptionalIdStorable<T>) {
+    if ('id' in obj) {
+      return this.set(obj as Storable<T>)
     }
-    return this.add(obj as Assign<T, NullableId>)
+    return this.add(obj)
   }
 
   public async delete (id: string) {
@@ -208,7 +212,7 @@ export class FirestoreSimpleCollection<T extends HasId> {
     return id
   }
 
-  public async bulkSet (objects: T[]) {
+  public async bulkSet (objects: Array<Storable<T>>) {
     const batch = this.context.firestore.batch()
 
     objects.forEach((obj) => {
