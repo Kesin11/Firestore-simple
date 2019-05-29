@@ -16,6 +16,7 @@ type Storable<T> = { [P in keyof T]: P extends 'id' ? T[P] : T[P] | FieldValue }
 // Convert 'id' property to optional type
 type HasSameKeyObject<T> = { [P in keyof T]: any }
 type OptionalIdStorable<T extends HasId> = Optional<Storable<T>, 'id'>
+type QueryKey<T> = { [K in keyof T]: K }[keyof T] | FirebaseFirestore.FieldPath
 export type Encodable<T extends HasId, S = FirebaseFirestore.DocumentData> = (obj: OptionalIdStorable<T>) => Storable<S>
 export type Decodable<T extends HasId, S = HasIdObject> = (doc: HasSameKeyObject<S> & HasId) => T
 
@@ -245,12 +246,12 @@ export class FirestoreSimpleCollection<T extends HasId, S = T> {
     return arr
   }
 
-  public where (fieldPath: string | FirebaseFirestore.FieldPath, opStr: FirebaseFirestore.WhereFilterOp, value: any) {
+  public where (fieldPath: QueryKey<S>, opStr: FirebaseFirestore.WhereFilterOp, value: any) {
     const query = new FirestoreSimpleQuery<T, S>(this)
     return query.where(fieldPath, opStr, value)
   }
 
-  public orderBy (fieldPath: string | FirebaseFirestore.FieldPath, directionStr?: FirebaseFirestore.OrderByDirection) {
+  public orderBy (fieldPath: QueryKey<S>, directionStr?: FirebaseFirestore.OrderByDirection) {
     const query = new FirestoreSimpleQuery<T, S>(this)
     return query.orderBy(fieldPath, directionStr)
   }
@@ -270,24 +271,26 @@ export class FirestoreSimpleCollection<T extends HasId, S = T> {
   }
 }
 
-class FirestoreSimpleQuery<T extends HasId, S = T> {
+class FirestoreSimpleQuery<T extends HasId, S> {
   public query?: Query = undefined
   constructor (public collection: FirestoreSimpleCollection<T, S>) { }
 
-  public where (fieldPath: string | FirebaseFirestore.FieldPath, opStr: FirebaseFirestore.WhereFilterOp, value: any) {
+  public where (fieldPath: QueryKey<S>, opStr: FirebaseFirestore.WhereFilterOp, value: any) {
+    const _fieldPath = fieldPath as string | FirebaseFirestore.FieldPath
     if (!this.query) {
-      this.query = this.collection.collectionRef.where(fieldPath, opStr, value)
+      this.query = this.collection.collectionRef.where(_fieldPath, opStr, value)
     } else {
-      this.query = this.query.where(fieldPath, opStr, value)
+      this.query = this.query.where(_fieldPath, opStr, value)
     }
     return this
   }
 
-  public orderBy (fieldPath: string | FirebaseFirestore.FieldPath, directionStr?: FirebaseFirestore.OrderByDirection) {
+  public orderBy (fieldPath: QueryKey<S>, directionStr?: FirebaseFirestore.OrderByDirection) {
+    const _fieldPath = fieldPath as string | FirebaseFirestore.FieldPath
     if (!this.query) {
-      this.query = this.collection.collectionRef.orderBy(fieldPath, directionStr)
+      this.query = this.collection.collectionRef.orderBy(_fieldPath, directionStr)
     } else {
-      this.query = this.query.orderBy(fieldPath, directionStr)
+      this.query = this.query.orderBy(_fieldPath, directionStr)
     }
     return this
   }
