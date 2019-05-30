@@ -6,12 +6,16 @@ interface Book {
   bookTitle: string
 }
 
+interface BookDoc {
+  book_title: string
+}
+
 const firestore = initFirestore()
 const collectionPath = createRandomCollectionName()
 const firestoreSimple = new FirestoreSimple(firestore)
 
 describe('decode', () => {
-  const dao = firestoreSimple.collection<Book>({path: collectionPath,
+  const dao = firestoreSimple.collection<Book, BookDoc>({path: collectionPath,
     decode: (doc) => {
       return {
         id: doc.id,

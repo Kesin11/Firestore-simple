@@ -1,10 +1,15 @@
 import { FirestoreSimple, FirestoreSimpleCollection, Encodable, Decodable } from '../src'
 import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
 
-interface TestDoc {
+interface Book {
   id: string,
   title: string,
   createdAt: Date
+}
+
+interface BookDoc {
+  title: string,
+  created_at: Date,
 }
 
 const firestore = initFirestore()
@@ -17,13 +22,13 @@ describe('Factory and Subcollection', () => {
     await deleteCollection(firestore, collectionPath)
   })
 
-  const encodeFunc: Encodable<TestDoc> = (obj) => {
+  const encodeFunc: Encodable<Book, BookDoc> = (obj) => {
     return {
       title: obj.title,
       created_at: obj.createdAt,
     }
   }
-  const decodeFunc: Decodable<TestDoc> = (doc) => {
+  const decodeFunc: Decodable<Book, BookDoc> = (doc) => {
     return {
       id: doc.id,
       title: doc.title,
@@ -33,7 +38,7 @@ describe('Factory and Subcollection', () => {
 
   describe('FirestoreSimple.collectionFactory', () => {
     it('should has same encode function', async () => {
-      const factory = firestoreSimple.collectionFactory<TestDoc>({
+      const factory = firestoreSimple.collectionFactory<Book, BookDoc>({
         encode: encodeFunc,
       })
 
@@ -41,7 +46,7 @@ describe('Factory and Subcollection', () => {
     })
 
     it('should has same decode function', async () => {
-      const factory = firestoreSimple.collectionFactory<TestDoc>({
+      const factory = firestoreSimple.collectionFactory<Book, BookDoc>({
         decode: decodeFunc,
       })
 
@@ -51,11 +56,11 @@ describe('Factory and Subcollection', () => {
 
   describe('FirestoreSimpleCollectionFactory.create', () => {
     const subcollectionPath = `${collectionPath}/test1/sub`
-    const factory = firestoreSimple.collectionFactory<TestDoc>({
+    const factory = firestoreSimple.collectionFactory<Book, BookDoc>({
       encode: encodeFunc,
       decode: decodeFunc,
     })
-    let dao: FirestoreSimpleCollection<TestDoc>
+    let dao: FirestoreSimpleCollection<Book, BookDoc>
 
     beforeEach(async () => {
       dao = factory.create(subcollectionPath)
