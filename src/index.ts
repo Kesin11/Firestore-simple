@@ -7,7 +7,7 @@ import {
   Query,
   QuerySnapshot,
 } from '@google-cloud/firestore'
-import { Optional } from 'utility-types'
+import { Omit, Optional } from 'utility-types'
 
 type HasId = { id: string }
 type HasIdObject = { id: string, [key: string]: any }
@@ -17,6 +17,7 @@ type Storable<T> = { [P in keyof T]: P extends 'id' ? T[P] : T[P] | FieldValue }
 type HasSameKeyObject<T> = { [P in keyof T]: any }
 type OptionalIdStorable<T extends HasId> = Optional<Storable<T>, 'id'>
 type QueryKey<T> = { [K in keyof T]: K }[keyof T] | FirebaseFirestore.FieldPath
+type OmitId<T> = Omit<T, 'id'>
 export type Encodable<T extends HasId, S = FirebaseFirestore.DocumentData> = (obj: OptionalIdStorable<T>) => Storable<S>
 export type Decodable<T extends HasId, S = HasIdObject> = (doc: HasSameKeyObject<S> & HasId) => T
 
@@ -30,7 +31,7 @@ export class FirestoreSimple {
   constructor (firestore: Firestore) {
     this.context = { firestore, tx: undefined }
   }
-  public collection<T extends HasId, S = T> ({ path, encode, decode }: {
+  public collection<T extends HasId, S = OmitId<T>> ({ path, encode, decode }: {
     path: string,
     encode?: Encodable<T, S>,
     decode?: Decodable<T, S>,
@@ -43,7 +44,7 @@ export class FirestoreSimple {
     return factory.create(path)
   }
 
-  public collectionFactory<T extends HasId, S = T> ({ encode, decode }: {
+  public collectionFactory<T extends HasId, S = OmitId<T>> ({ encode, decode }: {
     encode?: Encodable<T, S>,
     decode?: Decodable<T, S>,
   }) {
@@ -63,7 +64,7 @@ export class FirestoreSimple {
   }
 }
 
-class CollectionFactory<T extends HasId, S = T> {
+class CollectionFactory<T extends HasId, S = OmitId<T>> {
   public context: Context
   public encode?: Encodable<T, S>
   public decode?: Decodable<T, S>
@@ -88,7 +89,7 @@ class CollectionFactory<T extends HasId, S = T> {
   }
 }
 
-export class FirestoreSimpleCollection<T extends HasId, S = T> {
+export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
   public context: Context
   public collectionRef: CollectionReference
   public encode?: Encodable<T, S>
