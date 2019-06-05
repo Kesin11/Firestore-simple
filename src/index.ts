@@ -2,17 +2,24 @@ import {
   CollectionReference,
   DocumentReference,
   DocumentSnapshot,
+  FieldValue,
   Firestore,
   Query,
   QuerySnapshot,
 } from '@google-cloud/firestore'
-import { Assign } from 'utility-types'
+import { Omit, Optional } from 'utility-types'
 
 type HasId = { id: string }
 type HasIdObject = { id: string, [key: string]: any }
-type NullableId = { id?: string }
-export type Encodable<T extends HasId> = (obj: Assign<T, NullableId>) => FirebaseFirestore.DocumentData
-export type Decodable<T extends HasId> = (doc: HasIdObject) => T
+// Accpet original type and Firestore.FieldValue without 'id' property
+type Storable<T> = { [P in keyof T]: P extends 'id' ? T[P] : T[P] | FieldValue }
+// Convert 'id' property to optional type
+type HasSameKeyObject<T> = { [P in keyof T]: any }
+type OptionalIdStorable<T extends HasId> = Optional<Storable<T>, 'id'>
+type QueryKey<T> = { [K in keyof T]: K }[keyof T] | FirebaseFirestore.FieldPath
+type OmitId<T> = Omit<T, 'id'>
+export type Encodable<T extends HasId, S = FirebaseFirestore.DocumentData> = (obj: OptionalIdStorable<T>) => Storable<S>
+export type Decodable<T extends HasId, S = HasIdObject> = (doc: HasSameKeyObject<S> & HasId) => T
 
 interface Context {
   firestore: Firestore,
@@ -24,12 +31,12 @@ export class FirestoreSimple {
   constructor (firestore: Firestore) {
     this.context = { firestore, tx: undefined }
   }
-  public collection<T extends HasId> ({ path, encode, decode }: {
+  public collection<T extends HasId, S = OmitId<T>> ({ path, encode, decode }: {
     path: string,
-    encode?: Encodable<T>,
-    decode?: Decodable<T>,
+    encode?: Encodable<T, S>,
+    decode?: Decodable<T, S>,
   }) {
-    const factory = new CollectionFactory<T>({
+    const factory = new CollectionFactory<T, S>({
       context: this.context,
       encode,
       decode,
@@ -37,11 +44,11 @@ export class FirestoreSimple {
     return factory.create(path)
   }
 
-  public collectionFactory<T extends HasId> ({ encode, decode }: {
-    encode?: Encodable<T>,
-    decode?: Decodable<T>,
+  public collectionFactory<T extends HasId, S = OmitId<T>> ({ encode, decode }: {
+    encode?: Encodable<T, S>,
+    decode?: Decodable<T, S>,
   }) {
-    return new CollectionFactory<T>({
+    return new CollectionFactory<T, S>({
       context: this.context,
       encode,
       decode,
@@ -57,15 +64,15 @@ export class FirestoreSimple {
   }
 }
 
-class CollectionFactory<T extends HasId> {
+class CollectionFactory<T extends HasId, S = OmitId<T>> {
   public context: Context
-  public encode?: Encodable<T>
-  public decode?: Decodable<T>
+  public encode?: Encodable<T, S>
+  public decode?: Decodable<T, S>
 
   constructor ({ context, encode, decode }: {
     context: Context
-    encode?: Encodable<T>,
-    decode?: Decodable<T>,
+    encode?: Encodable<T, S>,
+    decode?: Decodable<T, S>,
   }) {
     this.context = context
     this.encode = encode
@@ -73,7 +80,7 @@ class CollectionFactory<T extends HasId> {
   }
 
   public create (path: string) {
-    return new FirestoreSimpleCollection<T>({
+    return new FirestoreSimpleCollection<T, S>({
       context: this.context,
       path,
       encode: this.encode,
@@ -82,17 +89,17 @@ class CollectionFactory<T extends HasId> {
   }
 }
 
-export class FirestoreSimpleCollection<T extends HasId> {
+export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
   public context: Context
   public collectionRef: CollectionReference
-  public encode?: Encodable<T>
-  public decode?: Decodable<T>
+  public encode?: Encodable<T, S>
+  public decode?: Decodable<T, S>
 
   constructor ({ context, path, encode, decode }: {
     context: Context
     path: string,
-    encode?: Encodable<T>,
-    decode?: Decodable<T>,
+    encode?: Encodable<T, S>,
+    decode?: Decodable<T, S>,
   }) {
     this.context = context
     this.collectionRef = context.firestore.collection(path)
@@ -100,25 +107,25 @@ export class FirestoreSimpleCollection<T extends HasId> {
     this.decode = decode
   }
 
-  private _decode (doc: HasIdObject): T {
+  private _decode (doc: HasSameKeyObject<S> & HasId) {
     if (this.decode) return this.decode(doc)
     return doc as T
   }
 
-  private _encode (obj: T | Assign<T, NullableId>) {
+  private _encode (obj: OptionalIdStorable<T>) {
     if (this.encode) return this.encode(obj)
     return Object.assign({}, obj)
   }
 
-  private _toDoc (obj: T | Assign<T, NullableId>) {
+  private _toDoc (obj: OptionalIdStorable<T>) {
     const doc = this._encode(obj)
-    if (doc.id) delete doc.id
+    if ('id' in doc) delete doc.id
     return doc
   }
 
-  public toObject (documentSnapshot: DocumentSnapshot): T {
+  public toObject (documentSnapshot: DocumentSnapshot) {
     const obj = { id: documentSnapshot.id, ...documentSnapshot.data() }
-    return this._decode(obj)
+    return this._decode(obj as HasSameKeyObject<S> & HasId)
   }
 
   public docRef (id?: string) {
@@ -164,7 +171,7 @@ export class FirestoreSimpleCollection<T extends HasId> {
     return this.fetchAll()
   }
 
-  public async add (obj: Assign<T, NullableId>) {
+  public async add (obj: OptionalIdStorable<T>) {
     let docRef: DocumentReference
     const doc = this._toDoc(obj)
 
@@ -177,7 +184,7 @@ export class FirestoreSimpleCollection<T extends HasId> {
     return docRef.id
   }
 
-  public async set (obj: T) {
+  public async set (obj: Storable<T>) {
     if (!obj.id) throw new Error('Argument object must have "id" property')
 
     const docRef = this.docRef(obj.id)
@@ -191,11 +198,11 @@ export class FirestoreSimpleCollection<T extends HasId> {
     return obj.id
   }
 
-  public addOrSet (obj: Assign<T, NullableId> | T) {
-    if ('id' in obj && typeof obj.id === 'string') {
-      return this.set(obj as T)
+  public addOrSet (obj: OptionalIdStorable<T>) {
+    if ('id' in obj) {
+      return this.set(obj as Storable<T>)
     }
-    return this.add(obj as Assign<T, NullableId>)
+    return this.add(obj)
   }
 
   public async delete (id: string) {
@@ -208,7 +215,7 @@ export class FirestoreSimpleCollection<T extends HasId> {
     return id
   }
 
-  public async bulkSet (objects: T[]) {
+  public async bulkSet (objects: Array<Storable<T>>) {
     const batch = this.context.firestore.batch()
 
     objects.forEach((obj) => {
@@ -240,18 +247,18 @@ export class FirestoreSimpleCollection<T extends HasId> {
     return arr
   }
 
-  public where (fieldPath: string | FirebaseFirestore.FieldPath, opStr: FirebaseFirestore.WhereFilterOp, value: any) {
-    const query = new FirestoreSimpleQuery<T>(this)
+  public where (fieldPath: QueryKey<S>, opStr: FirebaseFirestore.WhereFilterOp, value: any) {
+    const query = new FirestoreSimpleQuery<T, S>(this)
     return query.where(fieldPath, opStr, value)
   }
 
-  public orderBy (fieldPath: string | FirebaseFirestore.FieldPath, directionStr?: FirebaseFirestore.OrderByDirection) {
-    const query = new FirestoreSimpleQuery<T>(this)
+  public orderBy (fieldPath: QueryKey<S>, directionStr?: FirebaseFirestore.OrderByDirection) {
+    const query = new FirestoreSimpleQuery<T, S>(this)
     return query.orderBy(fieldPath, directionStr)
   }
 
   public limit (limit: number) {
-    const query = new FirestoreSimpleQuery<T>(this)
+    const query = new FirestoreSimpleQuery<T, S>(this)
     return query.limit(limit)
   }
 
@@ -265,24 +272,26 @@ export class FirestoreSimpleCollection<T extends HasId> {
   }
 }
 
-class FirestoreSimpleQuery<T extends HasId> {
+class FirestoreSimpleQuery<T extends HasId, S> {
   public query?: Query = undefined
-  constructor (public collection: FirestoreSimpleCollection<T>) { }
+  constructor (public collection: FirestoreSimpleCollection<T, S>) { }
 
-  public where (fieldPath: string | FirebaseFirestore.FieldPath, opStr: FirebaseFirestore.WhereFilterOp, value: any) {
+  public where (fieldPath: QueryKey<S>, opStr: FirebaseFirestore.WhereFilterOp, value: any) {
+    const _fieldPath = fieldPath as string | FirebaseFirestore.FieldPath
     if (!this.query) {
-      this.query = this.collection.collectionRef.where(fieldPath, opStr, value)
+      this.query = this.collection.collectionRef.where(_fieldPath, opStr, value)
     } else {
-      this.query = this.query.where(fieldPath, opStr, value)
+      this.query = this.query.where(_fieldPath, opStr, value)
     }
     return this
   }
 
-  public orderBy (fieldPath: string | FirebaseFirestore.FieldPath, directionStr?: FirebaseFirestore.OrderByDirection) {
+  public orderBy (fieldPath: QueryKey<S>, directionStr?: FirebaseFirestore.OrderByDirection) {
+    const _fieldPath = fieldPath as string | FirebaseFirestore.FieldPath
     if (!this.query) {
-      this.query = this.collection.collectionRef.orderBy(fieldPath, directionStr)
+      this.query = this.collection.collectionRef.orderBy(_fieldPath, directionStr)
     } else {
-      this.query = this.query.orderBy(fieldPath, directionStr)
+      this.query = this.query.orderBy(_fieldPath, directionStr)
     }
     return this
   }
@@ -296,8 +305,8 @@ class FirestoreSimpleQuery<T extends HasId> {
     return this
   }
 
-  public startAt (snapshot: DocumentSnapshot): FirestoreSimpleQuery<T>
-  public startAt (...fieldValues: any[]): FirestoreSimpleQuery<T>
+  public startAt (snapshot: DocumentSnapshot): FirestoreSimpleQuery<T, S>
+  public startAt (...fieldValues: any[]): FirestoreSimpleQuery<T, S>
   public startAt (
     snapshotOrValue: DocumentSnapshot | unknown,
     ...fieldValues: unknown[]
@@ -312,8 +321,8 @@ class FirestoreSimpleQuery<T extends HasId> {
     return this
   }
 
-  public startAfter (snapshot: DocumentSnapshot): FirestoreSimpleQuery<T>
-  public startAfter (...fieldValues: any[]): FirestoreSimpleQuery<T>
+  public startAfter (snapshot: DocumentSnapshot): FirestoreSimpleQuery<T, S>
+  public startAfter (...fieldValues: any[]): FirestoreSimpleQuery<T, S>
   public startAfter (
     snapshotOrValue: DocumentSnapshot | unknown,
     ...fieldValues: unknown[]
@@ -328,8 +337,8 @@ class FirestoreSimpleQuery<T extends HasId> {
     return this
   }
 
-  public endAt (snapshot: DocumentSnapshot): FirestoreSimpleQuery<T>
-  public endAt (...fieldValues: any[]): FirestoreSimpleQuery<T>
+  public endAt (snapshot: DocumentSnapshot): FirestoreSimpleQuery<T, S>
+  public endAt (...fieldValues: any[]): FirestoreSimpleQuery<T, S>
   public endAt (
     snapshotOrValue: DocumentSnapshot | unknown,
     ...fieldValues: unknown[]
@@ -344,8 +353,8 @@ class FirestoreSimpleQuery<T extends HasId> {
     return this
   }
 
-  public endBefore (snapshot: DocumentSnapshot): FirestoreSimpleQuery<T>
-  public endBefore (...fieldValues: any[]): FirestoreSimpleQuery<T>
+  public endBefore (snapshot: DocumentSnapshot): FirestoreSimpleQuery<T, S>
+  public endBefore (...fieldValues: any[]): FirestoreSimpleQuery<T, S>
   public endBefore (
     snapshotOrValue: DocumentSnapshot | unknown,
     ...fieldValues: unknown[]

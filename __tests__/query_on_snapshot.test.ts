@@ -8,12 +8,18 @@ interface Book {
   bookId: number,
 }
 
+interface BookDoc {
+  book_title: string,
+  created: Date,
+  book_id: number
+}
+
 const firestore = initFirestore()
 const collectionPath = createRandomCollectionName()
 const firestoreSimple = new FirestoreSimple(firestore)
 
 describe('query on_snapshot test', () => {
-  const dao = firestoreSimple.collection<Book>({path: collectionPath,
+  const dao = firestoreSimple.collection<Book, BookDoc>({path: collectionPath,
     encode: (book) => {
       return {
         book_title: book.bookTitle,
