@@ -26,7 +26,7 @@ describe('batch', () => {
     ]
     await dao.bulkSet(docs)
 
-    const actualDocs = await dao.fetchCollection()
+    const actualDocs = await dao.fetchAll()
     expect(actualDocs).toEqual(docs)
   })
 
@@ -43,7 +43,7 @@ describe('batch', () => {
     const docIds = docs.map((doc) => doc.id)
     await dao.bulkDelete(docIds)
 
-    const actualDocs = await dao.fetchCollection()
+    const actualDocs = await dao.fetchAll()
     expect(actualDocs).toEqual([])
   })
   
