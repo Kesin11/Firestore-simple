@@ -96,7 +96,7 @@ describe('Basic', () => {
       const addedId = await dao.addOrSet(doc)
       expect(addedId).toBeTruthy()
 
-      const fetchedAddDoc = await dao.fetchDocument(addedId)
+      const fetchedAddDoc = await dao.fetch(addedId)
       expect(fetchedAddDoc).toEqual({
         id: expect.anything(),
         title: doc.title,
@@ -114,7 +114,7 @@ describe('Basic', () => {
       const setedId = await dao.addOrSet(setDoc)
       expect(setedId).toEqual(docId)
 
-      const fetchedSetDoc = await dao.fetchDocument(docId)
+      const fetchedSetDoc = await dao.fetch(docId)
       expect(fetchedSetDoc).toEqual(setDoc)
     })
   })
