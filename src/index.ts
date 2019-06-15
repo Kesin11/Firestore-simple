@@ -143,14 +143,6 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
     return this.toObject(snapshot)
   }
 
-  /**
-   * for v1 API compatibility
-   * @deprecated 3.0 Use {@link FirestoreSimpleCollection#fetch} instead.
-   */
-  public async fetchDocument (id: string): Promise<T | undefined> {
-    return this.fetch(id)
-  }
-
   public async fetchAll (): Promise<T[]> {
     const snapshot = (this.context.tx)
       ? await this.context.tx.get(this.collectionRef)
@@ -161,14 +153,6 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
       arr.push(this.toObject(documentSnapshot))
     })
     return arr
-  }
-
-  /**
-   * for v1 API compatibility
-   * @deprecated 3.0 Use {@link FirestoreSimpleCollection#fetchAll} instead.
-   */
-  public async fetchCollection (): Promise<T[]> {
-    return this.fetchAll()
   }
 
   public async add (obj: OptionalIdStorable<T>) {
