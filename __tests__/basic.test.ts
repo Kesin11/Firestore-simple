@@ -4,7 +4,7 @@ import { createRandomCollectionName, deleteCollection, initFirestore } from './u
 interface TestDoc {
   id: string,
   title: string,
-  url: string
+  num: number,
 }
 
 const firestore = initFirestore()
@@ -16,14 +16,14 @@ describe('Basic', () => {
   const existsDocId = 'test'
   const existsDoc = {
     title: 'title',
-    url: 'http://example.com',
+    num: 10,
   }
   // Add fix id document and random id document
   beforeEach(async () => {
     await dao.collectionRef.doc(existsDocId).set(existsDoc)
     await dao.collectionRef.add({
       title: 'before',
-      url: 'http://example.com/before',
+      num: 10,
     })
   })
 
@@ -56,7 +56,7 @@ describe('Basic', () => {
   it('add', async () => {
     const doc = {
       title: 'add',
-      url: 'http://example.com/add',
+      num: 10,
     }
 
     const addedId = await dao.add(doc)
@@ -65,19 +65,19 @@ describe('Basic', () => {
     expect(fetchedDoc).toEqual({
       id: expect.anything(),
       title: doc.title,
-      url: doc.url,
+      num: doc.num,
     })
   })
 
   it('set', async () => {
     const addedDoc = await dao.collectionRef.add({
       title: 'hogehoge',
-      url: 'http://example.com/hogehoge',
+      num: 10,
     })
     const setDoc = {
       id: addedDoc.id,
       title: 'set',
-      url: 'http://example.com/set',
+      num: 20,
     }
 
     const setedId = await dao.set(setDoc)
@@ -90,7 +90,7 @@ describe('Basic', () => {
     it('add', async () => {
       const doc = {
         title: 'add',
-        url: 'http://example.com/add',
+        num: 10,
       }
 
       const addedId = await dao.addOrSet(doc)
@@ -100,7 +100,7 @@ describe('Basic', () => {
       expect(fetchedAddDoc).toEqual({
         id: expect.anything(),
         title: doc.title,
-        url: doc.url,
+        num: doc.num,
       })
     })
 
@@ -109,7 +109,7 @@ describe('Basic', () => {
       const setDoc = {
         id: docId,
         title: 'set',
-        url: 'http://example.com/set',
+        num: 10,
       }
       const setedId = await dao.addOrSet(setDoc)
       expect(setedId).toEqual(docId)
@@ -122,7 +122,7 @@ describe('Basic', () => {
   it('delete', async () => {
     const doc = {
       title: 'delete',
-      url: 'http://example.com/delete',
+      num: 10,
     }
     const addedId = await dao.add(doc)
 
