@@ -99,6 +99,24 @@ describe('transaction', () => {
         const fetched = await dao.fetch(newId)
         expect(fetched).not.toBeUndefined()
       })
+
+      it('update', async () => {
+        const updatedTitle = 'update'
+        const doc = { id: 'test2', title: 'aaa' }
+        await dao.set(doc)
+
+        await txFirestoreSimple.runTransaction(async () => {
+          await txDao.update({id: doc.id, title: updatedTitle})
+
+          // Updated document can't see outside transaction
+          const outTxFetched = await dao.fetch(doc.id)
+          expect(outTxFetched!.title).toEqual(doc.title)
+        })
+
+        // Updated document can see after transaction
+        const fetched = await dao.fetch(doc.id)
+        expect(fetched!.title).toEqual(updatedTitle)
+      })
     })
 
     describe('read method', () => {
