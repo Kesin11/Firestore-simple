@@ -1,5 +1,6 @@
 import { FirestoreSimple } from '../src'
 import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
+import { FieldValue } from '@google-cloud/firestore';
 
 interface TestDoc {
   id: string,
@@ -145,6 +146,43 @@ describe('Basic', () => {
 
       const fetchedDoc = await dao.fetch(docRef.id)
       expect(fetchedDoc).not.toBeUndefined()
+    })
+  })
+
+  describe('update', () => {
+    it('with simple value', async () => {
+      const addedDoc = await dao.collectionRef.add({
+        title: 'hogehoge',
+        num: 10,
+      })
+
+      const expectTitle = 'update'
+      const updatedId = await dao.update({
+        id: addedDoc.id,
+        title: expectTitle,
+      })
+
+      expect(updatedId).toEqual(addedDoc.id)
+
+      const fetchedDoc = await dao.fetch(updatedId)
+      expect(fetchedDoc!.title).toEqual(expectTitle)
+    })
+
+    it('with FieldValue.increment', async () => {
+      const baseNum = 10
+      const addedDoc = await dao.collectionRef.add({
+        title: 'FieldValue_increment',
+        num: baseNum,
+      })
+
+      const incrementNum = 100
+      const updatedId = await dao.update({
+        id: addedDoc.id,
+        num: FieldValue.increment(incrementNum)
+      })
+
+      const fetchedDoc = await dao.fetch(updatedId)
+      expect(fetchedDoc!.num).toEqual(baseNum + incrementNum)
     })
   })
 })
