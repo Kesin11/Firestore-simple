@@ -286,6 +286,42 @@ await firestoreSimple.runTransaction(async (_tx) => {
 
 If you want to see more transaction example, please check [example code](./example) and [test code](./__tests__).
 
+# FieldValue.increment
+Firestore can increment or decrement a numeric field value. This is very useful for counter like fields.  
+see: https://firebase.google.com/docs/firestore/manage-data/add-data?hl=en#increment_a_numeric_value
+
+
+firestore-simple supports to update a document using special value of `FieldValue`. So of course you can use `FieldValue.increment` with update.
+
+```js
+interface User {
+  id: string,
+  coin: number,
+  timestamp: Date,
+}
+
+const firestoreSimple = new FirestoreSimple(firestore)
+const dao = firestoreSimple.collection<User>({ path: `${ROOT_PATH}/user` })
+
+// Setup user
+const userId = await dao.add({
+  coin: 100,
+  timestamp: FieldValue.serverTimestamp()
+})
+
+// Add 100 coin and update timestamp
+await dao.update({
+  id: userId,
+  coin: FieldValue.increment(100),
+  timestamp: FieldValue.serverTimestamp()
+})
+
+console.log(await dao.fetch(userId))
+// { id: 'E4pROVpeLaE3WBCYDDSh',
+//   coin: 200,
+//   timestamp: Timestamp { _seconds: 1560666401, _nanoseconds: 731000000 } }
+```
+
 
 # Fallback to use original firestore
 Unfortunately firestore-simple does not support all the features of Firestore, so sometimes you may want to use raw collection references or document references.

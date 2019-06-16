@@ -13,9 +13,13 @@ type HasId = { id: string }
 type HasIdObject = { id: string, [key: string]: any }
 // Accpet original type and Firestore.FieldValue without 'id' property
 type Storable<T> = { [P in keyof T]: P extends 'id' ? T[P] : T[P] | FieldValue }
+// Storable but only 'id' is optional
+type OptionalIdStorable<T extends HasId> = Optional<Storable<T>, 'id'>
+// Storable but all keys exclude 'id' are optional
+type PartialStorable<T extends HasId> = Partial<Storable<T>> & HasId
+
 // Convert 'id' property to optional type
 type HasSameKeyObject<T> = { [P in keyof T]: any }
-type OptionalIdStorable<T extends HasId> = Optional<Storable<T>, 'id'>
 type QueryKey<T> = { [K in keyof T]: K }[keyof T] | FirebaseFirestore.FieldPath
 type OmitId<T> = Omit<T, 'id'>
 export type Encodable<T extends HasId, S = FirebaseFirestore.DocumentData> = (obj: OptionalIdStorable<T>) => Storable<S>
@@ -187,6 +191,21 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
       return this.set(obj as Storable<T>)
     }
     return this.add(obj)
+  }
+
+  public async update (obj: PartialStorable<T>) {
+    if (!obj.id) throw new Error('Argument object must have "id" property')
+
+    const docRef = this.docRef(obj.id)
+    const updateDoc = Object.assign({}, obj)
+    delete updateDoc.id
+
+    if (this.context.tx) {
+      await this.context.tx.update(docRef, updateDoc)
+    } else {
+      await docRef.update(updateDoc)
+    }
+    return obj.id
   }
 
   public async delete (id: string) {

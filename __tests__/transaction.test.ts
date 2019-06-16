@@ -46,106 +46,128 @@ describe('transaction', () => {
   })
 
   describe('Collection', () => {
-    it('set', async () => {
-      const doc = { id: 'test1', title: 'aaa' }
-      const updatedDoc = { id: 'test1', title: 'bbb' }
-      await dao.set(doc)
+    describe('write method', () => {
+      it('set', async () => {
+        const doc = { id: 'test1', title: 'aaa' }
+        const updatedDoc = { id: 'test1', title: 'bbb' }
+        await dao.set(doc)
 
-      await txFirestoreSimple.runTransaction(async () => {
-        await txDao.set(updatedDoc)
+        await txFirestoreSimple.runTransaction(async () => {
+          await txDao.set(updatedDoc)
 
-        // Set document can't see outside transaction
-        const outTxFetched = await dao.fetch(doc.id)
-        expect(outTxFetched).toEqual(doc)
+          // Set document can't see outside transaction
+          const outTxFetched = await dao.fetch(doc.id)
+          expect(outTxFetched).toEqual(doc)
+        })
+
+        // Set document can see after transaction
+        const fetched = await dao.fetch(doc.id)
+        expect(fetched).toEqual(updatedDoc)
       })
 
-      // Set document can see after transaction
-      const fetched = await dao.fetch(doc.id)
-      expect(fetched).toEqual(updatedDoc)
-    })
+      it('delete', async () => {
+        const doc = { id: 'test1', title: 'aaa' }
+        await dao.set(doc)
 
-    it('delete', async () => {
-      const doc = { id: 'test1', title: 'aaa' }
-      await dao.set(doc)
+        await txFirestoreSimple.runTransaction(async () => {
+          await txDao.delete(doc.id)
 
-      await txFirestoreSimple.runTransaction(async () => {
-        await txDao.delete(doc.id)
+          // Deleted document can't see outside transaction
+          const outTxFetched = await dao.fetch(doc.id)
+          expect(outTxFetched).toEqual(doc)
+        })
 
-        // Deleted document can't see outside transaction
-        const outTxFetched = await dao.fetch(doc.id)
-        expect(outTxFetched).toEqual(doc)
+        // Deleted document can see after transaction
+        const fetched = await dao.fetch(doc.id)
+        expect(fetched).toBeUndefined()
       })
 
-      // Deleted document can see after transaction
-      const fetched = await dao.fetch(doc.id)
-      expect(fetched).toBeUndefined()
-    })
+      it('add', async () => {
+        let newId: string | undefined
+        const doc = { title: 'aaa' }
 
-    it('add', async () => {
-      let newId: string | undefined
-      const doc = { title: 'aaa' }
+        await txFirestoreSimple.runTransaction(async () => {
+          newId = await txDao.add(doc)
 
-      await txFirestoreSimple.runTransaction(async () => {
-        newId = await txDao.add(doc)
+          // Added document can't see outside transaction
+          const outTxFetched = await dao.fetch(newId)
+          expect(outTxFetched).toBeUndefined()
+        })
 
-        // Added document can't see outside transaction
-        const outTxFetched = await dao.fetch(newId)
-        expect(outTxFetched).toBeUndefined()
+        if (!newId) return
+        // Added document can see after transaction
+        const fetched = await dao.fetch(newId)
+        expect(fetched).not.toBeUndefined()
       })
 
-      if (!newId) return
-      // Added document can see after transaction
-      const fetched = await dao.fetch(newId)
-      expect(fetched).not.toBeUndefined()
-    })
+      it('update', async () => {
+        const updatedTitle = 'update'
+        const doc = { id: 'test2', title: 'aaa' }
+        await dao.set(doc)
 
-    it('fetch after set in transaction should be error', async () => {
-      const doc = { id: 'test1', title: 'aaa' }
-      const updatedDoc = { id: 'test1', title: 'bbb' }
-      await dao.set(doc)
+        await txFirestoreSimple.runTransaction(async () => {
+          await txDao.update({id: doc.id, title: updatedTitle})
 
-      await txFirestoreSimple.runTransaction(async () => {
-        await txDao.set(updatedDoc)
+          // Updated document can't see outside transaction
+          const outTxFetched = await dao.fetch(doc.id)
+          expect(outTxFetched!.title).toEqual(doc.title)
+        })
 
-        // Firestore throw error READ after WRITE in same transaction.
-        // To show txDao.fetch() is inside transaction, assert transaction error.
-        await expect(txDao.fetch(doc.id)).rejects.toThrow(
-          'Firestore transactions require all reads to be executed before all writes.'
-        )
-      })
-    })
-
-    it('fetchAll after set in transaction should be error', async () => {
-      const doc = { id: 'test1', title: 'aaa' }
-      const updatedDoc = { id: 'test1', title: 'bbb' }
-      await dao.set(doc)
-
-      await txFirestoreSimple.runTransaction(async () => {
-        await txDao.set(updatedDoc)
-
-        // Firestore throw error READ after WRITE in same transaction.
-        // To show txDao.fetchAll() is inside transaction, assert transaction error.
-        await expect(txDao.fetchAll()).rejects.toThrow(
-          'Firestore transactions require all reads to be executed before all writes.'
-        )
+        // Updated document can see after transaction
+        const fetched = await dao.fetch(doc.id)
+        expect(fetched!.title).toEqual(updatedTitle)
       })
     })
 
-    it('query after set in transaction should be error', async () => {
-      const doc = { id: 'test1', title: 'aaa' }
-      const updatedDoc = { id: 'test1', title: 'bbb' }
-      await dao.set(doc)
+    describe('read method', () => {
+      it('fetch after set in transaction should be error', async () => {
+        const doc = { id: 'test1', title: 'aaa' }
+        const updatedDoc = { id: 'test1', title: 'bbb' }
+        await dao.set(doc)
 
-      await txFirestoreSimple.runTransaction(async () => {
-        await txDao.set(updatedDoc)
+        await txFirestoreSimple.runTransaction(async () => {
+          await txDao.set(updatedDoc)
 
-        // Firestore throw error READ after WRITE in same transaction.
-        // To show txDao.where().fetch() is inside transaction, assert transaction error.
-        await expect(
-          txDao.where('title', '==', 'bbb').fetch()
-         ).rejects.toThrow(
-          'Firestore transactions require all reads to be executed before all writes.'
-        )
+          // Firestore throw error READ after WRITE in same transaction.
+          // To show txDao.fetch() is inside transaction, assert transaction error.
+          await expect(txDao.fetch(doc.id)).rejects.toThrow(
+            'Firestore transactions require all reads to be executed before all writes.'
+          )
+        })
+      })
+
+      it('fetchAll after set in transaction should be error', async () => {
+        const doc = { id: 'test1', title: 'aaa' }
+        const updatedDoc = { id: 'test1', title: 'bbb' }
+        await dao.set(doc)
+
+        await txFirestoreSimple.runTransaction(async () => {
+          await txDao.set(updatedDoc)
+
+          // Firestore throw error READ after WRITE in same transaction.
+          // To show txDao.fetchAll() is inside transaction, assert transaction error.
+          await expect(txDao.fetchAll()).rejects.toThrow(
+            'Firestore transactions require all reads to be executed before all writes.'
+          )
+        })
+      })
+
+      it('query after set in transaction should be error', async () => {
+        const doc = { id: 'test1', title: 'aaa' }
+        const updatedDoc = { id: 'test1', title: 'bbb' }
+        await dao.set(doc)
+
+        await txFirestoreSimple.runTransaction(async () => {
+          await txDao.set(updatedDoc)
+
+          // Firestore throw error READ after WRITE in same transaction.
+          // To show txDao.where().fetch() is inside transaction, assert transaction error.
+          await expect(
+            txDao.where('title', '==', 'bbb').fetch()
+          ).rejects.toThrow(
+            'Firestore transactions require all reads to be executed before all writes.'
+          )
+        })
       })
     })
   })
