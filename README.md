@@ -57,6 +57,7 @@ const main = async () => {
   // 3Y5jwT8pB4cMqS1n3maj
 
   // fetch(get)
+  // A return document is typed as `User` automatically.
   const bob: User | undefined = await dao.fetch(bobId)
   // { id: '3Y5jwT8pB4cMqS1n3maj', age: 20, name: 'bob' }
 
@@ -143,6 +144,7 @@ class User {
 const firestoreSimple = new FirestoreSimple(firestore)
 const dao = firestoreSimple.collection<User>({
   path: `user`,
+  // Map `User` to firestore document
   encode: (user) => {
     return {
       name: user.name,
@@ -150,6 +152,7 @@ const dao = firestoreSimple.collection<User>({
       updated: admin.firestore.FieldValue.serverTimestamp() // Using Firebase server timestamp when set document
     }
   },
+  // Map firestore document to `User`
   decode: (doc) => {
     return new User(
       doc.id,
@@ -169,7 +172,7 @@ dao.where('age', '>=', 20)
   .onSnapshot((querySnapshot, toObject) => {
     querySnapshot.docChanges.forEach((change) => {
       if (change.type === 'added') {
-        const changedDoc = toObject(change.doc)
+        const changedDoc = toObject(change.doc) // changeDoc is mapped by `decode`.
       }
     })
   })
@@ -183,7 +186,7 @@ It can define `encode` and `decode` but not `path`. You can create FirestoreSimp
 This is example using `collectionFactory` for subcollection.
 
 ```js
-// Subcollection user/${user.id}/friend
+// Subcollection: /user/${user.id}/friend
 interface UserFriend {
   id: string,
   name: string,
@@ -195,7 +198,7 @@ const userNames = ['alice', 'bob', 'john']
 const main = async () => {
   const firestoreSimple = new FirestoreSimple(firestore)
 
-  // Create factory with define decode function for subcollection
+  // Create factory with define `decode` function for subcollection
   const userFriendFactory = firestoreSimple.collectionFactory<UserFriend>({
     decode: (doc) => {
       return {
@@ -208,7 +211,7 @@ const main = async () => {
 
   const users = await userDao.fetchAll()
   for (const user of users) {
-    // Create subcollection dao that inherited decode function defined in factory
+    // Create subcollection dao that inherited `decode` function defined in factory
     const userFriendDao = userFriendFactory.create(`user/${user.id}/friend`)
 
     const friends = await userFriendDao.fetchAll()
@@ -261,7 +264,7 @@ Firestore can increment or decrement a numeric field value. This is very useful 
 see: https://firebase.google.com/docs/firestore/manage-data/add-data?hl=en#increment_a_numeric_value
 
 
-firestore-simple supports to update a document using special value of `FieldValue`. So of course you can use `FieldValue.increment` with update.
+firestore-simple supports to `update` a document using special value of `FieldValue`. So of course you can use `FieldValue.increment` with update.
 
 ```js
 interface User {
@@ -309,7 +312,10 @@ const collectionRef = dao.collectionRef
 const docRef = dao.docRef('documentId')
 ```
 
-# More example
+# More API and example
+firestore-simple provide more API and support almost firestore features.  
+ex: `addOrSet`, `update`, `where`, `orderBy`, `limit`.
+
 You can find more example from [example directory](./example). Also [test code](./__tests__) maybe as good sample.
 
 # API document
@@ -326,7 +332,7 @@ Sorry not yet. Please check [source code](./src) or look interface using your ID
 
 # Contribution
 Patches are welcome!  
-Olso welcome fixing english documentation.
+Also welcome fixing english documentation.
 
 # Development
 Unit tests are using **REAL Firestore(Firebase)**, not mock!
