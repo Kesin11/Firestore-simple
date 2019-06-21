@@ -323,7 +323,8 @@ Sorry not yet. Please check [source code](./src) or look interface using your ID
 
 # Feature works
 - [ ] Support new feature of firestore
-  - incrementValue, collectionGroup, etc...
+  - [x] incrementValue
+  - [ ] collectionGroup
 - [x] Support [pagination](https://firebase.google.com/docs/firestore/query-data/query-cursors)
 - [ ] API document
 - [ ] Lint with eslint
