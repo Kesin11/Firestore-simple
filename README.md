@@ -13,10 +13,8 @@ More simple, powerful and TypeScript friendly Firestore wrapper.
 
 |Support Firestore SDK|
 |----|
-|[Web](https://firebase.google.com/docs/reference/js/firebase.firestore)|
-|[Node.js](https://firebase.google.com/docs/reference/node/firebase.firestore)|
-|[admin](https://firebase.google.com/docs/reference/functions/functions.firestore)|
-|[Cloud Functions](https://firebase.google.com/docs/reference/admin/node/admin.firestore)|
+|[Cloud Functions](https://firebase.google.com/docs/reference/functions/functions.firestore)|
+|[admin](https://firebase.google.com/docs/reference/admin/node/admin.firestore)|
 
 
 Blog posts (sorry Japanese only)
@@ -350,9 +348,9 @@ Sorry not yet. Please check [source code](./src) or look interface using your ID
   - incrementValue, collectionGroup, etc...
 - [x] Support [pagination](https://firebase.google.com/docs/firestore/query-data/query-cursors)
 - [ ] API document
-- [ ] Test and example using other than admin SDK
 - [ ] Lint with eslint
 - [x] Continuous upgrade and test new firestore SDK using with [Renovate](https://renovatebot.com/)(or similar other tool)
+- [ ] Support [web sdk](https://firebase.google.com/docs/reference/js/firebase.firestore)
 
 # Contribution
 Patches are welcome!  
