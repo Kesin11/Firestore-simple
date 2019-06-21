@@ -13,8 +13,8 @@ More simple, powerful and TypeScript friendly Firestore wrapper.
 
 |Support Firestore SDK|
 |----|
-|[admin](https://firebase.google.com/docs/reference/functions/functions.firestore)|
-|[Cloud Functions](https://firebase.google.com/docs/reference/admin/node/admin.firestore)|
+|[Cloud Functions](https://firebase.google.com/docs/reference/functions/functions.firestore)|
+|[admin](https://firebase.google.com/docs/reference/admin/node/admin.firestore)|
 
 
 Blog posts (sorry Japanese only)
