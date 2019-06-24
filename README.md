@@ -165,33 +165,33 @@ const dao = firestoreSimple.collection<User>({
 ```
 
 ## Generics of `FirestoreSimple.collection`
-`FirestoreSimple.collection<T, S>` has two of the type arguments `T` and `S`. If keys of `T` and document in firestore collection keys as same, you no longer to need `S`. firestore-simple provide auto completion and restriction in most methods by keys of `T`.
+`FirestoreSimple.collection<T, S>` has two of the type arguments `T` and `S`. If property names of `T` and property names of the document in firestore as same, you no longer to need `S`. firestore-simple provide auto completion and restriction in most methods by using `T`.
 
-On the other hand, if the keys of the document in firestore are different from `T`, you need to assign` S` that has same keys as the document in firestore.
+On the other hand, if property names of the document in firestore are different from `T`, you need to assign` S` that has same property names as the document in firestore.
 
 ```js
-// T: A type firestore-simple auto typing after fetch.
+// T: A type that firestore-simple types automatically after fetch.
 interface Book {
   id: string,
   bookTitle: string
   created: Date
 }
 
-// S: A type that shas same keys in document in firestore collection.
+// S: A type that has same property names the document in firestore.
 interface BookDoc {
   book_title: string,
   created: Date,
 }
 
 const dao = firestoreSimple.collection<Book, BookDoc>({path: collectionPath,
-  // Return object has to has same keys of `BookDoc`
+  // Return object has to has same property names of `BookDoc`
   encode: (book) => {
     return {
       book_title: book.bookTitle,
       created: book.created,
     }
   },
-  // Return object has to has same keys of `Book`
+  // Return object has to has same property names of `Book`
   decode: (doc) => {
     return {
       id: doc.id,
