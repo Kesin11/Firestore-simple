@@ -38,9 +38,7 @@ import { FirestoreSimple } from 'firestore-simple'
 
 const ROOT_PATH = 'example/usage'
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount as ServiceAccount),
-})
+admin.initializeApp({ credential: admin.credential.cert(serviceAccount as ServiceAccount) })
 const firestore = admin.firestore()
 
 interface User {
@@ -56,12 +54,12 @@ const main = async () => {
 
   // add
   const bobId = await dao.add({ name: 'bob', age: 20 })
+  // 3Y5jwT8pB4cMqS1n3maj
 
   // fetch(get)
+  // A return document is typed as `User` automatically.
   const bob: User | undefined = await dao.fetch(bobId)
-  console.log(bob)
   // { id: '3Y5jwT8pB4cMqS1n3maj', age: 20, name: 'bob' }
-  if (!bob) return
 
   // update
   await dao.set({
@@ -70,51 +68,26 @@ const main = async () => {
     age: 30, // update 20 -> 30
   })
 
-  // add or set
-  // same as 'add' when id is not given
-  const aliceId = await dao.addOrSet({ name: 'alice', age: 22 })
-  // same as 'set' when id is given
-  await dao.addOrSet({
-    id: aliceId,
-    name: 'alice',
-    age: 30, // update 22 -> 30
-  })
-  const alice: User | undefined = await dao.fetch(aliceId)
-  console.log(alice)
-  // { name: 'alice', age: 30, id: 'YdfB2rkXoid603nKRX65' }
-
   // delete
   const deletedId = await dao.delete(bobId)
-  console.log(deletedId)
   // 3Y5jwT8pB4cMqS1n3maj
-
-  await dao.delete(aliceId)
 
   // multi set
   // `bulkSet` and `bulkDelete` are wrapper for WriteBatch
-  const _bulkSetBatch = await dao.bulkSet([
+  await dao.bulkSet([
     { id: '1', name: 'foo', age: 1 },
     { id: '2', name: 'bar', age: 2 },
   ])
 
   // multi fetch
   const users: User[] = await dao.fetchAll()
-  console.log(users)
   // [
   //   { id: '1', name: 'foo', age: 1 },
   //   { id: '2', name: 'bar', age: 2 },
   // ]
 
-  // fetch by query
-  const fetchedByQueryUser: User[] = await dao.where('age', '>=', 1)
-                                .orderBy('age')
-                                .limit(1)
-                                .fetch()
-  console.log(fetchedByQueryUser)
-  // [ { id: '1', name: 'foo', age: 1 } ]
-
   // multi delete
-  const _deletedDocBatch = await dao.bulkDelete(users.map((user) => user.id))
+  await dao.bulkDelete(users.map((user) => user.id))
 }
 
 main()
@@ -171,6 +144,7 @@ class User {
 const firestoreSimple = new FirestoreSimple(firestore)
 const dao = firestoreSimple.collection<User>({
   path: `user`,
+  // Map `User` to firestore document
   encode: (user) => {
     return {
       name: user.name,
@@ -178,6 +152,7 @@ const dao = firestoreSimple.collection<User>({
       updated: admin.firestore.FieldValue.serverTimestamp() // Using Firebase server timestamp when set document
     }
   },
+  // Map firestore document to `User`
   decode: (doc) => {
     return new User(
       doc.id,
@@ -189,6 +164,44 @@ const dao = firestoreSimple.collection<User>({
 })
 ```
 
+## Generics of `FirestoreSimple.collection`
+`FirestoreSimple.collection<T, S>` has two of the type arguments `T` and `S`. If property names of `T` and property names of the document in firestore as same, you no longer to need `S`. firestore-simple provide auto completion and restriction in most methods by using `T`.
+
+On the other hand, if property names of the document in firestore are different from `T`, you need to assign` S` that has same property names as the document in firestore.
+
+```js
+// T: A type that firestore-simple types automatically after fetch.
+interface Book {
+  id: string,
+  bookTitle: string
+  created: Date
+}
+
+// S: A type that has same property names the document in firestore.
+interface BookDoc {
+  book_title: string,
+  created: Date,
+}
+
+const dao = firestoreSimple.collection<Book, BookDoc>({path: collectionPath,
+  // Return object has to has same property names of `BookDoc`
+  encode: (book) => {
+    return {
+      book_title: book.bookTitle,
+      created: book.created,
+    }
+  },
+  // Return object has to has same property names of `Book`
+  decode: (doc) => {
+    return {
+      id: doc.id,
+      bookTitle: doc.book_title,
+      created: doc.created.toDate(),
+    }
+  },
+})
+```
+
 # onSnapshot
 firestore-simple partially supports `onSnapshot`. You can map raw document data to an object with `decode` by using `toObject() `.
 
@@ -197,7 +210,7 @@ dao.where('age', '>=', 20)
   .onSnapshot((querySnapshot, toObject) => {
     querySnapshot.docChanges.forEach((change) => {
       if (change.type === 'added') {
-        const changedDoc = toObject(change.doc)
+        const changedDoc = toObject(change.doc) // changeDoc is mapped by `decode`.
       }
     })
   })
@@ -211,7 +224,7 @@ It can define `encode` and `decode` but not `path`. You can create FirestoreSimp
 This is example using `collectionFactory` for subcollection.
 
 ```js
-// Subcollection user/${user.id}/friend
+// Subcollection: /user/${user.id}/friend
 interface UserFriend {
   id: string,
   name: string,
@@ -223,7 +236,7 @@ const userNames = ['alice', 'bob', 'john']
 const main = async () => {
   const firestoreSimple = new FirestoreSimple(firestore)
 
-  // Create factory with define decode function for subcollection
+  // Create factory with define `decode` function for subcollection
   const userFriendFactory = firestoreSimple.collectionFactory<UserFriend>({
     decode: (doc) => {
       return {
@@ -236,7 +249,7 @@ const main = async () => {
 
   const users = await userDao.fetchAll()
   for (const user of users) {
-    // Create subcollection dao that inherited decode function defined in factory
+    // Create subcollection dao that inherited `decode` function defined in factory
     const userFriendDao = userFriendFactory.create(`user/${user.id}/friend`)
 
     const friends = await userFriendDao.fetchAll()
@@ -289,7 +302,7 @@ Firestore can increment or decrement a numeric field value. This is very useful 
 see: https://firebase.google.com/docs/firestore/manage-data/add-data?hl=en#increment_a_numeric_value
 
 
-firestore-simple supports to update a document using special value of `FieldValue`. So of course you can use `FieldValue.increment` with update.
+firestore-simple supports to `update` a document using special value of `FieldValue`. So of course you can use `FieldValue.increment` with update.
 
 ```js
 interface User {
@@ -337,7 +350,10 @@ const collectionRef = dao.collectionRef
 const docRef = dao.docRef('documentId')
 ```
 
-# More example
+# More API and example
+firestore-simple provide more API and support almost firestore features.  
+ex: `addOrSet`, `update`, `where`, `orderBy`, `limit`.
+
 You can find more example from [example directory](./example). Also [test code](./__tests__) maybe as good sample.
 
 # API document
@@ -345,7 +361,8 @@ Sorry not yet. Please check [source code](./src) or look interface using your ID
 
 # Feature works
 - [ ] Support new feature of firestore
-  - incrementValue, collectionGroup, etc...
+  - [x] incrementValue
+  - [ ] collectionGroup
 - [x] Support [pagination](https://firebase.google.com/docs/firestore/query-data/query-cursors)
 - [ ] API document
 - [ ] Lint with eslint
@@ -354,7 +371,7 @@ Sorry not yet. Please check [source code](./src) or look interface using your ID
 
 # Contribution
 Patches are welcome!  
-Olso welcome fixing english documentation.
+Also welcome fixing english documentation.
 
 # Development
 Unit tests are using **REAL Firestore(Firebase)**, not mock!
