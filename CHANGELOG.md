@@ -8,11 +8,25 @@ The versioning follows [Semantic Versioning](http://semver.org/):
 > 2. MINOR version when you add functionality in a backwards-compatible manner, and
 > 3. PATCH version when you make backwards-compatible bug fixes.
 
+## v4.0.0 2019/06/26
+https://github.com/Kesin11/Firestore-simple/compare/v3.1.0..v4.0.0
+
+- **Braking changes**
+  - Fix FirestoreSimple.collection generics type arguments
+    - `FirestoreSimple.collection<T>` to `FirestoreSimple.collection<T, S>`
+    - For this changes, improve property name completion and restriction in most methods
+  - Remove deprecated methods `fetchDocument` and `fetchCollection`
+- [#23](https://github.com/Kesin11/Firestore-simple/pull/23) Improve generic typing
+  - `encode()` argument can now assign `Firestore.FieldValue` type.
+- [#25](https://github.com/Kesin11/Firestore-simple/pull/25) Remove deprecated methods
+- [#27](https://github.com/Kesin11/Firestore-simple/pull/27) Support firestore 'update'
+- Bump some dependencies by Renovate
+
 ## v3.1.0 2019/05/25
 https://github.com/Kesin11/Firestore-simple/compare/v3.0.0..v3.1.0
 
-- #17 Support add() inside runTransaction(). This is firestore-simple original feature.
-- #19 Support pagination method: startAt, startAfter, endAt, endBefore
+- [#17](https://github.com/Kesin11/Firestore-simple/pull/17) Support add() inside runTransaction(). This is firestore-simple original feature.
+- [#19](https://github.com/Kesin11/Firestore-simple/pull/19) Support pagination method: startAt, startAfter, endAt, endBefore
 - Bump some dependencies
 
 ## v3.0.0 2019/05/13
