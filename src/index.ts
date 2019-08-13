@@ -18,9 +18,9 @@ type OptionalIdStorable<T extends HasId> = Optional<Storable<T>, 'id'>
 // Storable but all keys exclude 'id' are optional
 type PartialStorable<T extends HasId> = Partial<Storable<T>> & HasId
 
-// Convert 'id' property to optional type
 type HasSameKeyObject<T> = { [P in keyof T]: any }
 type QueryKey<T> = { [K in keyof T]: K }[keyof T] | FirebaseFirestore.FieldPath
+// Convert 'id' property to optional type
 type OmitId<T> = Omit<T, 'id'>
 export type Encodable<T extends HasId, S = FirebaseFirestore.DocumentData> = (obj: OptionalIdStorable<T>) => Storable<S>
 export type Decodable<T extends HasId, S = HasIdObject> = (doc: HasSameKeyObject<S> & HasId) => T
@@ -111,25 +111,23 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
     this.decode = decode
   }
 
-  private _decode (doc: HasSameKeyObject<S> & HasId) {
-    if (this.decode) return this.decode(doc)
-    return doc as T
+  private _decode (documentSnapshot: DocumentSnapshot): T {
+    const obj = { id: documentSnapshot.id, ...documentSnapshot.data() }
+    if (this.decode) return this.decode(obj as S & HasId)
+
+    return obj as T
   }
 
-  private _encode (obj: OptionalIdStorable<T>) {
+  private _encode (obj: OptionalIdStorable<T>): Optional<Storable<T>, 'id'> | Storable<S> {
     if (this.encode) return this.encode(obj)
-    return Object.assign({}, obj)
-  }
 
-  private _toDoc (obj: OptionalIdStorable<T>) {
-    const doc = this._encode(obj)
+    const doc = { ...obj }
     if ('id' in doc) delete doc.id
     return doc
   }
 
-  public toObject (documentSnapshot: DocumentSnapshot) {
-    const obj = { id: documentSnapshot.id, ...documentSnapshot.data() }
-    return this._decode(obj as HasSameKeyObject<S> & HasId)
+  public toObject (documentSnapshot: DocumentSnapshot): T {
+    return this._decode(documentSnapshot)
   }
 
   public docRef (id?: string) {
@@ -161,7 +159,7 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
 
   public async add (obj: OptionalIdStorable<T>) {
     let docRef: DocumentReference
-    const doc = this._toDoc(obj)
+    const doc = this._encode(obj)
 
     if (this.context.tx) {
       docRef = this.docRef()
@@ -176,7 +174,7 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
     if (!obj.id) throw new Error('Argument object must have "id" property')
 
     const docRef = this.docRef(obj.id)
-    const setDoc = this._toDoc(obj)
+    const setDoc = this._encode(obj)
 
     if (this.context.tx) {
       await this.context.tx.set(docRef, setDoc)
@@ -223,7 +221,7 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
 
     objects.forEach((obj) => {
       const docId = obj.id
-      const setDoc = this._toDoc(obj)
+      const setDoc = this._encode(obj)
       batch.set(this.collectionRef.doc(docId), setDoc)
     })
     return batch.commit()
