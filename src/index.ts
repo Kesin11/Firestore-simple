@@ -164,7 +164,7 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
 
     if (this.context.tx) {
       docRef = this.docRef()
-      await this.context.tx.set(docRef, doc)
+      this.context.tx.set(docRef, doc)
     } else {
       docRef = await this.collectionRef.add(doc)
     }
@@ -178,7 +178,7 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
     const setDoc = this._encode(obj)
 
     if (this.context.tx) {
-      await this.context.tx.set(docRef, setDoc)
+      this.context.tx.set(docRef, setDoc)
     } else {
       await docRef.set(setDoc)
     }
@@ -200,7 +200,7 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
     delete updateDoc.id
 
     if (this.context.tx) {
-      await this.context.tx.update(docRef, updateDoc)
+      this.context.tx.update(docRef, updateDoc)
     } else {
       await docRef.update(updateDoc)
     }
@@ -210,7 +210,7 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
   async delete (id: string): Promise<string> {
     const docRef = this.docRef(id)
     if (this.context.tx) {
-      await this.context.tx.delete(docRef)
+      this.context.tx.delete(docRef)
     } else {
       await docRef.delete()
     }
