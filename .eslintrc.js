@@ -3,7 +3,6 @@ module.exports = {
       "standard",
       "plugin:@typescript-eslint/eslint-recommended",
       "plugin:@typescript-eslint/recommended",
-      "plugin:@typescript-eslint/recommended-requiring-type-checking"
   ],
   "parser": "@typescript-eslint/parser",
   "plugins": [
@@ -11,7 +10,6 @@ module.exports = {
   ],
   "parserOptions": {
       "sourceType": "module",
-      "project": "./tsconfig.json"
   },
   "rules": {
       "lines-between-class-members": ["error", "always", {
