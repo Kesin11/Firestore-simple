@@ -3,13 +3,13 @@ import { createRandomCollectionName, deleteCollection, initFirestore } from './u
 
 interface Book {
   id: string,
-  bookTitle: string
-  created: Date
+  bookTitle: string,
+  created: Date,
 }
 
 interface BookDoc {
   book_title: string,
-  created: Date
+  created: Date,
 }
 
 const firestore = initFirestore()
@@ -17,7 +17,8 @@ const collectionPath = createRandomCollectionName()
 const firestoreSimple = new FirestoreSimple(firestore)
 
 describe('on_snapshot test', () => {
-  const dao = firestoreSimple.collection<Book, BookDoc>({path: collectionPath,
+  const dao = firestoreSimple.collection<Book, BookDoc>({
+    path: collectionPath,
     encode: (book) => {
       return {
         book_title: book.bookTitle,

@@ -1,6 +1,6 @@
 import { FirestoreSimple } from '../src'
 import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
-import { FieldValue } from '@google-cloud/firestore';
+import { FieldValue } from '@google-cloud/firestore'
 
 interface TestDoc {
   id: string,

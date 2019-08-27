@@ -106,7 +106,7 @@ describe('transaction', () => {
         await dao.set(doc)
 
         await txFirestoreSimple.runTransaction(async () => {
-          await txDao.update({id: doc.id, title: updatedTitle})
+          await txDao.update({ id: doc.id, title: updatedTitle })
 
           // Updated document can't see outside transaction
           const outTxFetched = await dao.fetch(doc.id)

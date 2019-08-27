@@ -3,15 +3,15 @@ import { createRandomCollectionName, deleteCollection, initFirestore } from './u
 
 interface Book {
   id: string,
-  bookTitle: string
-  created: Date
+  bookTitle: string,
+  created: Date,
   bookId: number,
 }
 
 interface BookDoc {
   book_title: string,
   created: Date,
-  book_id: number
+  book_id: number,
 }
 
 const firestore = initFirestore()
@@ -19,7 +19,8 @@ const collectionPath = createRandomCollectionName()
 const firestoreSimple = new FirestoreSimple(firestore)
 
 describe('query on_snapshot test', () => {
-  const dao = firestoreSimple.collection<Book, BookDoc>({path: collectionPath,
+  const dao = firestoreSimple.collection<Book, BookDoc>({
+    path: collectionPath,
     encode: (book) => {
       return {
         book_title: book.bookTitle,
@@ -77,7 +78,7 @@ describe('query on_snapshot test', () => {
             }
           })
         })
-      })
+    })
 
     await new Promise((resolve) => setTimeout(resolve, 100)) // for async stability
     await dao.add(doc)
@@ -103,7 +104,7 @@ describe('query on_snapshot test', () => {
               resolve()
             }
           })
-      })
+        })
     })
 
     await new Promise((resolve) => setTimeout(resolve, 100)) // for async stability

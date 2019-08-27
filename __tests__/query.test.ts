@@ -4,7 +4,7 @@ import { createRandomCollectionName, deleteCollection, initFirestore } from './u
 export interface TestDoc {
   id: string,
   title: string,
-  order: number
+  order: number,
 }
 
 const firestore = initFirestore()
@@ -37,7 +37,7 @@ describe('query', () => {
     const docs = await dao.orderBy('order', 'desc').fetch()
 
     const actualOrders = docs.map((doc) => doc.order)
-    expect(actualOrders).toEqual([4,3,2,1])
+    expect(actualOrders).toEqual([4, 3, 2, 1])
   })
 
   it('limit', async () => {
@@ -54,7 +54,7 @@ describe('query', () => {
         .where('order', '<', 4)
         .fetch()
 
-      const expectOrders = [2,3]
+      const expectOrders = [2, 3]
       const actualOrders = docs.map((doc) => doc.order)
       expect(actualOrders).toEqual(expectOrders)
     })
