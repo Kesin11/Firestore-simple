@@ -24,13 +24,13 @@
   },
   "devDependencies": {
     "codecov": "3.5.0",
-    "firebase-admin": "8.3.0",
+    "firebase-admin": "8.4.0",
     "tslint": "5.18.0",
     "tslint-config-standard": "8.0.1",
     "@types/jest": "24.0.18",
     "jest": "24.9.0",
     "ts-jest": "24.0.2",
-    "typescript": "3.5.3"
+    "typescript": "3.6.2"
   },
   "repository": {
     "type": "git",
