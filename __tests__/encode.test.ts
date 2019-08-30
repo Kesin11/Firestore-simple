@@ -3,11 +3,11 @@ import { createRandomCollectionName, deleteCollection, initFirestore } from './u
 
 interface Book {
   id: string,
-  bookTitle: string
+  bookTitle: string,
 }
 
 interface BookDoc {
-  book_title: string
+  book_title: string,
 }
 
 class BookClass {
@@ -25,7 +25,8 @@ describe('encode', () => {
   })
 
   describe('from object with different key', () => {
-    const dao = firestoreSimple.collection<Book, BookDoc>({path: collectionPath,
+    const dao = firestoreSimple.collection<Book, BookDoc>({
+      path: collectionPath,
       encode: (book) => {
         return {
           book_title: book.bookTitle,
@@ -61,7 +62,8 @@ describe('encode', () => {
   })
 
   describe('from class instance with same key', () => {
-    const dao = firestoreSimple.collection<Book>({path: collectionPath,
+    const dao = firestoreSimple.collection<Book>({
+      path: collectionPath,
       encode: (book) => {
         return {
           bookTitle: book.bookTitle,

@@ -4,7 +4,7 @@ import { createRandomCollectionName, deleteCollection, initFirestore } from './u
 interface Book {
   id: string,
   title: string,
-  createdAt: Date
+  createdAt: Date,
 }
 
 interface BookDoc {
@@ -32,7 +32,7 @@ describe('Factory and Subcollection', () => {
     return {
       id: doc.id,
       title: doc.title,
-      createdAt: doc.created_at.toDate() //Firestore timestamp to JS Date
+      createdAt: doc.created_at.toDate() // Firestore timestamp to JS Date
     }
   }
 
@@ -73,7 +73,7 @@ describe('Factory and Subcollection', () => {
     it('should be same collection path', async () => {
       expect(dao.collectionRef.path).toEqual(subcollectionPath)
     })
-    
+
     it('should has same context', async () => {
       expect(dao.context).toBe(firestoreSimple.context)
     })

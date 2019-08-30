@@ -13,9 +13,8 @@
     "build": "tsc --project .",
     "build:test": "tsc --project test",
     "test": "jest",
-    "lint": "tslint src/**/*.ts test/**/*.ts",
+    "lint": "eslint src __tests__ --ext=.ts",
     "lint:fix": "npm run lint -- --fix",
-    "lint:project": "tslint -p .",
     "coverage": "codecov",
     "publish:beta": "npm publish --tag beta"
   },
@@ -25,12 +24,18 @@
   "devDependencies": {
     "codecov": "3.5.0",
     "firebase-admin": "8.3.0",
-    "tslint": "5.18.0",
-    "tslint-config-standard": "8.0.1",
     "@types/jest": "24.0.18",
     "jest": "24.9.0",
     "ts-jest": "24.0.2",
-    "typescript": "3.5.3"
+    "typescript": "3.5.3",
+    "@typescript-eslint/eslint-plugin": "2.0.0",
+    "@typescript-eslint/parser": "2.0.0",
+    "eslint": "6.2.2",
+    "eslint-config-standard": "14.0.1",
+    "eslint-plugin-import": "2.18.2",
+    "eslint-plugin-node": "9.1.0",
+    "eslint-plugin-promise": "4.2.1",
+    "eslint-plugin-standard": "4.0.1"
   },
   "repository": {
     "type": "git",

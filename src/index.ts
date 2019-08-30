@@ -27,19 +27,20 @@ export type Decodable<T extends HasId, S = HasIdObject> = (doc: HasSameKeyObject
 
 interface Context {
   firestore: Firestore,
-  tx?: FirebaseFirestore.Transaction
+  tx?: FirebaseFirestore.Transaction,
 }
 
 export class FirestoreSimple {
-  public context: Context
+  context: Context
   constructor (firestore: Firestore) {
     this.context = { firestore, tx: undefined }
   }
-  public collection<T extends HasId, S = OmitId<T>> ({ path, encode, decode }: {
+
+  collection<T extends HasId, S = OmitId<T>> ({ path, encode, decode }: {
     path: string,
     encode?: Encodable<T, S>,
     decode?: Decodable<T, S>,
-  }) {
+  }): FirestoreSimpleCollection<T, S> {
     const factory = new CollectionFactory<T, S>({
       context: this.context,
       encode,
@@ -48,10 +49,10 @@ export class FirestoreSimple {
     return factory.create(path)
   }
 
-  public collectionFactory<T extends HasId, S = OmitId<T>> ({ encode, decode }: {
+  collectionFactory<T extends HasId, S = OmitId<T>> ({ encode, decode }: {
     encode?: Encodable<T, S>,
     decode?: Decodable<T, S>,
-  }) {
+  }): CollectionFactory<T, S> {
     return new CollectionFactory<T, S>({
       context: this.context,
       encode,
@@ -59,7 +60,7 @@ export class FirestoreSimple {
     })
   }
 
-  public async runTransaction (updateFunction: (tx: FirebaseFirestore.Transaction) => Promise<any>) {
+  async runTransaction (updateFunction: (tx: FirebaseFirestore.Transaction) => Promise<any>): Promise<void> {
     await this.context.firestore.runTransaction(async (tx) => {
       this.context.tx = tx
       await updateFunction(tx)
@@ -69,12 +70,12 @@ export class FirestoreSimple {
 }
 
 class CollectionFactory<T extends HasId, S = OmitId<T>> {
-  public context: Context
-  public encode?: Encodable<T, S>
-  public decode?: Decodable<T, S>
+  context: Context
+  encode?: Encodable<T, S>
+  decode?: Decodable<T, S>
 
   constructor ({ context, encode, decode }: {
-    context: Context
+    context: Context,
     encode?: Encodable<T, S>,
     decode?: Decodable<T, S>,
   }) {
@@ -83,7 +84,7 @@ class CollectionFactory<T extends HasId, S = OmitId<T>> {
     this.decode = decode
   }
 
-  public create (path: string) {
+  create (path: string): FirestoreSimpleCollection<T, S> {
     return new FirestoreSimpleCollection<T, S>({
       context: this.context,
       path,
@@ -94,13 +95,13 @@ class CollectionFactory<T extends HasId, S = OmitId<T>> {
 }
 
 export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
-  public context: Context
-  public collectionRef: CollectionReference
-  public encode?: Encodable<T, S>
-  public decode?: Decodable<T, S>
+  context: Context
+  collectionRef: CollectionReference
+  encode?: Encodable<T, S>
+  decode?: Decodable<T, S>
 
   constructor ({ context, path, encode, decode }: {
-    context: Context
+    context: Context,
     path: string,
     encode?: Encodable<T, S>,
     decode?: Decodable<T, S>,
@@ -126,16 +127,16 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
     return doc
   }
 
-  public toObject (documentSnapshot: DocumentSnapshot): T {
+  toObject (documentSnapshot: DocumentSnapshot): T {
     return this._decode(documentSnapshot)
   }
 
-  public docRef (id?: string) {
+  docRef (id?: string): DocumentReference {
     if (id) return this.collectionRef.doc(id)
     return this.collectionRef.doc()
   }
 
-  public async fetch (id: string): Promise <T | undefined> {
+  async fetch (id: string): Promise <T | undefined> {
     const docRef = this.docRef(id)
     const snapshot = (this.context.tx)
       ? await this.context.tx.get(docRef)
@@ -145,7 +146,7 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
     return this.toObject(snapshot)
   }
 
-  public async fetchAll (): Promise<T[]> {
+  async fetchAll (): Promise<T[]> {
     const snapshot = (this.context.tx)
       ? await this.context.tx.get(this.collectionRef)
       : await this.collectionRef.get()
@@ -157,41 +158,41 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
     return arr
   }
 
-  public async add (obj: OptionalIdStorable<T>) {
+  async add (obj: OptionalIdStorable<T>): Promise<string> {
     let docRef: DocumentReference
     const doc = this._encode(obj)
 
     if (this.context.tx) {
       docRef = this.docRef()
-      await this.context.tx.set(docRef, doc)
+      this.context.tx.set(docRef, doc)
     } else {
       docRef = await this.collectionRef.add(doc)
     }
     return docRef.id
   }
 
-  public async set (obj: Storable<T>) {
+  async set (obj: Storable<T>): Promise<string> {
     if (!obj.id) throw new Error('Argument object must have "id" property')
 
     const docRef = this.docRef(obj.id)
     const setDoc = this._encode(obj)
 
     if (this.context.tx) {
-      await this.context.tx.set(docRef, setDoc)
+      this.context.tx.set(docRef, setDoc)
     } else {
       await docRef.set(setDoc)
     }
     return obj.id
   }
 
-  public addOrSet (obj: OptionalIdStorable<T>) {
+  addOrSet (obj: OptionalIdStorable<T>): Promise<string> {
     if ('id' in obj) {
       return this.set(obj as Storable<T>)
     }
     return this.add(obj)
   }
 
-  public async update (obj: PartialStorable<T>) {
+  async update (obj: PartialStorable<T>): Promise<string> {
     if (!obj.id) throw new Error('Argument object must have "id" property')
 
     const docRef = this.docRef(obj.id)
@@ -199,24 +200,24 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
     delete updateDoc.id
 
     if (this.context.tx) {
-      await this.context.tx.update(docRef, updateDoc)
+      this.context.tx.update(docRef, updateDoc)
     } else {
       await docRef.update(updateDoc)
     }
     return obj.id
   }
 
-  public async delete (id: string) {
+  async delete (id: string): Promise<string> {
     const docRef = this.docRef(id)
     if (this.context.tx) {
-      await this.context.tx.delete(docRef)
+      this.context.tx.delete(docRef)
     } else {
       await docRef.delete()
     }
     return id
   }
 
-  public async bulkSet (objects: Array<Storable<T>>) {
+  async bulkSet (objects: Array<Storable<T>>): Promise<FirebaseFirestore.WriteResult[]> {
     const batch = this.context.firestore.batch()
 
     objects.forEach((obj) => {
@@ -227,7 +228,7 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
     return batch.commit()
   }
 
-  public async bulkDelete (docIds: string[]) {
+  async bulkDelete (docIds: string[]): Promise<FirebaseFirestore.WriteResult[]> {
     const batch = this.context.firestore.batch()
 
     docIds.forEach((docId) => {
@@ -236,7 +237,7 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
     return batch.commit()
   }
 
-  public async fetchByQuery (query: Query) {
+  async fetchByQuery (query: Query): Promise<T[]> {
     const snapshot = (this.context.tx)
       ? await this.context.tx.get(query)
       : await query.get()
@@ -248,25 +249,26 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
     return arr
   }
 
-  public where (fieldPath: QueryKey<S>, opStr: FirebaseFirestore.WhereFilterOp, value: any) {
+  where (fieldPath: QueryKey<S>, opStr: FirebaseFirestore.WhereFilterOp, value: any): FirestoreSimpleQuery<T, S> {
     const query = new FirestoreSimpleQuery<T, S>(this)
     return query.where(fieldPath, opStr, value)
   }
 
-  public orderBy (fieldPath: QueryKey<S>, directionStr?: FirebaseFirestore.OrderByDirection) {
+  orderBy (fieldPath: QueryKey<S>, directionStr?: FirebaseFirestore.OrderByDirection): FirestoreSimpleQuery<T, S> {
     const query = new FirestoreSimpleQuery<T, S>(this)
     return query.orderBy(fieldPath, directionStr)
   }
 
-  public limit (limit: number) {
+  limit (limit: number): FirestoreSimpleQuery<T, S> {
     const query = new FirestoreSimpleQuery<T, S>(this)
     return query.limit(limit)
   }
 
-  public onSnapshot (callback: (
+  onSnapshot (callback: (
     querySnapshot: QuerySnapshot,
     toObject: (documentSnapshot: DocumentSnapshot) => T
-    ) => void) {
+    ) => void
+  ): () => void {
     return this.collectionRef.onSnapshot((_querySnapshot) => {
       callback(_querySnapshot, this.toObject.bind(this))
     })
@@ -274,10 +276,10 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
 }
 
 class FirestoreSimpleQuery<T extends HasId, S> {
-  public query?: Query = undefined
+  query?: Query = undefined
   constructor (public collection: FirestoreSimpleCollection<T, S>) { }
 
-  public where (fieldPath: QueryKey<S>, opStr: FirebaseFirestore.WhereFilterOp, value: any) {
+  where (fieldPath: QueryKey<S>, opStr: FirebaseFirestore.WhereFilterOp, value: any): this {
     const _fieldPath = fieldPath as string | FirebaseFirestore.FieldPath
     if (!this.query) {
       this.query = this.collection.collectionRef.where(_fieldPath, opStr, value)
@@ -287,7 +289,7 @@ class FirestoreSimpleQuery<T extends HasId, S> {
     return this
   }
 
-  public orderBy (fieldPath: QueryKey<S>, directionStr?: FirebaseFirestore.OrderByDirection) {
+  orderBy (fieldPath: QueryKey<S>, directionStr?: FirebaseFirestore.OrderByDirection): this {
     const _fieldPath = fieldPath as string | FirebaseFirestore.FieldPath
     if (!this.query) {
       this.query = this.collection.collectionRef.orderBy(_fieldPath, directionStr)
@@ -297,7 +299,7 @@ class FirestoreSimpleQuery<T extends HasId, S> {
     return this
   }
 
-  public limit (limit: number) {
+  limit (limit: number): this {
     if (!this.query) {
       this.query = this.collection.collectionRef.limit(limit)
     } else {
@@ -306,12 +308,12 @@ class FirestoreSimpleQuery<T extends HasId, S> {
     return this
   }
 
-  public startAt (snapshot: DocumentSnapshot): FirestoreSimpleQuery<T, S>
-  public startAt (...fieldValues: any[]): FirestoreSimpleQuery<T, S>
-  public startAt (
+  startAt (snapshot: DocumentSnapshot): FirestoreSimpleQuery<T, S>
+  startAt (...fieldValues: any[]): FirestoreSimpleQuery<T, S>
+  startAt (
     snapshotOrValue: DocumentSnapshot | unknown,
     ...fieldValues: unknown[]
-  ) {
+  ): this {
     if (!this.query) throw new Error('no query statement before startAt()')
 
     if (snapshotOrValue instanceof DocumentSnapshot) {
@@ -322,12 +324,12 @@ class FirestoreSimpleQuery<T extends HasId, S> {
     return this
   }
 
-  public startAfter (snapshot: DocumentSnapshot): FirestoreSimpleQuery<T, S>
-  public startAfter (...fieldValues: any[]): FirestoreSimpleQuery<T, S>
-  public startAfter (
+  startAfter (snapshot: DocumentSnapshot): FirestoreSimpleQuery<T, S>
+  startAfter (...fieldValues: any[]): FirestoreSimpleQuery<T, S>
+  startAfter (
     snapshotOrValue: DocumentSnapshot | unknown,
     ...fieldValues: unknown[]
-  ) {
+  ): this {
     if (!this.query) throw new Error('no query statement before startAfter()')
 
     if (snapshotOrValue instanceof DocumentSnapshot) {
@@ -338,12 +340,12 @@ class FirestoreSimpleQuery<T extends HasId, S> {
     return this
   }
 
-  public endAt (snapshot: DocumentSnapshot): FirestoreSimpleQuery<T, S>
-  public endAt (...fieldValues: any[]): FirestoreSimpleQuery<T, S>
-  public endAt (
+  endAt (snapshot: DocumentSnapshot): FirestoreSimpleQuery<T, S>
+  endAt (...fieldValues: any[]): FirestoreSimpleQuery<T, S>
+  endAt (
     snapshotOrValue: DocumentSnapshot | unknown,
     ...fieldValues: unknown[]
-  ) {
+  ): this {
     if (!this.query) throw new Error('no query statement before endAt()')
 
     if (snapshotOrValue instanceof DocumentSnapshot) {
@@ -354,12 +356,12 @@ class FirestoreSimpleQuery<T extends HasId, S> {
     return this
   }
 
-  public endBefore (snapshot: DocumentSnapshot): FirestoreSimpleQuery<T, S>
-  public endBefore (...fieldValues: any[]): FirestoreSimpleQuery<T, S>
-  public endBefore (
+  endBefore (snapshot: DocumentSnapshot): FirestoreSimpleQuery<T, S>
+  endBefore (...fieldValues: any[]): FirestoreSimpleQuery<T, S>
+  endBefore (
     snapshotOrValue: DocumentSnapshot | unknown,
     ...fieldValues: unknown[]
-  ) {
+  ): this {
     if (!this.query) throw new Error('no query statement before endBefore()')
 
     if (snapshotOrValue instanceof DocumentSnapshot) {
@@ -370,16 +372,17 @@ class FirestoreSimpleQuery<T extends HasId, S> {
     return this
   }
 
-  public async fetch () {
+  async fetch (): Promise<T[]> {
     if (!this.query) throw new Error('no query statement before fetch()')
 
     return this.collection.fetchByQuery(this.query)
   }
 
-  public onSnapshot (callback: (
+  onSnapshot (callback: (
     querySnapshot: QuerySnapshot,
     toObject: (documentSnapshot: DocumentSnapshot) => T
-    ) => void) {
+    ) => void
+  ): () => void {
     if (!this.query) throw new Error('no query statement before onSnapshot()')
     return this.query.onSnapshot((_querySnapshot) => {
       callback(_querySnapshot, this.collection.toObject.bind(this.collection))

@@ -46,5 +46,4 @@ describe('batch', () => {
     const actualDocs = await dao.fetchAll()
     expect(actualDocs).toEqual([])
   })
-  
 })

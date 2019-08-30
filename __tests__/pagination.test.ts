@@ -4,7 +4,7 @@ import { createRandomCollectionName, deleteCollection, initFirestore } from './u
 export interface TestDoc {
   id: string,
   title: string,
-  order: number
+  order: number,
 }
 
 const firestore = initFirestore()

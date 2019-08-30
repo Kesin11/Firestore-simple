@@ -3,8 +3,8 @@ import { createRandomCollectionName, deleteCollection, initFirestore } from './u
 
 interface Book {
   id: string,
-  bookTitle: string
-  created: Date
+  bookTitle: string,
+  created: Date,
 }
 
 interface BookDoc {
@@ -17,7 +17,8 @@ const collectionPath = createRandomCollectionName()
 const firestoreSimple = new FirestoreSimple(firestore)
 
 describe('encode and decode', () => {
-  const dao = firestoreSimple.collection<Book, BookDoc>({path: collectionPath,
+  const dao = firestoreSimple.collection<Book, BookDoc>({
+    path: collectionPath,
     encode: (book) => {
       return {
         book_title: book.bookTitle,
