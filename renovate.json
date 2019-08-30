@@ -13,9 +13,9 @@
     "rangeStrategy": "bump",
     "packageRules": [
       {
-        "groupName": "Exclude check ESLint and TSLint update",
-        "excludePackageNames": ["eslint", "tslint"],
-        "excludePackagePatterns": ["^eslint-config-", "^eslint-plugin-", "^tslint-config-"]
+        "groupName": "Exclude check ESLint update",
+        "excludePackageNames": ["eslint"],
+        "excludePackagePatterns": ["^eslint-config-", "^eslint-plugin-", "^@typescript-eslint"]
       },
       {
         "description": "automerge minor updates of widely used libraries in devDeps",
