@@ -14,7 +14,8 @@
     "packageRules": [
       {
         "groupName": "Ignore check ESLint and plugin and config update",
-        "depTypeList": ["devDependencies"],
+        "packageNames": ["eslint"],
+        "packagePatterns": ["^eslint-config-", "^eslint-plugin-", "^@typescript-eslint"],
         "ignoreDeps": [
           "@typescript-eslint/eslint-plugin",
           "@typescript-eslint/parser",
