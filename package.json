@@ -22,7 +22,7 @@
     "utility-types": "3.7.0"
   },
   "devDependencies": {
-    "codecov": "3.5.0",
+    "codecov": "3.6.1",
     "firebase-admin": "8.5.0",
     "@types/jest": "24.0.18",
     "jest": "24.9.0",
