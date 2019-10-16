@@ -1,6 +1,9 @@
 import { FirestoreSimple } from '../src'
 import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
 
+// Workaround for flaky onSnapshot callback tests.
+jest.retryTimes(3)
+
 interface Book {
   id: string,
   bookTitle: string,
