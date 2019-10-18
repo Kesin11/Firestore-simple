@@ -5,7 +5,7 @@ jobs:
   test:
     strategy:
       matrix:
-        container: ["node:8", "node:10", "node:12", "node:current", "node:lts"]
+        container: ["node:current", "node:lts"]
 
     runs-on: ubuntu-latest
     container:
