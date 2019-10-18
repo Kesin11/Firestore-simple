@@ -11,9 +11,9 @@ jobs:
     container:
       image: ${{ matrix.container }}
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@master
     - name: Create firebase secret json
-      run: echo ${{ secrets.FIREBASE_SECRET }} > firebase_secret.json
+      run: echo "${{ secrets.FIREBASE_SECRET }}" > firebase_secret.json
 
     - name: "Show version"
       run: |
