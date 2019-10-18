@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Create firebase secret json
-      run: echo "${{ secrets.FIREBASE_SECRET }}" > firebase_secret.json
+      run: echo "${{ secrets.FIREBASE_SECRET }}" | base64 --decode > firebase_secret.json
 
     - name: "Show version"
       run: |
