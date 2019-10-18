@@ -1,0 +1,33 @@
+name: "CI"
+on: [push]
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        container: ["node:current", "node:lts"]
+
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ matrix.container }}
+    steps:
+    # Prepare
+    - uses: actions/checkout@master
+    - name: Create firebase secret json
+      run: echo "${{ secrets.FIREBASE_SECRET }}" | base64 --decode > firebase_secret.json
+    - name: "Show version"
+      run: |
+        node --version
+        npm --version
+
+    # Run
+    - run: npm ci
+    - run: npm run lint
+    - name: test
+      run: npm run test -- --forceExit --coverage
+
+    # Post process
+    - name: Upload coverage
+      run: npm run coverage
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
