@@ -1,6 +1,6 @@
 # Firestore-simple
 [![npm version](https://badge.fury.io/js/firestore-simple.svg)](https://badge.fury.io/js/firestore-simple)
-[![Build Status](https://travis-ci.org/Kesin11/Firestore-simple.svg?branch=master)](https://travis-ci.org/Kesin11/Firestore-simple)
+[![Build Status](https://github.com/Kesin11/Firestore-simple/workflows/CI/badge.svg)](https://github.com/Kesin11/Firestore-simple/actions)
 [![codecov](https://codecov.io/gh/Kesin11/Firestore-simple/branch/master/graph/badge.svg)](https://codecov.io/gh/Kesin11/Firestore-simple)
 
 More simple, powerful and TypeScript friendly Firestore wrapper.
