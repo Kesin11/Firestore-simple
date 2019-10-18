@@ -1,0 +1,26 @@
+name: "CI"
+on: [push]
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        container: ["node:8", "node:10", "node:12", "node:current", "node:lts"]
+
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ matrix.container }}
+    steps:
+    - uses: actions/checkout@v1
+    - name: Create firebase secret json
+      run: echo ${{ secrets.FIREBASE_SECRET }} > firebase_secret.json
+
+    - name: "Show version"
+      run: |
+        node --version
+        npm --version
+
+    - run: npm ci
+    - run: npm run lint
+    - name: test
+      run: npm run test -- --forceExit --coverage
