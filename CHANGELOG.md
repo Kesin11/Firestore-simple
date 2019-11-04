@@ -8,6 +8,17 @@ The versioning follows [Semantic Versioning](http://semver.org/):
 > 2. MINOR version when you add functionality in a backwards-compatible manner, and
 > 3. PATCH version when you make backwards-compatible bug fixes.
 
+## v4.0.1 2019/11/5
+https://github.com/Kesin11/Firestore-simple/compare/v4.0.0..v4.0.1
+
+- **Braking changes**
+  - Nothing
+- [#36](https://github.com/Kesin11/Firestore-simple/pull/36) Refactoring _encode, _decode
+- [#42](https://github.com/Kesin11/Firestore-simple/pull/42) tslint to eslint
+- [#61](https://github.com/Kesin11/Firestore-simple/pull/61) Add retry for flaky callback tests
+- [#63](https://github.com/Kesin11/Firestore-simple/pull/63) Change CI TravisCI to Github Actions
+- Update some dependencies by Renovate
+
 ## v4.0.0 2019/06/26
 https://github.com/Kesin11/Firestore-simple/compare/v3.1.0..v4.0.0
 
