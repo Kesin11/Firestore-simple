@@ -19,7 +19,7 @@
     "publish:beta": "npm publish --tag beta"
   },
   "dependencies": {
-    "utility-types": "3.9.0"
+    "utility-types": "3.10.0"
   },
   "devDependencies": {
     "@types/jest": "24.0.22",
