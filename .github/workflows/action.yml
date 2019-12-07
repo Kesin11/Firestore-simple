@@ -12,7 +12,7 @@ jobs:
       image: ${{ matrix.container }}
     steps:
     # Prepare
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v1
     - name: Create firebase secret json
       run: echo "${{ secrets.FIREBASE_SECRET }}" | base64 --decode > firebase_secret.json
     - name: "Show version"
