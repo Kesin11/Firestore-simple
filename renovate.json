@@ -13,19 +13,11 @@
     "rangeStrategy": "bump",
     "packageRules": [
       {
-        "groupName": "Ignore check ESLint and plugin and config update",
+        "groupName": "ESLint and plugin and config monthly update",
+        "extends": ["schedule:monthly"],
+        "automerge": true,
         "packageNames": ["eslint"],
-        "packagePatterns": ["^eslint-config-", "^eslint-plugin-", "^@typescript-eslint"],
-        "ignoreDeps": [
-          "@typescript-eslint/eslint-plugin",
-          "@typescript-eslint/parser",
-          "eslint",
-          "eslint-config-standard",
-          "eslint-plugin-import",
-          "eslint-plugin-node",
-          "eslint-plugin-promise",
-          "eslint-plugin-standard"
-        ]
+        "packagePatterns": ["^eslint-config-", "^eslint-plugin-", "^@typescript-eslint"]
       },
       {
         "description": "automerge minor updates of widely used libraries in devDeps",
