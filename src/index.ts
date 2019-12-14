@@ -250,18 +250,18 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
   }
 
   where (fieldPath: QueryKey<S>, opStr: FirebaseFirestore.WhereFilterOp, value: any): FirestoreSimpleQuery<T, S> {
-    const query = new FirestoreSimpleQuery<T, S>(this)
-    return query.where(fieldPath, opStr, value)
+    const query = this.collectionRef.where(fieldPath as string | FirebaseFirestore.FieldPath, opStr, value)
+    return new FirestoreSimpleQuery<T, S>(this, query)
   }
 
   orderBy (fieldPath: QueryKey<S>, directionStr?: FirebaseFirestore.OrderByDirection): FirestoreSimpleQuery<T, S> {
-    const query = new FirestoreSimpleQuery<T, S>(this)
-    return query.orderBy(fieldPath, directionStr)
+    const query = this.collectionRef.orderBy(fieldPath as string | FirebaseFirestore.FieldPath, directionStr)
+    return new FirestoreSimpleQuery<T, S>(this, query)
   }
 
   limit (limit: number): FirestoreSimpleQuery<T, S> {
-    const query = new FirestoreSimpleQuery<T, S>(this)
-    return query.limit(limit)
+    const query = this.collectionRef.limit(limit)
+    return new FirestoreSimpleQuery<T, S>(this, query)
   }
 
   onSnapshot (callback: (
@@ -276,35 +276,20 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
 }
 
 class FirestoreSimpleQuery<T extends HasId, S> {
-  query?: Query = undefined
-  constructor (public collection: FirestoreSimpleCollection<T, S>) { }
+  constructor (public collection: FirestoreSimpleCollection<T, S>, public query: Query) { }
 
   where (fieldPath: QueryKey<S>, opStr: FirebaseFirestore.WhereFilterOp, value: any): this {
-    const _fieldPath = fieldPath as string | FirebaseFirestore.FieldPath
-    if (!this.query) {
-      this.query = this.collection.collectionRef.where(_fieldPath, opStr, value)
-    } else {
-      this.query = this.query.where(_fieldPath, opStr, value)
-    }
+    this.query = this.query.where(fieldPath as string | FirebaseFirestore.FieldPath, opStr, value)
     return this
   }
 
   orderBy (fieldPath: QueryKey<S>, directionStr?: FirebaseFirestore.OrderByDirection): this {
-    const _fieldPath = fieldPath as string | FirebaseFirestore.FieldPath
-    if (!this.query) {
-      this.query = this.collection.collectionRef.orderBy(_fieldPath, directionStr)
-    } else {
-      this.query = this.query.orderBy(_fieldPath, directionStr)
-    }
+    this.query = this.query.orderBy(fieldPath as string | FirebaseFirestore.FieldPath, directionStr)
     return this
   }
 
   limit (limit: number): this {
-    if (!this.query) {
-      this.query = this.collection.collectionRef.limit(limit)
-    } else {
-      this.query = this.query.limit(limit)
-    }
+    this.query = this.query.limit(limit)
     return this
   }
 
