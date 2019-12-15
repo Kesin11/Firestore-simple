@@ -60,6 +60,15 @@ export class FirestoreSimple {
     })
   }
 
+  collectionGroup<T extends HasId, S = OmitId<T>> ({ collectionId, decode }: {
+    collectionId: string,
+    decode?: Decodable<T, S>,
+  }): FirestoreSimpleQuery<T, S> {
+    const query = this.context.firestore.collectionGroup(collectionId)
+    const converter = new FirestoreSimpleConverter({ decode })
+    return new FirestoreSimpleQuery<T, S>(converter, this.context, query)
+  }
+
   async runTransaction (updateFunction: (tx: FirebaseFirestore.Transaction) => Promise<any>): Promise<void> {
     await this.context.firestore.runTransaction(async (tx) => {
       this.context.tx = tx
