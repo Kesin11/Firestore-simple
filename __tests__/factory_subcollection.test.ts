@@ -78,14 +78,6 @@ describe('Factory and Subcollection', () => {
       expect(dao.context).toBe(firestoreSimple.context)
     })
 
-    it('should has same encode function', async () => {
-      expect(dao.encode).toBe(encodeFunc)
-    })
-
-    it('should has same decode function', async () => {
-      expect(dao.decode).toBe(decodeFunc)
-    })
-
     it('set with encode/decode by created dao', async () => {
       const now = new Date()
       const doc = {
