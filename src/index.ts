@@ -28,6 +28,7 @@ export type Decodable<T extends HasId, S = HasIdObject> = (doc: HasSameKeyObject
 interface Context {
   firestore: Firestore,
   tx?: FirebaseFirestore.Transaction,
+  batch?: FirebaseFirestore.WriteBatch,
 }
 
 export class FirestoreSimple {
@@ -75,6 +76,16 @@ export class FirestoreSimple {
       await updateFunction(tx)
     })
     this.context.tx = undefined
+  }
+
+  async runBatch (updateFunction: (batch: FirebaseFirestore.WriteBatch) => Promise<any>): Promise<void> {
+    const _batch = this.context.firestore.batch()
+    this.context.batch = _batch
+
+    await updateFunction(_batch)
+    await this.context.batch.commit()
+
+    this.context.batch = undefined
   }
 }
 
@@ -185,6 +196,9 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
     if (this.context.tx) {
       docRef = this.docRef()
       this.context.tx.set(docRef, doc)
+    } else if (this.context.batch) {
+      docRef = this.docRef()
+      this.context.batch.set(docRef, doc)
     } else {
       docRef = await this.collectionRef.add(doc)
     }
@@ -199,6 +213,8 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
 
     if (this.context.tx) {
       this.context.tx.set(docRef, setDoc)
+    } else if (this.context.batch) {
+      this.context.batch.set(docRef, setDoc)
     } else {
       await docRef.set(setDoc)
     }
@@ -221,6 +237,8 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
 
     if (this.context.tx) {
       this.context.tx.update(docRef, updateDoc)
+    } else if (this.context.batch) {
+      this.context.batch.update(docRef, updateDoc)
     } else {
       await docRef.update(updateDoc)
     }
@@ -231,6 +249,8 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
     const docRef = this.docRef(id)
     if (this.context.tx) {
       this.context.tx.delete(docRef)
+    } else if (this.context.batch) {
+      this.context.batch.delete(docRef)
     } else {
       await docRef.delete()
     }
