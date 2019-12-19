@@ -25,16 +25,45 @@ type OmitId<T> = Omit<T, 'id'>
 export type Encodable<T extends HasId, S = FirebaseFirestore.DocumentData> = (obj: OptionalIdStorable<T>) => Storable<S>
 export type Decodable<T extends HasId, S = HasIdObject> = (doc: HasSameKeyObject<S> & HasId) => T
 
-interface Context {
-  firestore: Firestore,
-  tx?: FirebaseFirestore.Transaction,
-  batch?: FirebaseFirestore.WriteBatch,
+class Context {
+  firestore: Firestore
+  private _tx?: FirebaseFirestore.Transaction = undefined
+  private _batch?: FirebaseFirestore.WriteBatch = undefined
+  constructor (firestore: Firestore) {
+    this.firestore = firestore
+  }
+
+  get tx (): FirebaseFirestore.Transaction | undefined {
+    return this._tx
+  }
+
+  set tx (_tx: FirebaseFirestore.Transaction | undefined) {
+    if (_tx === undefined) {
+      this._tx = _tx
+      return
+    }
+    if (this._tx || this._batch) throw new Error('Disallow nesting transaction or batch')
+    this._tx = _tx
+  }
+
+  get batch (): FirebaseFirestore.WriteBatch | undefined {
+    return this._batch
+  }
+
+  set batch (_batch: FirebaseFirestore.WriteBatch | undefined) {
+    if (_batch === undefined) {
+      this._batch = _batch
+      return
+    }
+    if (this._tx || this._batch) throw new Error('Disallow nesting transaction or batch')
+    this._batch = _batch
+  }
 }
 
 export class FirestoreSimple {
   context: Context
   constructor (firestore: Firestore) {
-    this.context = { firestore, tx: undefined }
+    this.context = new Context(firestore)
   }
 
   collection<T extends HasId, S = OmitId<T>> ({ path, encode, decode }: {
