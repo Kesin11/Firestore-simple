@@ -4,7 +4,6 @@ import { createRandomCollectionName, deleteCollection, initFirestore } from './u
 interface TestDoc {
   id: string,
   title: string,
-  order: number,
 }
 
 const expectTitles = ['aaa', 'bbb', 'ccc', 'ddd']
@@ -16,10 +15,10 @@ const firestoreSimple = new FirestoreSimple(firestore)
 
 describe('collectionGroup', () => {
   beforeEach(async () => {
-    await firestore.collection(`${collectionPath}/1/${collectionId}`).add({ title: expectTitles[0], order: 2 })
-    await firestore.collection(`${collectionPath}/1/${collectionId}`).add({ title: expectTitles[1], order: 1 })
-    await firestore.collection(`${collectionPath}/2/${collectionId}`).add({ title: expectTitles[2], order: 3 })
-    await firestore.collection(`${collectionPath}/3/${collectionId}`).add({ title: expectTitles[3], order: 4 })
+    await firestore.collection(`${collectionPath}/1/${collectionId}`).add({ title: expectTitles[0] })
+    await firestore.collection(`${collectionPath}/1/${collectionId}`).add({ title: expectTitles[1] })
+    await firestore.collection(`${collectionPath}/2/${collectionId}`).add({ title: expectTitles[2] })
+    await firestore.collection(`${collectionPath}/3/${collectionId}`).add({ title: expectTitles[3] })
   })
 
   afterEach(async () => {
@@ -32,7 +31,7 @@ describe('collectionGroup', () => {
     const query = firestoreSimple.collectionGroup<TestDoc>({ collectionId })
     const docs = await query.fetch()
 
-    const actualTitles = docs.map((doc) => doc.title)
+    const actualTitles = docs.map((doc) => doc.title).sort()
     expect(actualTitles).toEqual(expectTitles)
   })
 
