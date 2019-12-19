@@ -43,6 +43,22 @@ describe('transaction', () => {
 
       expect(txFirestoreSimple.context.tx).toBeUndefined()
     })
+
+    it('should be error nesting transaction', async () => {
+      await txFirestoreSimple.runTransaction(async (_tx) => {
+        expect(
+          txFirestoreSimple.runTransaction(async (_tx) => { })
+        ).rejects.toThrow()
+      })
+    })
+
+    it('should be error runBatch in transaction', async () => {
+      await txFirestoreSimple.runTransaction(async (_tx) => {
+        expect(
+          txFirestoreSimple.runBatch(async (_batch) => { })
+        ).rejects.toThrow()
+      })
+    })
   })
 
   describe('Collection', () => {

@@ -35,11 +35,27 @@ describe('runBatch', () => {
     })
 
     it('should be undefined after runBatch', async () => {
-      await firestoreSimple.runBatch(async (_batch) => {
+      await firestoreSimple.runBatch(async () => {
         expect(firestoreSimple.context.batch).not.toBeUndefined()
       })
 
       expect(firestoreSimple.context.batch).toBeUndefined()
+    })
+
+    it('should be error nesting runBatch', async () => {
+      await firestoreSimple.runBatch(async (_tx) => {
+        expect(
+          firestoreSimple.runBatch(async (_tx) => { })
+        ).rejects.toThrow()
+      })
+    })
+
+    it('should be error transaction in runBatch', async () => {
+      await firestoreSimple.runBatch(async (_tx) => {
+        expect(
+          firestoreSimple.runTransaction(async (_batch) => { })
+        ).rejects.toThrow()
+      })
     })
   })
 
@@ -163,6 +179,26 @@ describe('runBatch', () => {
       expect(fetched).toEqual(updatedDoc)
       const anotherFetched = await anotherDao.fetch(anotherDoc.id)
       expect(anotherFetched).toEqual(updatedAnotherDoc)
+    })
+
+    it('should be error bulkSet in runBatch', async () => {
+      await firestoreSimple.runBatch(async () => {
+        const doc = [{ id: 'test1', title: 'aaa' }]
+        expect(
+          dao.bulkSet(doc)
+        ).rejects.toThrow()
+      })
+    })
+
+    it('should be error bulkDelete in runBatch', async () => {
+      const doc = { id: 'test1', title: 'aaa' }
+      await dao.set(doc)
+
+      await firestoreSimple.runBatch(async () => {
+        expect(
+          dao.bulkDelete([doc.id])
+        ).rejects.toThrow()
+      })
     })
   })
 })

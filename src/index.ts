@@ -288,22 +288,28 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
 
   async bulkSet (objects: Array<Storable<T>>): Promise<FirebaseFirestore.WriteResult[]> {
     const batch = this.context.firestore.batch()
+    this.context.batch = batch
 
     objects.forEach((obj) => {
       const docId = obj.id
       const setDoc = this.converter.encode(obj)
       batch.set(this.collectionRef.doc(docId), setDoc)
     })
-    return batch.commit()
+    const writeBatch = await batch.commit()
+    this.context.batch = undefined
+    return writeBatch
   }
 
   async bulkDelete (docIds: string[]): Promise<FirebaseFirestore.WriteResult[]> {
     const batch = this.context.firestore.batch()
+    this.context.batch = batch
 
     docIds.forEach((docId) => {
       batch.delete(this.collectionRef.doc(docId))
     })
-    return batch.commit()
+    const writeBatch = batch.commit()
+    this.context.batch = undefined
+    return writeBatch
   }
 
   where (fieldPath: QueryKey<S>, opStr: FirebaseFirestore.WhereFilterOp, value: any): FirestoreSimpleQuery<T, S> {
