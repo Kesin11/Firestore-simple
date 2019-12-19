@@ -1,6 +1,9 @@
 import { FirestoreSimple, FirestoreSimpleCollection } from '../src'
 import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
 
+// Workaround for flaky nesting transaction/runBatch test
+jest.retryTimes(3)
+
 interface TestDoc {
   id: string,
   title: string,
