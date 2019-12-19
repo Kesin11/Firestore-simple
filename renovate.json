@@ -15,6 +15,7 @@
     "packageRules": [
       {
         "groupName": "ESLint and plugin and config monthly update",
+        "extends": ["schedule:monthly"],
         "automerge": true,
         "packageNames": ["eslint"],
         "packagePatterns": ["^eslint-config-", "^eslint-plugin-", "^@typescript-eslint"]
