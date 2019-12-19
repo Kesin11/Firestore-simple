@@ -47,7 +47,7 @@ describe('transaction', () => {
     it('should be error nesting transaction', async () => {
       await txFirestoreSimple.runTransaction(async (_tx) => {
         expect(
-          txFirestoreSimple.runTransaction(async (_tx) => { })
+          txFirestoreSimple.runTransaction(async (_tx) => { dao.add({ title: 'test' }) })
         ).rejects.toThrow()
       })
     })
@@ -55,7 +55,7 @@ describe('transaction', () => {
     it('should be error runBatch in transaction', async () => {
       await txFirestoreSimple.runTransaction(async (_tx) => {
         expect(
-          txFirestoreSimple.runBatch(async (_batch) => { })
+          txFirestoreSimple.runBatch(async (_batch) => { dao.add({ title: 'test' }) })
         ).rejects.toThrow()
       })
     })
