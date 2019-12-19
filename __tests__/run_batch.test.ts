@@ -43,17 +43,17 @@ describe('runBatch', () => {
     })
 
     it('should be error nesting runBatch', async () => {
-      await firestoreSimple.runBatch(async (_tx) => {
+      await firestoreSimple.runBatch(async () => {
         expect(
-          firestoreSimple.runBatch(async (_tx) => { })
+          firestoreSimple.runBatch(async () => { })
         ).rejects.toThrow()
       })
     })
 
     it('should be error transaction in runBatch', async () => {
-      await firestoreSimple.runBatch(async (_tx) => {
+      await firestoreSimple.runBatch(async () => {
         expect(
-          firestoreSimple.runTransaction(async (_batch) => { })
+          firestoreSimple.runTransaction(async () => { })
         ).rejects.toThrow()
       })
     })
