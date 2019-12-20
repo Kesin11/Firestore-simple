@@ -25,15 +25,45 @@ type OmitId<T> = Omit<T, 'id'>
 export type Encodable<T extends HasId, S = FirebaseFirestore.DocumentData> = (obj: OptionalIdStorable<T>) => Storable<S>
 export type Decodable<T extends HasId, S = HasIdObject> = (doc: HasSameKeyObject<S> & HasId) => T
 
-interface Context {
-  firestore: Firestore,
-  tx?: FirebaseFirestore.Transaction,
+class Context {
+  firestore: Firestore
+  private _tx?: FirebaseFirestore.Transaction = undefined
+  private _batch?: FirebaseFirestore.WriteBatch = undefined
+  constructor (firestore: Firestore) {
+    this.firestore = firestore
+  }
+
+  get tx (): FirebaseFirestore.Transaction | undefined {
+    return this._tx
+  }
+
+  set tx (_tx: FirebaseFirestore.Transaction | undefined) {
+    if (_tx === undefined) {
+      this._tx = _tx
+      return
+    }
+    if (this._tx || this._batch) throw new Error('Disallow nesting transaction or batch')
+    this._tx = _tx
+  }
+
+  get batch (): FirebaseFirestore.WriteBatch | undefined {
+    return this._batch
+  }
+
+  set batch (_batch: FirebaseFirestore.WriteBatch | undefined) {
+    if (_batch === undefined) {
+      this._batch = _batch
+      return
+    }
+    if (this._tx || this._batch) throw new Error('Disallow nesting transaction or batch')
+    this._batch = _batch
+  }
 }
 
 export class FirestoreSimple {
   context: Context
   constructor (firestore: Firestore) {
-    this.context = { firestore, tx: undefined }
+    this.context = new Context(firestore)
   }
 
   collection<T extends HasId, S = OmitId<T>> ({ path, encode, decode }: {
@@ -75,6 +105,16 @@ export class FirestoreSimple {
       await updateFunction(tx)
     })
     this.context.tx = undefined
+  }
+
+  async runBatch (updateFunction: (batch: FirebaseFirestore.WriteBatch) => Promise<any>): Promise<void> {
+    const _batch = this.context.firestore.batch()
+    this.context.batch = _batch
+
+    await updateFunction(_batch)
+    await this.context.batch.commit()
+
+    this.context.batch = undefined
   }
 }
 
@@ -185,6 +225,9 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
     if (this.context.tx) {
       docRef = this.docRef()
       this.context.tx.set(docRef, doc)
+    } else if (this.context.batch) {
+      docRef = this.docRef()
+      this.context.batch.set(docRef, doc)
     } else {
       docRef = await this.collectionRef.add(doc)
     }
@@ -199,6 +242,8 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
 
     if (this.context.tx) {
       this.context.tx.set(docRef, setDoc)
+    } else if (this.context.batch) {
+      this.context.batch.set(docRef, setDoc)
     } else {
       await docRef.set(setDoc)
     }
@@ -221,6 +266,8 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
 
     if (this.context.tx) {
       this.context.tx.update(docRef, updateDoc)
+    } else if (this.context.batch) {
+      this.context.batch.update(docRef, updateDoc)
     } else {
       await docRef.update(updateDoc)
     }
@@ -231,6 +278,8 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
     const docRef = this.docRef(id)
     if (this.context.tx) {
       this.context.tx.delete(docRef)
+    } else if (this.context.batch) {
+      this.context.batch.delete(docRef)
     } else {
       await docRef.delete()
     }
@@ -239,22 +288,28 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
 
   async bulkSet (objects: Array<Storable<T>>): Promise<FirebaseFirestore.WriteResult[]> {
     const batch = this.context.firestore.batch()
+    this.context.batch = batch
 
     objects.forEach((obj) => {
       const docId = obj.id
       const setDoc = this.converter.encode(obj)
       batch.set(this.collectionRef.doc(docId), setDoc)
     })
-    return batch.commit()
+    const writeBatch = await batch.commit()
+    this.context.batch = undefined
+    return writeBatch
   }
 
   async bulkDelete (docIds: string[]): Promise<FirebaseFirestore.WriteResult[]> {
     const batch = this.context.firestore.batch()
+    this.context.batch = batch
 
     docIds.forEach((docId) => {
       batch.delete(this.collectionRef.doc(docId))
     })
-    return batch.commit()
+    const writeBatch = batch.commit()
+    this.context.batch = undefined
+    return writeBatch
   }
 
   where (fieldPath: QueryKey<S>, opStr: FirebaseFirestore.WhereFilterOp, value: any): FirestoreSimpleQuery<T, S> {

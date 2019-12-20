@@ -1,6 +1,9 @@
 import { FirestoreSimple, FirestoreSimpleCollection } from '../src'
 import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
 
+// Workaround for flaky nesting transaction/runBatch test
+jest.retryTimes(3)
+
 interface TestDoc {
   id: string,
   title: string,
@@ -42,6 +45,22 @@ describe('transaction', () => {
       })
 
       expect(txFirestoreSimple.context.tx).toBeUndefined()
+    })
+
+    it('should be error nesting transaction', async () => {
+      await txFirestoreSimple.runTransaction(async (_tx) => {
+        expect(
+          txFirestoreSimple.runTransaction(async (_tx) => { dao.add({ title: 'test' }) })
+        ).rejects.toThrow()
+      })
+    })
+
+    it('should be error runBatch in transaction', async () => {
+      await txFirestoreSimple.runTransaction(async (_tx) => {
+        expect(
+          txFirestoreSimple.runBatch(async (_batch) => { dao.add({ title: 'test' }) })
+        ).rejects.toThrow()
+      })
     })
   })
 
