@@ -13,7 +13,10 @@ const firestore = initFirestore()
 const collectionPath = createRandomCollectionName()
 const firestoreSimple = new FirestoreSimple(firestore)
 
-describe('collectionGroup', () => {
+// Skip reason: CollectionGroup can not handle parallel test(ex: node10 + node12).
+// CollectionGroup get all documents that have same collectionId from "ALL" collections.
+// We will use Firestore local emulator to resolve this problem.
+describe.skip('collectionGroup', () => {
   beforeEach(async () => {
     await firestore.collection(`${collectionPath}/1/${collectionId}`).add({ title: expectTitles[0] })
     await firestore.collection(`${collectionPath}/1/${collectionId}`).add({ title: expectTitles[1] })
