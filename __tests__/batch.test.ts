@@ -18,6 +18,20 @@ describe('batch', () => {
     await deleteCollection(firestore, collectionPath)
   })
 
+  it('bulkAdd', async () => {
+    const docs = [
+      { title: 'aaa' },
+      { title: 'bbb' },
+      { title: 'ccc' },
+    ]
+    await dao.bulkAdd(docs)
+    const fetchedDocs = await dao.fetchAll()
+
+    const actualTitles = fetchedDocs.map((doc) => doc.title).sort()
+    const expectTitles = docs.map((doc) => doc.title).sort()
+    expect(actualTitles).toEqual(expectTitles)
+  })
+
   it('bulkSet', async () => {
     const docs = [
       { id: 'test1', title: 'aaa' },
