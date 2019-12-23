@@ -286,6 +286,20 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
     return id
   }
 
+  async bulkAdd (objects: Array<OptionalIdStorable<T>>): Promise<FirebaseFirestore.WriteResult[]> {
+    const batch = this.context.firestore.batch()
+    this.context.batch = batch
+
+    objects.forEach((obj) => {
+      const docRef = this.docRef()
+      const doc = this.converter.encode(obj)
+      batch.set(docRef, doc)
+    })
+    const writeBatch = await batch.commit()
+    this.context.batch = undefined
+    return writeBatch
+  }
+
   async bulkSet (objects: Array<Storable<T>>): Promise<FirebaseFirestore.WriteResult[]> {
     const batch = this.context.firestore.batch()
     this.context.batch = batch
