@@ -295,43 +295,21 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
   }
 
   async bulkAdd (objects: Array<OptionalIdStorable<T>>): Promise<FirebaseFirestore.WriteResult[]> {
-    const batch = this.context.firestore.batch()
-    this.context.batch = batch
-
-    objects.forEach((obj) => {
-      const docRef = this.docRef()
-      const doc = this.converter.encode(obj)
-      batch.set(docRef, doc)
+    return this.context.runBatch(async () => {
+      objects.forEach((obj) => { this.add(obj) })
     })
-    const writeBatch = await batch.commit()
-    this.context.batch = undefined
-    return writeBatch
   }
 
   async bulkSet (objects: Array<Storable<T>>): Promise<FirebaseFirestore.WriteResult[]> {
-    const batch = this.context.firestore.batch()
-    this.context.batch = batch
-
-    objects.forEach((obj) => {
-      const docId = obj.id
-      const setDoc = this.converter.encode(obj)
-      batch.set(this.collectionRef.doc(docId), setDoc)
+    return this.context.runBatch(async () => {
+      objects.forEach((obj) => { this.set(obj) })
     })
-    const writeBatch = await batch.commit()
-    this.context.batch = undefined
-    return writeBatch
   }
 
   async bulkDelete (docIds: string[]): Promise<FirebaseFirestore.WriteResult[]> {
-    const batch = this.context.firestore.batch()
-    this.context.batch = batch
-
-    docIds.forEach((docId) => {
-      batch.delete(this.collectionRef.doc(docId))
+    return this.context.runBatch(async () => {
+      docIds.forEach((docId) => { this.delete(docId) })
     })
-    const writeBatch = batch.commit()
-    this.context.batch = undefined
-    return writeBatch
   }
 
   where (fieldPath: QueryKey<S>, opStr: FirebaseFirestore.WhereFilterOp, value: any): FirestoreSimpleQuery<T, S> {
