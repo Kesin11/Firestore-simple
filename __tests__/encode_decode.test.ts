@@ -73,4 +73,18 @@ describe('encode and decode', () => {
     const fetchedBook = await dao.fetch(setBook.id)
     expect(fetchedBook).toEqual(setBook)
   })
+
+  it('update with encode/decode accept "encoded" key name', async () => {
+    const doc = {
+      book_title: 'exists_book',
+      created: now,
+    }
+    const docRef = await dao.collectionRef.add(doc)
+
+    const updatedTitle = 'update'
+    await dao.update({ id: docRef.id, book_title: updatedTitle })
+
+    const fetchedBook = await dao.fetch(docRef.id)
+    expect(fetchedBook!.bookTitle).toEqual(updatedTitle)
+  })
 })
