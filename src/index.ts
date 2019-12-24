@@ -37,43 +37,29 @@ class Context {
     return this._tx
   }
 
-  set tx (_tx: FirebaseFirestore.Transaction | undefined) {
-    if (_tx === undefined) {
-      this._tx = _tx
-      return
-    }
-    if (this._tx || this._batch) throw new Error('Disallow nesting transaction or batch')
-    this._tx = _tx
-  }
-
   get batch (): FirebaseFirestore.WriteBatch | undefined {
     return this._batch
   }
 
-  set batch (_batch: FirebaseFirestore.WriteBatch | undefined) {
-    if (_batch === undefined) {
-      this._batch = _batch
-      return
-    }
-    if (this._tx || this._batch) throw new Error('Disallow nesting transaction or batch')
-    this._batch = _batch
-  }
-
   async runTransaction (updateFunction: (tx: FirebaseFirestore.Transaction) => Promise<void>): Promise<void> {
+    if (this._tx || this._batch) throw new Error('Disallow nesting transaction or batch')
+
     await this.firestore.runTransaction(async (tx) => {
-      this.tx = tx
+      this._tx = tx
       await updateFunction(tx)
     })
-    this.tx = undefined
+    this._tx = undefined
   }
 
   async runBatch (updateFunction: (batch: FirebaseFirestore.WriteBatch) => Promise<void>): Promise<FirebaseFirestore.WriteResult[]> {
-    this.batch = this.firestore.batch()
+    if (this._tx || this._batch) throw new Error('Disallow nesting transaction or batch')
 
-    await updateFunction(this.batch)
-    const writeResults = await this.batch.commit()
+    this._batch = this.firestore.batch()
 
-    this.batch = undefined
+    await updateFunction(this._batch)
+    const writeResults = await this._batch.commit()
+
+    this._batch = undefined
     return writeResults
   }
 }
