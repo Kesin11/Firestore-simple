@@ -37,26 +37,30 @@ class Context {
     return this._tx
   }
 
-  set tx (_tx: FirebaseFirestore.Transaction | undefined) {
-    if (_tx === undefined) {
-      this._tx = _tx
-      return
-    }
-    if (this._tx || this._batch) throw new Error('Disallow nesting transaction or batch')
-    this._tx = _tx
-  }
-
   get batch (): FirebaseFirestore.WriteBatch | undefined {
     return this._batch
   }
 
-  set batch (_batch: FirebaseFirestore.WriteBatch | undefined) {
-    if (_batch === undefined) {
-      this._batch = _batch
-      return
-    }
+  async runTransaction (updateFunction: (tx: FirebaseFirestore.Transaction) => Promise<void>): Promise<void> {
     if (this._tx || this._batch) throw new Error('Disallow nesting transaction or batch')
-    this._batch = _batch
+
+    await this.firestore.runTransaction(async (tx) => {
+      this._tx = tx
+      await updateFunction(tx)
+    })
+    this._tx = undefined
+  }
+
+  async runBatch (updateFunction: (batch: FirebaseFirestore.WriteBatch) => Promise<void>): Promise<FirebaseFirestore.WriteResult[]> {
+    if (this._tx || this._batch) throw new Error('Disallow nesting transaction or batch')
+
+    this._batch = this.firestore.batch()
+
+    await updateFunction(this._batch)
+    const writeResults = await this._batch.commit()
+
+    this._batch = undefined
+    return writeResults
   }
 }
 
@@ -99,22 +103,12 @@ export class FirestoreSimple {
     return new FirestoreSimpleQuery<T, S>(converter, this.context, query)
   }
 
-  async runTransaction (updateFunction: (tx: FirebaseFirestore.Transaction) => Promise<any>): Promise<void> {
-    await this.context.firestore.runTransaction(async (tx) => {
-      this.context.tx = tx
-      await updateFunction(tx)
-    })
-    this.context.tx = undefined
+  async runTransaction (updateFunction: (tx: FirebaseFirestore.Transaction) => Promise<void>): Promise<void> {
+    return this.context.runTransaction(updateFunction)
   }
 
-  async runBatch (updateFunction: (batch: FirebaseFirestore.WriteBatch) => Promise<any>): Promise<void> {
-    const _batch = this.context.firestore.batch()
-    this.context.batch = _batch
-
-    await updateFunction(_batch)
-    await this.context.batch.commit()
-
-    this.context.batch = undefined
+  async runBatch (updateFunction: (batch: FirebaseFirestore.WriteBatch) => Promise<void>): Promise<FirebaseFirestore.WriteResult[]> {
+    return this.context.runBatch(updateFunction)
   }
 }
 
@@ -287,43 +281,21 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
   }
 
   async bulkAdd (objects: Array<OptionalIdStorable<T>>): Promise<FirebaseFirestore.WriteResult[]> {
-    const batch = this.context.firestore.batch()
-    this.context.batch = batch
-
-    objects.forEach((obj) => {
-      const docRef = this.docRef()
-      const doc = this.converter.encode(obj)
-      batch.set(docRef, doc)
+    return this.context.runBatch(async () => {
+      objects.forEach((obj) => { this.add(obj) })
     })
-    const writeBatch = await batch.commit()
-    this.context.batch = undefined
-    return writeBatch
   }
 
   async bulkSet (objects: Array<Storable<T>>): Promise<FirebaseFirestore.WriteResult[]> {
-    const batch = this.context.firestore.batch()
-    this.context.batch = batch
-
-    objects.forEach((obj) => {
-      const docId = obj.id
-      const setDoc = this.converter.encode(obj)
-      batch.set(this.collectionRef.doc(docId), setDoc)
+    return this.context.runBatch(async () => {
+      objects.forEach((obj) => { this.set(obj) })
     })
-    const writeBatch = await batch.commit()
-    this.context.batch = undefined
-    return writeBatch
   }
 
   async bulkDelete (docIds: string[]): Promise<FirebaseFirestore.WriteResult[]> {
-    const batch = this.context.firestore.batch()
-    this.context.batch = batch
-
-    docIds.forEach((docId) => {
-      batch.delete(this.collectionRef.doc(docId))
+    return this.context.runBatch(async () => {
+      docIds.forEach((docId) => { this.delete(docId) })
     })
-    const writeBatch = batch.commit()
-    this.context.batch = undefined
-    return writeBatch
   }
 
   where (fieldPath: QueryKey<S>, opStr: FirebaseFirestore.WhereFilterOp, value: any): FirestoreSimpleQuery<T, S> {
