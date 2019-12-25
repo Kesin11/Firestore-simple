@@ -251,7 +251,7 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
     return this.add(obj)
   }
 
-  async update (obj: PartialStorable<T>): Promise<string> {
+  async update (obj: PartialStorable<S & HasId>): Promise<string> {
     if (!obj.id) throw new Error('Argument object must have "id" property')
 
     const docRef = this.docRef(obj.id)
