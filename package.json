@@ -1,20 +1,21 @@
 {
   "name": "firestore-simple",
-  "version": "4.0.1",
+  "version": "5.0.0",
   "description": "A simple wrapper for Firestore",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist/"],
+  "files": [
+    "dist/"
+  ],
   "scripts": {
     "clean": "rm -rf dist",
-    "prepare": "npm run clean && npm run build",
     "build": "tsc --project .",
     "build:test": "tsc --project test",
     "test": "jest",
     "lint": "eslint src __tests__ --ext=.ts",
     "lint:fix": "npm run lint -- --fix",
     "coverage": "codecov",
-    "publish:beta": "npm publish --tag beta",
+    "publish:beta": "npm version prerelease && npm publish --tag beta",
     "release:prepare": "shipjs prepare",
     "release:trigger": "shipjs trigger"
   },
@@ -43,7 +44,9 @@
     "type": "git",
     "url": "git+https://github.com/Kesin11/Firestore-simple.git"
   },
-  "keywords": ["Firestore"],
+  "keywords": [
+    "Firestore"
+  ],
   "author": "Kesin11",
   "email": "kesin1202000@gmail.com",
   "license": "MIT",
