@@ -15,7 +15,7 @@
     "lint": "eslint src __tests__ --ext=.ts",
     "lint:fix": "npm run lint -- --fix",
     "coverage": "codecov",
-    "publish:beta": "npm publish --tag beta",
+    "publish:beta": "npm version prerelease && npm publish --tag beta",
     "release:prepare": "shipjs prepare",
     "release:trigger": "shipjs trigger"
   },
