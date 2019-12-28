@@ -9,7 +9,6 @@
   ],
   "scripts": {
     "clean": "rm -rf dist",
-    "prepare": "npm run clean && npm run build",
     "build": "tsc --project .",
     "build:test": "tsc --project test",
     "test": "jest",
