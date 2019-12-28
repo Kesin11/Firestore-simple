@@ -19,8 +19,9 @@ More simple, powerful and TypeScript friendly Firestore wrapper.
 
 Blog posts (sorry Japanese only)
 
-- [Firestoreをもっと手軽に使えるfirestore-simpleを作った](http://kesin.hatenablog.com/entry/2018/06/12/095020)
 - [Firestoreをもっと手軽に使えるfirestore-simpleがバージョン2になりました](http://kesin.hatenablog.com/entry/firestore_simple_v2)
+- [TypeScriptからFirestoreを使いやすくするfirestore-simple v4をリリースしました](https://qiita.com/Kesin11/items/c2a52e4e33d6f8e83723)
+
 
 # Install
 ```
