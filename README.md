@@ -19,8 +19,9 @@ More simple, powerful and TypeScript friendly Firestore wrapper.
 
 Blog posts (sorry Japanese only)
 
-- [Firestoreをもっと手軽に使えるfirestore-simpleを作った](http://kesin.hatenablog.com/entry/2018/06/12/095020)
 - [Firestoreをもっと手軽に使えるfirestore-simpleがバージョン2になりました](http://kesin.hatenablog.com/entry/firestore_simple_v2)
+- [TypeScriptからFirestoreを使いやすくするfirestore-simple v4をリリースしました](https://qiita.com/Kesin11/items/c2a52e4e33d6f8e83723)
+
 
 # Install
 ```
@@ -30,7 +31,7 @@ npm i firestore-simple
 # Usage
 Use with Node.js admin SDK sample.
 
-```javascript
+```ts
 // TypeScript
 import admin, { ServiceAccount } from 'firebase-admin'
 import serviceAccount from '../../firebase_secret.json' // prepare your firebase secret json before exec example
@@ -73,7 +74,7 @@ const main = async () => {
   // 3Y5jwT8pB4cMqS1n3maj
 
   // multi set
-  // `bulkSet` and `bulkDelete` are wrapper for WriteBatch
+  // `bulkSet`, `bulkAdd` and `bulkDelete` are wrapper for WriteBatch
   await dao.bulkSet([
     { id: '1', name: 'foo', age: 1 },
     { id: '2', name: 'bar', age: 2 },
@@ -96,7 +97,7 @@ main()
 # Auto typing document data
 firestore-simple automatically types document data retrieved from a collection by TypeScript generics, you need to pass type arguments when creating a FirestoreSimpleCollection object.
 
-```js
+```ts
 interface User {
   id: string, // Must need `id: string` property
   name: string,
@@ -109,7 +110,7 @@ const dao = firestoreSimple.collection<User>({ path: `user` })
 
 After that, type of document obtained from FirestoreSimpleCollection will be `User`.
 
-```js
+```ts
 // fetch(get)
 const bob: User | undefined = await dao.fetch(bobId)
 ```
@@ -131,7 +132,7 @@ Here is example code to realize following these features.
   - Map document data fetched from firestore to `User` class instance
   - Convert firebase timestamp object to javascript Date object
 
-```js
+```ts
 class User {
   constructor(
     public id: string,
@@ -169,7 +170,7 @@ const dao = firestoreSimple.collection<User>({
 
 On the other hand, if property names of the document in firestore are different from `T`, you need to assign` S` that has same property names as the document in firestore.
 
-```js
+```ts
 // T: A type that firestore-simple types automatically after fetch.
 interface Book {
   id: string,
@@ -205,7 +206,7 @@ const dao = firestoreSimple.collection<Book, BookDoc>({path: collectionPath,
 # onSnapshot
 firestore-simple partially supports `onSnapshot`. You can map raw document data to an object with `decode` by using `toObject() `.
 
-```js
+```ts
 dao.where('age', '>=', 20)
   .onSnapshot((querySnapshot, toObject) => {
     querySnapshot.docChanges.forEach((change) => {
@@ -223,7 +224,7 @@ It can define `encode` and `decode` but not `path`. You can create FirestoreSimp
 
 This is example using `collectionFactory` for subcollection.
 
-```js
+```ts
 // Subcollection: /user/${user.id}/friend
 interface UserFriend {
   id: string,
@@ -256,12 +257,41 @@ const main = async () => {
   }
 ```
 
+# CollectionGroup
+Firestore `collectionGroup` is also supported. As same as `FirestoreSimple.collection`, `FirestoreSimple.collectionGroup` has generics and decode features too.
+
+```ts
+interface Review {
+  id: string,
+  userId: string,
+  text: string,
+  created: Date,
+}
+
+// Create CollectionGroup dao
+const firestoreSimple = new FirestoreSimple(firestore)
+const reviewCollectionGroup = firestoreSimple.collectionGroup<Review>({
+  collectionId: 'review',
+  decode: (doc) => {
+    return {
+      id: doc.id,
+      userId: doc.userId,
+      text: doc.text,
+      created: doc.created.toDate() // Convert timestamp to Date
+    }
+  }
+})
+
+// Fetch CollectionGroup documents
+const reviews = await reviewCollectionGroup.fetch()
+```
+
 # Transaction
 When using `runTransaction` with the original firestore, some methods like `get()`, `set()` and `delete()` need to be called from the `transaction` object. This is complicated and not easy to use.  
 
 firestore-simple allows you to use the same API in transactions. This way, you don't have to change your code depending on whether inside `runTransaction` block or not.
 
-```js
+```ts
 interface User {
   id: string,
   name: string,
@@ -297,6 +327,53 @@ await firestoreSimple.runTransaction(async (_tx) => {
 
 If you want to see more transaction example, please check [example code](./example) and [test code](./__tests__).
 
+# Batch
+firestore-simple provides `runBatch` it similar to `runTransaction`.  
+`set()`, `update()`, `delete()` executed in the `runBatch` callback function are executed by `batch.commit()` at the end of the block. firestore-simple handles creating batch at start of `runBatch` and commit at end of `runBatch`.
+
+```ts
+interface User {
+  id: string,
+  name: string,
+  rank: number,
+}
+const userNames = ['bob', 'alice', 'john', 'meary', 'king']
+
+const firestoreSimple = new FirestoreSimple(firestore)
+const userDao = firestoreSimple.collection<User>({ path: `${ROOT_PATH}/user` })
+
+// add() convert batch.add() inside runBatch and batch.commit() called at end of block.
+await firestoreSimple.runBatch(async (_batch) => {
+  let rank = 1
+  for (const name of userNames) {
+    await userDao.add({ name, rank })
+    rank += 1
+  }
+  console.dir(await userDao.fetchAll()) // Return empty at here.
+})
+// <- `batch.commit()`
+
+// Can use update() and delete() also set().
+await firestoreSimple.runBatch(async (_batch) => {
+  let rank = 0
+  for (const user of users) {
+    if (user.rank < 4) {
+      // Update rank to zero start
+      await userDao.update({ id: user.id, rank })
+    } else {
+      // Delete 'meary' and 'king'
+      await userDao.delete(user.id)
+    }
+    rank += 1
+  }
+})
+```
+
+If you want to see more runBatch example, please check [example code](./example) and [test code](./__tests__).
+
+
+If you just want to add/set/delete documents with array, you can use `bulkAdd`, `bulkSet`, `bulkDelete`. These are simple wrapper of batch execution.
+
 # FieldValue.increment
 Firestore can increment or decrement a numeric field value. This is very useful for counter like fields.  
 see: https://firebase.google.com/docs/firestore/manage-data/add-data?hl=en#increment_a_numeric_value
@@ -304,7 +381,7 @@ see: https://firebase.google.com/docs/firestore/manage-data/add-data?hl=en#incre
 
 firestore-simple supports to `update` a document using special value of `FieldValue`. So of course you can use `FieldValue.increment` with update.
 
-```js
+```ts
 interface User {
   id: string,
   coin: number,
@@ -339,7 +416,7 @@ Unfortunately firestore-simple does not support all the features of Firestore, s
 
 In this case, you can get raw collection reference from FirestoreSimpleCollection using `collectionRef` also document reference using `docRef(docId)`.
 
-```js
+```ts
 const firestoreSimple = new FirestoreSimple(firestore)
 const dao = firestoreSimple.collection<User>({ path: `user` })
 
@@ -360,12 +437,12 @@ You can find more example from [example directory](./example). Also [test code](
 Sorry not yet. Please check [source code](./src) or look interface using your IDE.
 
 # Feature works
-- [ ] Support new feature of firestore
+- [x] Support new feature of firestore
   - [x] incrementValue
-  - [ ] collectionGroup
+  - [x] collectionGroup
 - [x] Support [pagination](https://firebase.google.com/docs/firestore/query-data/query-cursors)
 - [ ] API document
-- [ ] Lint with eslint
+- [x] Lint with eslint
 - [x] Continuous upgrade and test new firestore SDK using with [Renovate](https://renovatebot.com/)(or similar other tool)
 - [ ] Support [web sdk](https://firebase.google.com/docs/reference/js/firebase.firestore)
 
