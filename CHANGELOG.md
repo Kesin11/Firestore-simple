@@ -1,5 +1,9 @@
 # [5.0.0](https://github.com/Kesin11/Firestore-simple/compare/v4.0.1...v5.0.0) (2019-12-28)
 
+### BREAKING CHANGES
+
+* Bugfix 'update' accept generic type S([ed3258e](https://github.com/Kesin11/Firestore-simple/commit/ed3258e8728d54c2324a8ed9be558ce3e544a406))
+* Remove fetchByQuery ([b3ae47a](https://github.com/Kesin11/Firestore-simple/commit/b3ae47a9638d699cc0e822402dab8a94c34f796b))
 
 ### Bug Fixes
 
@@ -12,28 +16,6 @@
 * Add collectionGroup() ([bd11452](https://github.com/Kesin11/Firestore-simple/commit/bd11452ccbba62b0294e0c7f0f72e1c398a685b9))
 * Add runBatch() and tests ([760e8ae](https://github.com/Kesin11/Firestore-simple/commit/760e8aefb2d8d85561f914df6efc7ec5bee5a7a0))
 
-
-### Performance Improvements
-
-* Add FirestoreSimpleConverter and refactoring for prepare implementing collectionGroup ([b3ae47a](https://github.com/Kesin11/Firestore-simple/commit/b3ae47a9638d699cc0e822402dab8a94c34f796b))
-* Change runTransaction/runBatch args type and refactoring ([46c04c6](https://github.com/Kesin11/Firestore-simple/commit/46c04c6edb1d26c4fac300e1db43dc15825e8084))
-
-
-### Reverts
-
-* Revert "chore: Temporary remove renovate eslint schedule" ([048fb51](https://github.com/Kesin11/Firestore-simple/commit/048fb51ed27c8a00cd4a79de54b702730dd287cb))
-
-
-
-# The revision history of Firestore-simple
-
-The versioning follows [Semantic Versioning](http://semver.org/):
-
-> Given a version number MAJOR.MINOR.PATCH, increment the:
->
-> 1. MAJOR version when you make incompatible API changes,
-> 2. MINOR version when you add functionality in a backwards-compatible manner, and
-> 3. PATCH version when you make backwards-compatible bug fixes.
 
 ## v4.0.1 2019/11/5
 https://github.com/Kesin11/Firestore-simple/compare/v4.0.0..v4.0.1
