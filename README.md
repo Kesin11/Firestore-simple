@@ -73,7 +73,7 @@ const main = async () => {
   // 3Y5jwT8pB4cMqS1n3maj
 
   // multi set
-  // `bulkSet` and `bulkDelete` are wrapper for WriteBatch
+  // `bulkSet`, `bulkAdd` and `bulkDelete` are wrapper for WriteBatch
   await dao.bulkSet([
     { id: '1', name: 'foo', age: 1 },
     { id: '2', name: 'bar', age: 2 },
@@ -256,6 +256,35 @@ const main = async () => {
   }
 ```
 
+# CollectionGroup
+Firestore `collectionGroup` is also supported. As same as `FirestoreSimple.collection`, `FirestoreSimple.collectionGroup` has generics and decode features too.
+
+```js
+interface Review {
+  id: string,
+  userId: string,
+  text: string,
+  created: Date,
+}
+
+// Create CollectionGroup dao
+const firestoreSimple = new FirestoreSimple(firestore)
+const reviewCollectionGroup = firestoreSimple.collectionGroup<Review>({
+  collectionId: 'review',
+  decode: (doc) => {
+    return {
+      id: doc.id,
+      userId: doc.userId,
+      text: doc.text,
+      created: doc.created.toDate() // Convert timestamp to Date
+    }
+  }
+})
+
+// Fetch CollectionGroup documents
+const reviews = await reviewCollectionGroup.fetch()
+```
+
 # Transaction
 When using `runTransaction` with the original firestore, some methods like `get()`, `set()` and `delete()` need to be called from the `transaction` object. This is complicated and not easy to use.  
 
@@ -296,6 +325,53 @@ await firestoreSimple.runTransaction(async (_tx) => {
 ```
 
 If you want to see more transaction example, please check [example code](./example) and [test code](./__tests__).
+
+# Batch
+firestore-simple provides `runBatch` it similar to `runTransaction`.  
+`set()`, `update()`, `delete()` executed in the `runBatch` callback function are executed by `batch.commit()` at the end of the block. firestore-simple handles creating batch at start of `runBatch` and commit at end of `runBatch`.
+
+```js
+interface User {
+  id: string,
+  name: string,
+  rank: number,
+}
+const userNames = ['bob', 'alice', 'john', 'meary', 'king']
+
+const firestoreSimple = new FirestoreSimple(firestore)
+const userDao = firestoreSimple.collection<User>({ path: `${ROOT_PATH}/user` })
+
+// add() convert batch.add() inside runBatch and batch.commit() called at end of block.
+await firestoreSimple.runBatch(async (_batch) => {
+  let rank = 1
+  for (const name of userNames) {
+    await userDao.add({ name, rank })
+    rank += 1
+  }
+  console.dir(await userDao.fetchAll()) // Return empty at here.
+})
+// <- `batch.commit()`
+
+// Can use update() and delete() also set().
+await firestoreSimple.runBatch(async (_batch) => {
+  let rank = 0
+  for (const user of users) {
+    if (user.rank < 4) {
+      // Update rank to zero start
+      await userDao.update({ id: user.id, rank })
+    } else {
+      // Delete 'meary' and 'king'
+      await userDao.delete(user.id)
+    }
+    rank += 1
+  }
+})
+```
+
+If you want to see more runBatch example, please check [example code](./example) and [test code](./__tests__).
+
+
+If you just want to add/set/delete documents with array, you can use `bulkAdd`, `bulkSet`, `bulkDelete`. These are simple wrapper of batch execution.
 
 # FieldValue.increment
 Firestore can increment or decrement a numeric field value. This is very useful for counter like fields.  
@@ -360,12 +436,12 @@ You can find more example from [example directory](./example). Also [test code](
 Sorry not yet. Please check [source code](./src) or look interface using your IDE.
 
 # Feature works
-- [ ] Support new feature of firestore
+- [x] Support new feature of firestore
   - [x] incrementValue
-  - [ ] collectionGroup
+  - [x] collectionGroup
 - [x] Support [pagination](https://firebase.google.com/docs/firestore/query-data/query-cursors)
 - [ ] API document
-- [ ] Lint with eslint
+- [x] Lint with eslint
 - [x] Continuous upgrade and test new firestore SDK using with [Renovate](https://renovatebot.com/)(or similar other tool)
 - [ ] Support [web sdk](https://firebase.google.com/docs/reference/js/firebase.firestore)
 
