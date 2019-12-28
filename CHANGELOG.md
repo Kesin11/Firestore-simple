@@ -1,3 +1,30 @@
+# [5.0.0](https://github.com/Kesin11/Firestore-simple/compare/v4.0.1...v5.0.0) (2019-12-28)
+
+
+### Bug Fixes
+
+* throw error when nesting batch or bulkSet/bulkDelete ([a7e2b74](https://github.com/Kesin11/Firestore-simple/commit/a7e2b74aeec7cb1058bbfb0cd0f9e36bbffb2c97))
+
+
+### Features
+
+* Add bulkAdd() ([dc50489](https://github.com/Kesin11/Firestore-simple/commit/dc50489dbe51c31f694979f441662c4668cc0010))
+* Add collectionGroup() ([bd11452](https://github.com/Kesin11/Firestore-simple/commit/bd11452ccbba62b0294e0c7f0f72e1c398a685b9))
+* Add runBatch() and tests ([760e8ae](https://github.com/Kesin11/Firestore-simple/commit/760e8aefb2d8d85561f914df6efc7ec5bee5a7a0))
+
+
+### Performance Improvements
+
+* Add FirestoreSimpleConverter and refactoring for prepare implementing collectionGroup ([b3ae47a](https://github.com/Kesin11/Firestore-simple/commit/b3ae47a9638d699cc0e822402dab8a94c34f796b))
+* Change runTransaction/runBatch args type and refactoring ([46c04c6](https://github.com/Kesin11/Firestore-simple/commit/46c04c6edb1d26c4fac300e1db43dc15825e8084))
+
+
+### Reverts
+
+* Revert "chore: Temporary remove renovate eslint schedule" ([048fb51](https://github.com/Kesin11/Firestore-simple/commit/048fb51ed27c8a00cd4a79de54b702730dd287cb))
+
+
+
 # The revision history of Firestore-simple
 
 The versioning follows [Semantic Versioning](http://semver.org/):
