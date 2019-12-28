@@ -1,11 +1,6 @@
 ## [5.0.1](https://github.com/Kesin11/Firestore-simple/compare/v5.0.0...v5.0.1) (2019-12-28)
 
-
-### Bug Fixes
-
-* empty commit for retry shipjs ([7ae2821](https://github.com/Kesin11/Firestore-simple/commit/7ae282114f825a7759c39a15c134d5ec603f0b8d))
-
-
+v5.0.0 was failed to release. So v5.0.1 is just republishing to npm.
 
 # [5.0.0](https://github.com/Kesin11/Firestore-simple/compare/v4.0.1...v5.0.0) (2019-12-28)
 
