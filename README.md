@@ -21,6 +21,7 @@ Blog posts (sorry Japanese only)
 
 - [Firestoreをもっと手軽に使えるfirestore-simpleがバージョン2になりました](http://kesin.hatenablog.com/entry/firestore_simple_v2)
 - [TypeScriptからFirestoreを使いやすくするfirestore-simple v4をリリースしました](https://qiita.com/Kesin11/items/c2a52e4e33d6f8e83723)
+- [firestore-simple v5をリリースしました](https://qiita.com/Kesin11/items/999011de9b6aeba37e78)
 
 
 # Install
