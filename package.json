@@ -34,7 +34,7 @@
     "eslint-plugin-promise": "4.2.1",
     "eslint-plugin-standard": "4.0.1",
     "firebase-admin": "8.9.2",
-    "jest": "24.9.0",
+    "jest": "25.1.0",
     "jest-circus": "24.9.0",
     "shipjs": "0.12.1",
     "ts-jest": "24.3.0",
