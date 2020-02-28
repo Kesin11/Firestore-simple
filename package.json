@@ -38,7 +38,7 @@
     "jest-circus": "25.1.0",
     "shipjs": "0.12.1",
     "ts-jest": "25.2.1",
-    "typescript": "3.8.2"
+    "typescript": "3.8.3"
   },
   "repository": {
     "type": "git",
