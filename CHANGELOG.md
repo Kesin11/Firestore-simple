@@ -1,3 +1,7 @@
+# [6.0.0](https://github.com/Kesin11/Firestore-simple/compare/v5.0.1...v6.0.0) (2020-03-05)
+
+
+
 ## [5.0.1](https://github.com/Kesin11/Firestore-simple/compare/v5.0.0...v5.0.1) (2019-12-28)
 
 v5.0.0 was failed to release. So v5.0.1 is just republishing to npm.
