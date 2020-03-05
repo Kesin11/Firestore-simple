@@ -1,5 +1,5 @@
 ## [6.0.1](https://github.com/Kesin11/Firestore-simple/compare/v5.0.1...v6.0.1) (2020-03-05)
-
+* chore(test): Skip flaky tests [#122](https://github.com/Kesin11/Firestore-simple/pull/122)
 
 
 # [6.0.0](https://github.com/Kesin11/Firestore-simple/compare/v5.0.1...v6.0.0) (2020-03-05)
