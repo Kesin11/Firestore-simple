@@ -1,5 +1,20 @@
 # [6.0.0](https://github.com/Kesin11/Firestore-simple/compare/v5.0.1...v6.0.0) (2020-03-05)
 
+### BREAKING CHANGES
+* Rename module name 'FirestoreSimple' to 'FirestoreSimpleAdmin'([3c6fafe](https://github.com/Kesin11/Firestore-simple/commit/3c6fafea580992402b248dd6a6bf53fbc294754e))
+
+Exported class name `FirestoreSimple` was **DEPRECATED**. Please use `FirestoreSimpleAdmin` instead.
+You can still import `FirestoreSimple`, but it will be removed in future versoin.
+
+If you use firestore-simple before v6.0.0, migrate your code like this.
+
+```ts
+// old
+import { FirestoreSimple } from 'firestore-simple'
+
+// new
+import { FirestoreSimpleAdmin } from 'firestore-simple'
+```
 
 
 ## [5.0.1](https://github.com/Kesin11/Firestore-simple/compare/v5.0.0...v5.0.1) (2019-12-28)
