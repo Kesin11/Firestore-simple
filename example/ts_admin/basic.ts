@@ -1,6 +1,6 @@
 import admin, { ServiceAccount } from 'firebase-admin'
 import serviceAccount from '../../firebase_secret.json' // prepare your firebase secret json before exec example
-import { FirestoreSimple } from '../../src'
+import { FirestoreSimpleAdmin } from '../../src'
 
 const ROOT_PATH = 'example/ts_admin_basic'
 
@@ -17,7 +17,7 @@ interface User {
 
 const main = async () => {
   // declaration
-  const firestoreSimple = new FirestoreSimple(firestore)
+  const firestoreSimple = new FirestoreSimpleAdmin(firestore)
   const dao = firestoreSimple.collection<User>({ path: `${ROOT_PATH}/user` })
 
   // add
@@ -73,9 +73,9 @@ const main = async () => {
 
   // fetch by query
   const fetchedByQueryUser: User[] = await dao.where('age', '>=', 1)
-                                .orderBy('age')
-                                .limit(1)
-                                .fetch()
+    .orderBy('age')
+    .limit(1)
+    .fetch()
   console.log(fetchedByQueryUser)
   // [ { id: '1', name: 'foo', age: 1 } ]
 

@@ -1,6 +1,6 @@
 import admin, { ServiceAccount } from 'firebase-admin'
 import serviceAccount from '../../firebase_secret.json' // your firebase secret json
-import { FirestoreSimple, FirestoreSimpleCollection } from '../../src'
+import { FirestoreSimpleAdmin } from '../../src'
 
 const ROOT_PATH = 'example/ts_admin_transaction'
 
@@ -17,7 +17,7 @@ interface User {
 const userNames = ['bob', 'alice', 'john', 'meary', 'king']
 
 const main = async (): Promise<void> => {
-  const firestoreSimple = new FirestoreSimple(firestore)
+  const firestoreSimple = new FirestoreSimpleAdmin(firestore)
   const userDao = firestoreSimple.collection<User>({ path: `${ROOT_PATH}/user` })
 
   // add() convert batch.add() inside runBatch and batch.commit()

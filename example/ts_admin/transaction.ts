@@ -1,6 +1,6 @@
 import admin, { ServiceAccount } from 'firebase-admin'
 import serviceAccount from '../../firebase_secret.json' // your firebase secret json
-import { FirestoreSimple, FirestoreSimpleCollection } from '../../src'
+import { FirestoreSimpleAdmin, AdminCollection } from '../../src'
 
 const ROOT_PATH = 'example/ts_admin_transaction'
 
@@ -18,27 +18,27 @@ interface UserFriend {
   id: string,
   name: string,
   created: Date,
-  ref: FirebaseFirestore.DocumentReference
+  ref: FirebaseFirestore.DocumentReference,
 }
 
 interface FriendRequest {
   id: string,
   from: string,
   to: string,
-  status: 'pending' | 'accepted'
+  status: 'pending' | 'accepted',
   created: Date,
   updated: Date,
 }
 
 class FriendRequestUsecase {
-  public firestoreSimple: FirestoreSimple
-  public userDao: FirestoreSimpleCollection<User>
-  public friendRequestDao: FirestoreSimpleCollection<FriendRequest>
+  firestoreSimple: FirestoreSimpleAdmin
+  userDao: AdminCollection<User>
+  friendRequestDao: AdminCollection<FriendRequest>
 
   constructor ({ firestoreSimple, userDao, friendRequestDao }: {
-    firestoreSimple: FirestoreSimple,
-    userDao: FirestoreSimpleCollection<User>
-    friendRequestDao: FirestoreSimpleCollection<FriendRequest>,
+    firestoreSimple: FirestoreSimpleAdmin,
+    userDao: AdminCollection<User>,
+    friendRequestDao: AdminCollection<FriendRequest>,
   }) {
     this.firestoreSimple = firestoreSimple
     this.userDao = userDao
@@ -46,7 +46,7 @@ class FriendRequestUsecase {
   }
 
   // Make friend request
-  public async request (fromUserId: string, toUserId: string) {
+  async request (fromUserId: string, toUserId: string) {
     // Check is target user already friend.
     const friendDao = this.firestoreSimple.collection<UserFriend>({ path: `${ROOT_PATH}/user/${fromUserId}/friends` })
     const friend = await friendDao.fetch(toUserId)
@@ -64,7 +64,7 @@ class FriendRequestUsecase {
     })
   }
 
-  public async getPendingRequest (userId: string) {
+  async getPendingRequest (userId: string) {
     const pendingRequests = await this.friendRequestDao
       .where('status', '==', 'pending')
       .where('to', '==', userId)
@@ -74,7 +74,7 @@ class FriendRequestUsecase {
   }
 
   // Accept friend request
-  public async accept (friendRequest: FriendRequest) {
+  async accept (friendRequest: FriendRequest) {
     // Change status
     await this.friendRequestDao.set({ ...friendRequest, status: 'accepted', updated: new Date() })
 
@@ -93,8 +93,8 @@ class FriendRequestUsecase {
 }
 
 const main = async () => {
-  const firestoreSimple = new FirestoreSimple(firestore)
-  const userDao = firestoreSimple.collection<User>({ path: `${ROOT_PATH}/user`})
+  const firestoreSimple = new FirestoreSimpleAdmin(firestore)
+  const userDao = firestoreSimple.collection<User>({ path: `${ROOT_PATH}/user` })
   const friendRequestDao = firestoreSimple.collection<FriendRequest>({ path: `${ROOT_PATH}/request_friend` })
 
   // Clean before execute data

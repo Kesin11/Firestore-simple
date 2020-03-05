@@ -1,4 +1,4 @@
-import { FirestoreSimple } from '../src'
+import { FirestoreSimpleAdmin } from '../../src'
 import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
 
 // Workaround for flaky onSnapshot callback tests.
@@ -19,7 +19,7 @@ interface BookDoc {
 
 const firestore = initFirestore()
 const collectionPath = createRandomCollectionName()
-const firestoreSimple = new FirestoreSimple(firestore)
+const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 
 describe('query on_snapshot test', () => {
   const dao = firestoreSimple.collection<Book, BookDoc>({

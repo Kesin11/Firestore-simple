@@ -1,5 +1,5 @@
 import admin, { ServiceAccount } from 'firebase-admin'
-import { FirestoreSimple } from '../../src'
+import { FirestoreSimpleAdmin } from '../../src'
 import serviceAccount from '../../firebase_secret.json' // prepare your firebase secret json before exec example
 
 const ROOT_PATH = 'example/pagination'
@@ -12,7 +12,7 @@ const firestore = admin.firestore()
 interface Doc {
   id: string,
   name: string,
-  order: number
+  order: number,
 }
 
 const main = async () => {
@@ -25,7 +25,7 @@ const main = async () => {
     { id: '6', name: 'd', order: 6 },
     { id: '7', name: 'f', order: 7 },
   ]
-  const firestoreSimple = new FirestoreSimple(firestore)
+  const firestoreSimple = new FirestoreSimpleAdmin(firestore)
   const dao = firestoreSimple.collection<Doc>({ path: `${ROOT_PATH}/docs` })
   await dao.bulkSet(docs)
 

@@ -23,6 +23,20 @@ Blog posts (sorry Japanese only)
 - [TypeScriptからFirestoreを使いやすくするfirestore-simple v4をリリースしました](https://qiita.com/Kesin11/items/c2a52e4e33d6f8e83723)
 - [firestore-simple v5をリリースしました](https://qiita.com/Kesin11/items/999011de9b6aeba37e78)
 
+# NOTICE
+Exported class name `FirestoreSimple` was **DEPRECATED**. Please use `FirestoreSimpleAdmin` instead.
+You can still import `FirestoreSimple`, but it will be removed in future versoin.
+
+If you use firestore-simple before v6.0.0, migrate your code like this.
+
+```ts
+// old
+import { FirestoreSimple } from 'firestore-simple'
+
+// new
+import { FirestoreSimpleAdmin } from 'firestore-simple'
+```
+
 
 # Install
 ```
@@ -36,7 +50,7 @@ Use with Node.js admin SDK sample.
 // TypeScript
 import admin, { ServiceAccount } from 'firebase-admin'
 import serviceAccount from '../../firebase_secret.json' // prepare your firebase secret json before exec example
-import { FirestoreSimple } from 'firestore-simple'
+import { FirestoreSimpleAdmin } from 'firestore-simple'
 
 const ROOT_PATH = 'example/usage'
 
@@ -51,7 +65,7 @@ interface User {
 
 const main = async () => {
   // declaration
-  const firestoreSimple = new FirestoreSimple(firestore)
+  const firestoreSimple = new FirestoreSimpleAdmin(firestore)
   const dao = firestoreSimple.collection<User>({ path: `${ROOT_PATH}/user` })
 
   // add
@@ -105,7 +119,7 @@ interface User {
   age: number,
 }
 
-const firestoreSimple = new FirestoreSimple(firestore)
+const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 const dao = firestoreSimple.collection<User>({ path: `user` })
 ```
 
@@ -143,7 +157,7 @@ class User {
   ) { }
 }
 
-const firestoreSimple = new FirestoreSimple(firestore)
+const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 const dao = firestoreSimple.collection<User>({
   path: `user`,
   // Map `User` to firestore document
@@ -166,8 +180,8 @@ const dao = firestoreSimple.collection<User>({
 })
 ```
 
-## Generics of `FirestoreSimple.collection`
-`FirestoreSimple.collection<T, S>` has two of the type arguments `T` and `S`. If property names of `T` and property names of the document in firestore as same, you no longer to need `S`. firestore-simple provide auto completion and restriction in most methods by using `T`.
+## Generics of `FirestoreSimpleAdmin.collection`
+`FirestoreSimpleAdmin.collection<T, S>` has two of the type arguments `T` and `S`. If property names of `T` and property names of the document in firestore as same, you no longer to need `S`. firestore-simple provide auto completion and restriction in most methods by using `T`.
 
 On the other hand, if property names of the document in firestore are different from `T`, you need to assign` S` that has same property names as the document in firestore.
 
@@ -221,7 +235,7 @@ dao.where('age', '>=', 20)
 # Subcollection
 firestore-simple does not provide API that direct manipulate subcollection. But `collectionFactory` is useful for subcollection.
 
-It can define `encode` and `decode` but not `path`. You can create FirestoreSimpleCollection from this factory with `path` and both `encode` and `decode` are inherited from the factory.
+It can define `encode` and `decode` but not `path`. You can create AdminCollection instance from this factory with `path` and both `encode` and `decode` are inherited from the factory.
 
 This is example using `collectionFactory` for subcollection.
 
@@ -236,7 +250,7 @@ interface UserFriend {
 const userNames = ['alice', 'bob', 'john']
 
 const main = async () => {
-  const firestoreSimple = new FirestoreSimple(firestore)
+  const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 
   // Create factory with define `decode` function for subcollection
   const userFriendFactory = firestoreSimple.collectionFactory<UserFriend>({
@@ -259,7 +273,7 @@ const main = async () => {
 ```
 
 # CollectionGroup
-Firestore `collectionGroup` is also supported. As same as `FirestoreSimple.collection`, `FirestoreSimple.collectionGroup` has generics and decode features too.
+Firestore `collectionGroup` is also supported. As same as `FirestoreSimpleAdmin.collection`, `FirestoreSimpleAdmin.collectionGroup` has generics and decode features too.
 
 ```ts
 interface Review {
@@ -270,7 +284,7 @@ interface Review {
 }
 
 // Create CollectionGroup dao
-const firestoreSimple = new FirestoreSimple(firestore)
+const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 const reviewCollectionGroup = firestoreSimple.collectionGroup<Review>({
   collectionId: 'review',
   decode: (doc) => {
@@ -315,7 +329,7 @@ await firestore.runTransaction(async (transaction) => {
 })
 
 // firestore-simple transaction
-const firestoreSimple = new FirestoreSimple(firestore)
+const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 const dao = firestoreSimple.collection<User>({ path: `${ROOT_PATH}/user` })
 await firestoreSimple.runTransaction(async (_tx) => {
   await dao.fetch(docId)
@@ -340,7 +354,7 @@ interface User {
 }
 const userNames = ['bob', 'alice', 'john', 'meary', 'king']
 
-const firestoreSimple = new FirestoreSimple(firestore)
+const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 const userDao = firestoreSimple.collection<User>({ path: `${ROOT_PATH}/user` })
 
 // add() convert batch.add() inside runBatch and batch.commit() called at end of block.
@@ -389,7 +403,7 @@ interface User {
   timestamp: Date,
 }
 
-const firestoreSimple = new FirestoreSimple(firestore)
+const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 const dao = firestoreSimple.collection<User>({ path: `${ROOT_PATH}/user` })
 
 // Setup user
@@ -418,7 +432,7 @@ Unfortunately firestore-simple does not support all the features of Firestore, s
 In this case, you can get raw collection reference from FirestoreSimpleCollection using `collectionRef` also document reference using `docRef(docId)`.
 
 ```ts
-const firestoreSimple = new FirestoreSimple(firestore)
+const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 const dao = firestoreSimple.collection<User>({ path: `user` })
 
 // Same as firestore.collection('user')

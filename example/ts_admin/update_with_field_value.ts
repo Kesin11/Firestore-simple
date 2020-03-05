@@ -1,7 +1,7 @@
 import admin, { ServiceAccount } from 'firebase-admin'
 import serviceAccount from '../../firebase_secret.json' // prepare your firebase secret json before exec example
-import { FirestoreSimple } from '../../src'
-import { FieldValue } from '@google-cloud/firestore';
+import { FirestoreSimpleAdmin } from '../../src'
+import { FieldValue } from '@google-cloud/firestore'
 
 const ROOT_PATH = 'example/ts_admin_basic'
 
@@ -17,7 +17,7 @@ interface User {
 }
 
 const main = async () => {
-  const firestoreSimple = new FirestoreSimple(firestore)
+  const firestoreSimple = new FirestoreSimpleAdmin(firestore)
   const dao = firestoreSimple.collection<User>({ path: `${ROOT_PATH}/user` })
 
   // Setup user
