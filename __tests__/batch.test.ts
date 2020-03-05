@@ -1,4 +1,4 @@
-import { FirestoreSimple } from '../src'
+import { FirestoreSimpleAdmin } from '../src'
 import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
 
 interface TestDoc {
@@ -8,7 +8,7 @@ interface TestDoc {
 
 const firestore = initFirestore()
 const collectionPath = createRandomCollectionName()
-const firestoreSimple = new FirestoreSimple(firestore)
+const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 
 describe('batch', () => {
   const dao = firestoreSimple.collection<TestDoc>({ path: collectionPath })

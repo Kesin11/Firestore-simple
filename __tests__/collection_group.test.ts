@@ -1,4 +1,4 @@
-import { FirestoreSimple } from '../src'
+import { FirestoreSimpleAdmin } from '../src'
 import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
 
 interface TestDoc {
@@ -11,7 +11,7 @@ const collectionId = 'collection_group'
 
 const firestore = initFirestore()
 const collectionPath = createRandomCollectionName()
-const firestoreSimple = new FirestoreSimple(firestore)
+const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 
 // Skip reason: CollectionGroup can not handle parallel test(ex: node10 + node12).
 // CollectionGroup get all documents that have same collectionId from "ALL" collections.

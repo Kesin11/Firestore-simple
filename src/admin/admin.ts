@@ -1,11 +1,11 @@
 import { Firestore } from '@google-cloud/firestore'
 import { HasId, OmitId, Encodable, Decodable } from './types'
 import { Context } from './context'
-import { FirestoreSimpleCollection } from './collection'
-import { FirestoreSimpleQuery } from './query'
-import { FirestoreSimpleConverter } from './converter'
+import { AdminCollection } from './collection'
+import { AdminQuery } from './query'
+import { AdminConverter } from './converter'
 
-export class FirestoreSimple {
+export class FirestoreSimpleAdmin {
   context: Context
   constructor (firestore: Firestore) {
     this.context = new Context(firestore)
@@ -15,7 +15,7 @@ export class FirestoreSimple {
     path: string,
     encode?: Encodable<T, S>,
     decode?: Decodable<T, S>,
-  }): FirestoreSimpleCollection<T, S> {
+  }): AdminCollection<T, S> {
     const factory = new CollectionFactory<T, S>({
       context: this.context,
       encode,
@@ -38,10 +38,10 @@ export class FirestoreSimple {
   collectionGroup<T extends HasId, S = OmitId<T>> ({ collectionId, decode }: {
     collectionId: string,
     decode?: Decodable<T, S>,
-  }): FirestoreSimpleQuery<T, S> {
+  }): AdminQuery<T, S> {
     const query = this.context.firestore.collectionGroup(collectionId)
-    const converter = new FirestoreSimpleConverter({ decode })
-    return new FirestoreSimpleQuery<T, S>(converter, this.context, query)
+    const converter = new AdminConverter({ decode })
+    return new AdminQuery<T, S>(converter, this.context, query)
   }
 
   async runTransaction (updateFunction: (tx: FirebaseFirestore.Transaction) => Promise<void>): Promise<void> {
@@ -68,8 +68,8 @@ class CollectionFactory<T extends HasId, S = OmitId<T>> {
     this.decode = decode
   }
 
-  create (path: string): FirestoreSimpleCollection<T, S> {
-    return new FirestoreSimpleCollection<T, S>({
+  create (path: string): AdminCollection<T, S> {
+    return new AdminCollection<T, S>({
       context: this.context,
       path,
       encode: this.encode,

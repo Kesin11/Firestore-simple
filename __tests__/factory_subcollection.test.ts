@@ -1,6 +1,6 @@
-import { FirestoreSimple } from '../src'
+import { FirestoreSimpleAdmin } from '../src'
 import { Encodable, Decodable } from '../src/admin/types'
-import { FirestoreSimpleCollection } from '../src/admin/collection'
+import { AdminCollection } from '../src/admin/collection'
 import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
 
 interface Book {
@@ -16,7 +16,7 @@ interface BookDoc {
 
 const firestore = initFirestore()
 const collectionPath = createRandomCollectionName()
-const firestoreSimple = new FirestoreSimple(firestore)
+const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 
 describe('Factory and Subcollection', () => {
   // Delete all documents. (= delete collection)
@@ -62,7 +62,7 @@ describe('Factory and Subcollection', () => {
       encode: encodeFunc,
       decode: decodeFunc,
     })
-    let dao: FirestoreSimpleCollection<Book, BookDoc>
+    let dao: AdminCollection<Book, BookDoc>
 
     beforeEach(async () => {
       dao = factory.create(subcollectionPath)

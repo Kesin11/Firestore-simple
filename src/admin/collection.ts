@@ -6,13 +6,13 @@ import {
 } from '@google-cloud/firestore'
 import { HasId, OmitId, Encodable, Decodable, OptionalIdStorable, Storable, PartialStorable, QueryKey } from './types'
 import { Context } from './context'
-import { FirestoreSimpleConverter } from './converter'
-import { FirestoreSimpleQuery } from './query'
+import { AdminConverter } from './converter'
+import { AdminQuery } from './query'
 
-export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
+export class AdminCollection<T extends HasId, S = OmitId<T>> {
   context: Context
   collectionRef: CollectionReference
-  private converter: FirestoreSimpleConverter<T, S>
+  private converter: AdminConverter<T, S>
 
   constructor ({ context, path, encode, decode }: {
     context: Context,
@@ -22,7 +22,7 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
   }) {
     this.context = context
     this.collectionRef = context.firestore.collection(path)
-    this.converter = new FirestoreSimpleConverter({ encode, decode })
+    this.converter = new AdminConverter({ encode, decode })
   }
 
   toObject (documentSnapshot: DocumentSnapshot): T {
@@ -142,19 +142,19 @@ export class FirestoreSimpleCollection<T extends HasId, S = OmitId<T>> {
     })
   }
 
-  where (fieldPath: QueryKey<S>, opStr: FirebaseFirestore.WhereFilterOp, value: any): FirestoreSimpleQuery<T, S> {
+  where (fieldPath: QueryKey<S>, opStr: FirebaseFirestore.WhereFilterOp, value: any): AdminQuery<T, S> {
     const query = this.collectionRef.where(fieldPath as string | FirebaseFirestore.FieldPath, opStr, value)
-    return new FirestoreSimpleQuery<T, S>(this.converter, this.context, query)
+    return new AdminQuery<T, S>(this.converter, this.context, query)
   }
 
-  orderBy (fieldPath: QueryKey<S>, directionStr?: FirebaseFirestore.OrderByDirection): FirestoreSimpleQuery<T, S> {
+  orderBy (fieldPath: QueryKey<S>, directionStr?: FirebaseFirestore.OrderByDirection): AdminQuery<T, S> {
     const query = this.collectionRef.orderBy(fieldPath as string | FirebaseFirestore.FieldPath, directionStr)
-    return new FirestoreSimpleQuery<T, S>(this.converter, this.context, query)
+    return new AdminQuery<T, S>(this.converter, this.context, query)
   }
 
-  limit (limit: number): FirestoreSimpleQuery<T, S> {
+  limit (limit: number): AdminQuery<T, S> {
     const query = this.collectionRef.limit(limit)
-    return new FirestoreSimpleQuery<T, S>(this.converter, this.context, query)
+    return new AdminQuery<T, S>(this.converter, this.context, query)
   }
 
   onSnapshot (callback: (

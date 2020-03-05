@@ -1,4 +1,4 @@
-import { FirestoreSimple } from '../src'
+import { FirestoreSimpleAdmin } from '../src'
 import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
 
 export interface TestDoc {
@@ -10,7 +10,7 @@ export interface TestDoc {
 const firestore = initFirestore()
 // Set specific collection name because random name collection can not handle composit index
 const collectionPath = createRandomCollectionName() + '/test/test_pagination'
-const firestoreSimple = new FirestoreSimple(firestore)
+const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 
 describe('pagination', () => {
   const dao = firestoreSimple.collection<TestDoc>({ path: collectionPath })

@@ -2,7 +2,7 @@ import { DocumentSnapshot } from '@google-cloud/firestore'
 import { HasId, OmitId, Encodable, Decodable, OptionalIdStorable, Storable } from './types'
 import { Optional } from 'utility-types'
 
-export class FirestoreSimpleConverter<T extends HasId, S = OmitId<T>> {
+export class AdminConverter<T extends HasId, S = OmitId<T>> {
   private _encode?: Encodable<T, S>
   private _decode?: Decodable<T, S>
 

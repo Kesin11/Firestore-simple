@@ -1,10 +1,10 @@
 import { DocumentSnapshot, Query, QuerySnapshot } from '@google-cloud/firestore'
 import { HasId, QueryKey } from './types'
-import { FirestoreSimpleConverter } from './converter'
+import { AdminConverter } from './converter'
 import { Context } from './context'
 
-export class FirestoreSimpleQuery<T extends HasId, S> {
-  constructor (public converter: FirestoreSimpleConverter<T, S>, public context: Context, public query: Query) { }
+export class AdminQuery<T extends HasId, S> {
+  constructor (public converter: AdminConverter<T, S>, public context: Context, public query: Query) { }
 
   where (fieldPath: QueryKey<S>, opStr: FirebaseFirestore.WhereFilterOp, value: any): this {
     this.query = this.query.where(fieldPath as string | FirebaseFirestore.FieldPath, opStr, value)
@@ -21,8 +21,8 @@ export class FirestoreSimpleQuery<T extends HasId, S> {
     return this
   }
 
-  startAt (snapshot: DocumentSnapshot): FirestoreSimpleQuery<T, S>
-  startAt (...fieldValues: any[]): FirestoreSimpleQuery<T, S>
+  startAt (snapshot: DocumentSnapshot): AdminQuery<T, S>
+  startAt (...fieldValues: any[]): AdminQuery<T, S>
   startAt (
     snapshotOrValue: DocumentSnapshot | unknown,
     ...fieldValues: unknown[]
@@ -37,8 +37,8 @@ export class FirestoreSimpleQuery<T extends HasId, S> {
     return this
   }
 
-  startAfter (snapshot: DocumentSnapshot): FirestoreSimpleQuery<T, S>
-  startAfter (...fieldValues: any[]): FirestoreSimpleQuery<T, S>
+  startAfter (snapshot: DocumentSnapshot): AdminQuery<T, S>
+  startAfter (...fieldValues: any[]): AdminQuery<T, S>
   startAfter (
     snapshotOrValue: DocumentSnapshot | unknown,
     ...fieldValues: unknown[]
@@ -53,8 +53,8 @@ export class FirestoreSimpleQuery<T extends HasId, S> {
     return this
   }
 
-  endAt (snapshot: DocumentSnapshot): FirestoreSimpleQuery<T, S>
-  endAt (...fieldValues: any[]): FirestoreSimpleQuery<T, S>
+  endAt (snapshot: DocumentSnapshot): AdminQuery<T, S>
+  endAt (...fieldValues: any[]): AdminQuery<T, S>
   endAt (
     snapshotOrValue: DocumentSnapshot | unknown,
     ...fieldValues: unknown[]
@@ -69,8 +69,8 @@ export class FirestoreSimpleQuery<T extends HasId, S> {
     return this
   }
 
-  endBefore (snapshot: DocumentSnapshot): FirestoreSimpleQuery<T, S>
-  endBefore (...fieldValues: any[]): FirestoreSimpleQuery<T, S>
+  endBefore (snapshot: DocumentSnapshot): AdminQuery<T, S>
+  endBefore (...fieldValues: any[]): AdminQuery<T, S>
   endBefore (
     snapshotOrValue: DocumentSnapshot | unknown,
     ...fieldValues: unknown[]

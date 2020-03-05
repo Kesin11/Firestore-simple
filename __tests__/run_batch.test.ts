@@ -1,5 +1,5 @@
-import { FirestoreSimple } from '../src'
-import { FirestoreSimpleCollection } from '../src/admin/collection'
+import { FirestoreSimpleAdmin } from '../src'
+import { AdminCollection } from '../src/admin/collection'
 import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
 
 // Workaround for flaky nesting transaction/runBatch test
@@ -14,11 +14,11 @@ const firestore = initFirestore()
 const collectionPath = createRandomCollectionName()
 
 describe('runBatch', () => {
-  let firestoreSimple: FirestoreSimple
-  let dao: FirestoreSimpleCollection<TestDoc>
+  let firestoreSimple: FirestoreSimpleAdmin
+  let dao: AdminCollection<TestDoc>
 
   beforeEach(async () => {
-    firestoreSimple = new FirestoreSimple(firestore)
+    firestoreSimple = new FirestoreSimpleAdmin(firestore)
     dao = firestoreSimple.collection<TestDoc>({ path: collectionPath })
   })
 
@@ -138,7 +138,7 @@ describe('runBatch', () => {
 
   describe('Collection.context.batch', () => {
     const anotherCollectionPath = createRandomCollectionName()
-    let batchAnotherDao: FirestoreSimpleCollection<TestDoc>
+    let batchAnotherDao: AdminCollection<TestDoc>
 
     beforeEach(async () => {
       batchAnotherDao = firestoreSimple.collection<TestDoc>({ path: anotherCollectionPath })
