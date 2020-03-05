@@ -1,6 +1,6 @@
 import admin, { ServiceAccount } from 'firebase-admin'
 import serviceAccount from '../../firebase_secret.json' // your firebase secret json
-import { FirestoreSimple } from '../../src'
+import { FirestoreSimpleAdmin } from '../../src'
 
 const ROOT_PATH = 'example/ts_admin_collection_group'
 
@@ -29,7 +29,7 @@ const main = async (): Promise<void> => {
     .add({ userId: 'john', text: 'ccc', created: admin.firestore.FieldValue.serverTimestamp() })
 
   // Create CollectionGroup dao
-  const firestoreSimple = new FirestoreSimple(firestore)
+  const firestoreSimple = new FirestoreSimpleAdmin(firestore)
   const reviewCollectionGroup = firestoreSimple.collectionGroup<Review>({
     collectionId: 'review',
     decode: (doc) => {

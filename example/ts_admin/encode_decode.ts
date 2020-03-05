@@ -1,6 +1,6 @@
 import admin, { ServiceAccount } from 'firebase-admin'
 import serviceAccount from '../../firebase_secret.json'
-import { FirestoreSimple } from '../../src'
+import { FirestoreSimpleAdmin } from '../../src'
 
 const ROOT_PATH = 'example/ts_admin_encode_decode'
 
@@ -10,7 +10,7 @@ admin.initializeApp({
 const firestore = admin.firestore()
 
 class User {
-  constructor(
+  constructor (
     public id: string,
     public name: string,
     public created: Date,
@@ -19,7 +19,7 @@ class User {
 }
 
 const main = async () => {
-  const firestoreSimple = new FirestoreSimple(firestore)
+  const firestoreSimple = new FirestoreSimpleAdmin(firestore)
   const dao = firestoreSimple.collection<User>({
     path: `${ROOT_PATH}/user`,
     encode: (user) => {
