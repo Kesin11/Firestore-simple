@@ -1,4 +1,4 @@
-import { FirestoreSimpleAdmin } from '../src'
+import { FirestoreSimpleAdmin } from '../../src'
 import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
 import { FieldValue } from '@google-cloud/firestore'
 

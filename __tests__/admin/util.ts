@@ -1,7 +1,7 @@
 import { Firestore } from '@google-cloud/firestore'
 import crypto from 'crypto'
 import admin, { ServiceAccount } from 'firebase-admin'
-import serviceAccount from '../firebase_secret.json'
+import serviceAccount from '../../firebase_secret.json'
 
 export const initFirestore = () => {
   admin.initializeApp({

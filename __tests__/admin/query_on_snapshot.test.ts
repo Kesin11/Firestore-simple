@@ -1,4 +1,4 @@
-import { FirestoreSimpleAdmin } from '../src'
+import { FirestoreSimpleAdmin } from '../../src'
 import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
 
 // Workaround for flaky onSnapshot callback tests.
