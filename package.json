@@ -36,7 +36,7 @@
     "firebase-admin": "8.9.2",
     "jest": "25.1.0",
     "jest-circus": "25.1.0",
-    "shipjs": "0.16.1",
+    "shipjs": "0.17.0",
     "ts-jest": "25.2.1",
     "typescript": "3.8.3"
   },
