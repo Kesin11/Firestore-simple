@@ -1,5 +1,4 @@
-import * as firebase from 'firebase/app'
-import 'firebase/firestore'
+import type { firestore } from 'firebase'
 import { HasId, Encodable, Decodable } from './types'
 import { OmitId } from '../admin/types'
 import { Context } from './context'
@@ -7,7 +6,7 @@ import { WebCollection } from './collection'
 
 export class FirestoreSimpleWeb {
   context: Context
-  constructor (firestore: firebase.firestore.Firestore) {
+  constructor (firestore: firestore.Firestore) {
     this.context = new Context(firestore)
   }
 
@@ -23,7 +22,16 @@ export class FirestoreSimpleWeb {
     })
     return factory.create(path)
   }
+
+  async runTransaction (updateFunction: (tx: firestore.Transaction) => Promise<void>): Promise<void> {
+    return this.context.runTransaction(updateFunction)
+  }
+
+  async runBatch (updateFunction: (batch: firestore.WriteBatch) => Promise<void>): Promise<void> {
+    return this.context.runBatch(updateFunction)
+  }
 }
+
 class CollectionFactory<T extends HasId, S = OmitId<T>> {
   context: Context
   encode?: Encodable<T, S>

@@ -31,22 +31,34 @@ export class WebCollection<T extends HasId, S = OmitId<T>> {
 
   async fetch (id: string): Promise <T | undefined> {
     const docRef = this.docRef(id)
-    const snapshot = await docRef.get()
+    const snapshot = (this.context.tx)
+      ? await this.context.tx.get(docRef)
+      : await docRef.get()
     if (!snapshot.exists) return undefined
 
     return this.toObject(snapshot)
   }
 
   async fetchAll (): Promise<T[]> {
-    const snapshot = await this.collectionRef.get()
+    if (this.context.tx) throw new Error('Web SDK transaction.get() does not support QuerySnapshot')
 
+    const snapshot = await this.collectionRef.get()
     return snapshot.docs.map((snapshot) => this.toObject(snapshot))
   }
 
   async add (obj: OptionalIdStorable<T>): Promise<string> {
+    let docRef: firestore.DocumentReference
     const doc = this.converter.encode(obj)
 
-    const docRef = await this.collectionRef.add(doc)
+    if (this.context.tx) {
+      docRef = this.docRef()
+      this.context.tx.set(docRef, doc)
+    } else if (this.context.batch) {
+      docRef = this.docRef()
+      this.context.batch.set(docRef, doc)
+    } else {
+      docRef = await this.collectionRef.add(doc)
+    }
     return docRef.id
   }
 
@@ -56,7 +68,13 @@ export class WebCollection<T extends HasId, S = OmitId<T>> {
     const docRef = this.docRef(obj.id)
     const setDoc = this.converter.encode(obj)
 
-    await docRef.set(setDoc)
+    if (this.context.tx) {
+      this.context.tx.set(docRef, setDoc)
+    } else if (this.context.batch) {
+      this.context.batch.set(docRef, setDoc)
+    } else {
+      await docRef.set(setDoc)
+    }
     return obj.id
   }
 
@@ -74,15 +92,44 @@ export class WebCollection<T extends HasId, S = OmitId<T>> {
     const updateDoc = Object.assign({}, obj)
     delete updateDoc.id
 
-    await docRef.update(updateDoc)
+    if (this.context.tx) {
+      this.context.tx.update(docRef, updateDoc)
+    } else if (this.context.batch) {
+      this.context.batch.update(docRef, updateDoc)
+    } else {
+      await docRef.update(updateDoc)
+    }
     return obj.id
   }
 
   async delete (id: string): Promise<string> {
     const docRef = this.docRef(id)
-
-    await docRef.delete()
+    if (this.context.tx) {
+      this.context.tx.delete(docRef)
+    } else if (this.context.batch) {
+      this.context.batch.delete(docRef)
+    } else {
+      await docRef.delete()
+    }
     return id
+  }
+
+  async bulkAdd (objects: Array<OptionalIdStorable<T>>): Promise<void> {
+    return this.context.runBatch(async () => {
+      objects.forEach((obj) => { this.add(obj) })
+    })
+  }
+
+  async bulkSet (objects: Array<Storable<T>>): Promise<void> {
+    return this.context.runBatch(async () => {
+      objects.forEach((obj) => { this.set(obj) })
+    })
+  }
+
+  async bulkDelete (docIds: string[]): Promise<void> {
+    return this.context.runBatch(async () => {
+      docIds.forEach((docId) => { this.delete(docId) })
+    })
   }
 
   where (fieldPath: QueryKey<S>, opStr: FirebaseFirestore.WhereFilterOp, value: any): WebQuery<T, S> {

@@ -87,6 +87,7 @@ export class WebQuery<T extends HasId, S> {
 
   async fetch (): Promise<T[]> {
     if (!this.query) throw new Error('no query statement before fetch()')
+    if (this.context.tx) throw new Error('Web SDK transaction.get() does not support QuerySnapshot')
 
     const snapshot = await this.query.get()
     return snapshot.docs.map((documentSnapshot) => {
