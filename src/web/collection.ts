@@ -1,7 +1,8 @@
 import type { firestore } from 'firebase'
-import { HasId, OmitId, Encodable, Decodable, OptionalIdStorable, Storable, PartialStorable } from './types'
+import { HasId, OmitId, Encodable, Decodable, OptionalIdStorable, Storable, PartialStorable, QueryKey } from './types'
 import { Context } from './context'
 import { WebConverter } from './converter'
+import { WebQuery } from './query'
 
 export class WebCollection<T extends HasId, S = OmitId<T>> {
   context: Context
@@ -82,5 +83,30 @@ export class WebCollection<T extends HasId, S = OmitId<T>> {
 
     await docRef.delete()
     return id
+  }
+
+  where (fieldPath: QueryKey<S>, opStr: FirebaseFirestore.WhereFilterOp, value: any): WebQuery<T, S> {
+    const query = this.collectionRef.where(fieldPath as string | FirebaseFirestore.FieldPath, opStr, value)
+    return new WebQuery<T, S>(this.converter, this.context, query)
+  }
+
+  orderBy (fieldPath: QueryKey<S>, directionStr?: FirebaseFirestore.OrderByDirection): WebQuery<T, S> {
+    const query = this.collectionRef.orderBy(fieldPath as string | FirebaseFirestore.FieldPath, directionStr)
+    return new WebQuery<T, S>(this.converter, this.context, query)
+  }
+
+  limit (limit: number): WebQuery<T, S> {
+    const query = this.collectionRef.limit(limit)
+    return new WebQuery<T, S>(this.converter, this.context, query)
+  }
+
+  onSnapshot (callback: (
+    querySnapshot: firestore.QuerySnapshot,
+    toObject: (documentSnapshot: firestore.DocumentSnapshot) => T
+    ) => void
+  ): () => void {
+    return this.collectionRef.onSnapshot((_querySnapshot) => {
+      callback(_querySnapshot, this.toObject.bind(this))
+    })
   }
 }

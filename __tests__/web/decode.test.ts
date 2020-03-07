@@ -50,17 +50,17 @@ describe('decode', () => {
       expect(fetchedDoc).toEqual({ id: docRef.id, bookTitle: title })
     })
 
-    // it('where with decode', async () => {
-    //   const title = 'add2'
-    //   const docRef = await dao.collectionRef.add({
-    //     book_title: title,
-    //   })
+    it('where with decode', async () => {
+      const title = 'add2'
+      const docRef = await dao.collectionRef.add({
+        book_title: title,
+      })
 
-    //   const fetchedDoc = await dao.where('book_title', '==', title).fetch()
-    //   expect(fetchedDoc).toEqual([
-    //     { id: docRef.id, bookTitle: title }
-    //   ])
-    // })
+      const fetchedDoc = await dao.where('book_title', '==', title).fetch()
+      expect(fetchedDoc).toEqual([
+        { id: docRef.id, bookTitle: title }
+      ])
+    })
   })
 
   describe('to class instance with same key', () => {
