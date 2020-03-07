@@ -25,6 +25,17 @@ export class FirestoreSimpleWeb {
     return factory.create(path)
   }
 
+  collectionFactory<T extends HasId, S = OmitId<T>> ({ encode, decode }: {
+    encode?: Encodable<T, S>,
+    decode?: Decodable<T, S>,
+  }): CollectionFactory<T, S> {
+    return new CollectionFactory<T, S>({
+      context: this.context,
+      encode,
+      decode,
+    })
+  }
+
   collectionGroup<T extends HasId, S = OmitId<T>> ({ collectionId, decode }: {
     collectionId: string,
     decode?: Decodable<T, S>,
