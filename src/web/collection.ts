@@ -1,5 +1,5 @@
 import type { firestore } from 'firebase'
-import { HasId, OmitId, Encodable, Decodable } from './types'
+import { HasId, OmitId, Encodable, Decodable, OptionalIdStorable, Storable, PartialStorable } from './types'
 import { Context } from './context'
 import { WebConverter } from './converter'
 
@@ -40,5 +40,47 @@ export class WebCollection<T extends HasId, S = OmitId<T>> {
     const snapshot = await this.collectionRef.get()
 
     return snapshot.docs.map((snapshot) => this.toObject(snapshot))
+  }
+
+  async add (obj: OptionalIdStorable<T>): Promise<string> {
+    const doc = this.converter.encode(obj)
+
+    const docRef = await this.collectionRef.add(doc)
+    return docRef.id
+  }
+
+  async set (obj: Storable<T>): Promise<string> {
+    if (!obj.id) throw new Error('Argument object must have "id" property')
+
+    const docRef = this.docRef(obj.id)
+    const setDoc = this.converter.encode(obj)
+
+    await docRef.set(setDoc)
+    return obj.id
+  }
+
+  addOrSet (obj: OptionalIdStorable<T>): Promise<string> {
+    if ('id' in obj) {
+      return this.set(obj as Storable<T>)
+    }
+    return this.add(obj)
+  }
+
+  async update (obj: PartialStorable<S & HasId>): Promise<string> {
+    if (!obj.id) throw new Error('Argument object must have "id" property')
+
+    const docRef = this.docRef(obj.id)
+    const updateDoc = Object.assign({}, obj)
+    delete updateDoc.id
+
+    await docRef.update(updateDoc)
+    return obj.id
+  }
+
+  async delete (id: string): Promise<string> {
+    const docRef = this.docRef(id)
+
+    await docRef.delete()
+    return id
   }
 }
