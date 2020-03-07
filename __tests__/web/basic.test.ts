@@ -1,3 +1,4 @@
+import { FirestoreSimpleWeb } from '../../src/'
 import { WebFirestoreTestUtil } from './util'
 
 const util = new WebFirestoreTestUtil()
@@ -5,7 +6,16 @@ const webFirestore = util.webFirestore
 const adminFirestore = util.adminFirestore
 const collectionPath = 'basic'
 
+type TestDoc = {
+  id: string,
+  title: string,
+  num: number,
+}
+
+const firestoreSimple = new FirestoreSimpleWeb(webFirestore)
+
 describe('Basic', () => {
+  const dao = firestoreSimple.collection<TestDoc>({ path: collectionPath })
   const existsDocId = 'test'
   const existsDoc = {
     title: 'title',
@@ -30,25 +40,20 @@ describe('Basic', () => {
 
   describe('fetch', () => {
     it('exists document', async () => {
-      const snapshot = await webFirestore.collection(collectionPath).doc(existsDocId).get()
-      // const doc = await dao.fetch(existsDocId)
-      // const expectDoc = { ...existsDoc, ...{ id: existsDocId } }
+      const doc = await dao.fetch(existsDocId)
+      const expectDoc = { ...existsDoc, ...{ id: existsDocId } }
 
-      // expect(doc).toEqual(expectDoc)
-      expect(snapshot.data()).toEqual(existsDoc)
+      expect(doc).toEqual(expectDoc)
     })
 
     it('does not exist document', async () => {
-      // const doc = await dao.fetch('not_exists_document_id')
-      const snapshot = await webFirestore.collection(collectionPath).doc('not_exists_document_id').get()
+      const doc = await dao.fetch('not_exists_document_id')
 
-      // expect(doc).toEqual(undefined)
-      expect(snapshot.exists).toBeFalsy()
+      expect(doc).toEqual(undefined)
     })
 
     it('fetchAll', async () => {
-      // const docs = await dao.fetchAll()
-      const docs = await (await webFirestore.collection(collectionPath).get()).docs
+      const docs = await dao.fetchAll()
 
       expect(docs.length).toBeGreaterThanOrEqual(2)
     })
