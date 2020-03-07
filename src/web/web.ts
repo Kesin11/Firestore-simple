@@ -3,6 +3,8 @@ import { HasId, Encodable, Decodable } from './types'
 import { OmitId } from '../admin/types'
 import { Context } from './context'
 import { WebCollection } from './collection'
+import { WebQuery } from './query'
+import { WebConverter } from './converter'
 
 export class FirestoreSimpleWeb {
   context: Context
@@ -21,6 +23,15 @@ export class FirestoreSimpleWeb {
       decode,
     })
     return factory.create(path)
+  }
+
+  collectionGroup<T extends HasId, S = OmitId<T>> ({ collectionId, decode }: {
+    collectionId: string,
+    decode?: Decodable<T, S>,
+  }): WebQuery<T, S> {
+    const query = this.context.firestore.collectionGroup(collectionId)
+    const converter = new WebConverter({ decode })
+    return new WebQuery<T, S>(converter, this.context, query)
   }
 
   async runTransaction (updateFunction: (tx: firestore.Transaction) => Promise<void>): Promise<void> {
