@@ -4,7 +4,7 @@ import {
   DocumentSnapshot,
   QuerySnapshot,
 } from '@google-cloud/firestore'
-import { HasId, OmitId, Encodable, Decodable, OptionalIdStorable, Storable, PartialStorable, QueryKey } from './types'
+import { HasId, OmitId, AdminEncodable, AdminDecodable, OptionalIdStorable, Storable, PartialStorable, QueryKey } from './types'
 import { Context } from './context'
 import { AdminConverter } from './converter'
 import { AdminQuery } from './query'
@@ -17,8 +17,8 @@ export class AdminCollection<T extends HasId, S = OmitId<T>> {
   constructor ({ context, path, encode, decode }: {
     context: Context,
     path: string,
-    encode?: Encodable<T, S>,
-    decode?: Decodable<T, S>,
+    encode?: AdminEncodable<T, S>,
+    decode?: AdminDecodable<T, S>,
   }) {
     this.context = context
     this.collectionRef = context.firestore.collection(path)

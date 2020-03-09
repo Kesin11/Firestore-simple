@@ -1,6 +1,4 @@
-import { FirestoreSimpleAdmin } from '../../src'
-import { Encodable, Decodable } from '../../src/admin/types'
-import { AdminCollection } from '../../src/admin/collection'
+import { FirestoreSimpleAdmin, AdminEncodable, AdminDecodable, AdminCollection } from '../../src'
 import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
 
 interface Book {
@@ -24,13 +22,13 @@ describe('Factory and Subcollection', () => {
     await deleteCollection(firestore, collectionPath)
   })
 
-  const encodeFunc: Encodable<Book, BookDoc> = (obj) => {
+  const encodeFunc: AdminEncodable<Book, BookDoc> = (obj) => {
     return {
       title: obj.title,
       created_at: obj.createdAt,
     }
   }
-  const decodeFunc: Decodable<Book, BookDoc> = (doc) => {
+  const decodeFunc: AdminDecodable<Book, BookDoc> = (doc) => {
     return {
       id: doc.id,
       title: doc.title,

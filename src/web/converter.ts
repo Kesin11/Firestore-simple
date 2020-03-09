@@ -1,14 +1,14 @@
 import type { firestore } from 'firebase'
-import { HasId, OmitId, Encodable, Decodable, OptionalIdStorable, Storable } from './types'
+import { HasId, OmitId, WebEncodable, WebDecodable, OptionalIdStorable, Storable } from './types'
 import { Optional } from 'utility-types'
 
 export class WebConverter<T extends HasId, S = OmitId<T>> {
-  private _encode?: Encodable<T, S>
-  private _decode?: Decodable<T, S>
+  private _encode?: WebEncodable<T, S>
+  private _decode?: WebDecodable<T, S>
 
   constructor ({ encode, decode }: {
-    encode?: Encodable<T, S>,
-    decode?: Decodable<T, S>,
+    encode?: WebEncodable<T, S>,
+    decode?: WebDecodable<T, S>,
   }) {
     this._encode = encode
     this._decode = decode

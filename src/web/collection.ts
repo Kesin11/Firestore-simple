@@ -1,5 +1,5 @@
 import type { firestore } from 'firebase'
-import { HasId, OmitId, Encodable, Decodable, OptionalIdStorable, Storable, PartialStorable, QueryKey } from './types'
+import { HasId, OmitId, WebEncodable, WebDecodable, OptionalIdStorable, Storable, PartialStorable, QueryKey } from './types'
 import { Context } from './context'
 import { WebConverter } from './converter'
 import { WebQuery } from './query'
@@ -12,8 +12,8 @@ export class WebCollection<T extends HasId, S = OmitId<T>> {
   constructor ({ context, path, encode, decode }: {
     context: Context,
     path: string,
-    encode?: Encodable<T, S>,
-    decode?: Decodable<T, S>,
+    encode?: WebEncodable<T, S>,
+    decode?: WebDecodable<T, S>,
   }) {
     this.context = context
     this.collectionRef = context.firestore.collection(path)

@@ -1,5 +1,5 @@
 import type { firestore } from 'firebase'
-import { HasId, Encodable, Decodable } from './types'
+import { HasId, WebEncodable, WebDecodable } from './types'
 import { OmitId } from '../admin/types'
 import { Context } from './context'
 import { WebCollection } from './collection'
@@ -14,8 +14,8 @@ export class FirestoreSimpleWeb {
 
   collection<T extends HasId, S = OmitId<T>> ({ path, encode, decode }: {
     path: string,
-    encode?: Encodable<T, S>,
-    decode?: Decodable<T, S>,
+    encode?: WebEncodable<T, S>,
+    decode?: WebDecodable<T, S>,
   }): WebCollection<T, S> {
     const factory = new CollectionFactory<T, S>({
       context: this.context,
@@ -26,8 +26,8 @@ export class FirestoreSimpleWeb {
   }
 
   collectionFactory<T extends HasId, S = OmitId<T>> ({ encode, decode }: {
-    encode?: Encodable<T, S>,
-    decode?: Decodable<T, S>,
+    encode?: WebEncodable<T, S>,
+    decode?: WebDecodable<T, S>,
   }): CollectionFactory<T, S> {
     return new CollectionFactory<T, S>({
       context: this.context,
@@ -38,7 +38,7 @@ export class FirestoreSimpleWeb {
 
   collectionGroup<T extends HasId, S = OmitId<T>> ({ collectionId, decode }: {
     collectionId: string,
-    decode?: Decodable<T, S>,
+    decode?: WebDecodable<T, S>,
   }): WebQuery<T, S> {
     const query = this.context.firestore.collectionGroup(collectionId)
     const converter = new WebConverter({ decode })
@@ -56,13 +56,13 @@ export class FirestoreSimpleWeb {
 
 class CollectionFactory<T extends HasId, S = OmitId<T>> {
   context: Context
-  encode?: Encodable<T, S>
-  decode?: Decodable<T, S>
+  encode?: WebEncodable<T, S>
+  decode?: WebDecodable<T, S>
 
   constructor ({ context, encode, decode }: {
     context: Context,
-    encode?: Encodable<T, S>,
-    decode?: Decodable<T, S>,
+    encode?: WebEncodable<T, S>,
+    decode?: WebDecodable<T, S>,
   }) {
     this.context = context
     this.encode = encode

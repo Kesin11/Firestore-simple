@@ -1,6 +1,4 @@
-import { FirestoreSimpleWeb } from '../../src'
-import { WebCollection } from '../../src/web/collection'
-import { Encodable, Decodable } from '../../src/web/types'
+import { FirestoreSimpleWeb, WebCollection, WebEncodable, WebDecodable } from '../../src'
 import { WebFirestoreTestUtil } from './util'
 
 const util = new WebFirestoreTestUtil()
@@ -29,13 +27,13 @@ describe('Factory and Subcollection', () => {
     await util.clearFirestoreData()
   })
 
-  const encodeFunc: Encodable<Book, BookDoc> = (obj) => {
+  const encodeFunc: WebEncodable<Book, BookDoc> = (obj) => {
     return {
       title: obj.title,
       created_at: obj.createdAt,
     }
   }
-  const decodeFunc: Decodable<Book, BookDoc> = (doc) => {
+  const decodeFunc: WebDecodable<Book, BookDoc> = (doc) => {
     return {
       id: doc.id,
       title: doc.title,

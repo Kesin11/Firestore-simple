@@ -14,5 +14,5 @@ type HasSameKeyObject<T> = { [P in keyof T]: any }
 export type QueryKey<T> = { [K in keyof T]: K }[keyof T] | firestore.FieldPath
 // Convert 'id' property to optional type
 export type OmitId<T> = Omit<T, 'id'>
-export type Encodable<T extends HasId, S = firestore.DocumentData> = (obj: OptionalIdStorable<T>) => Storable<S>
-export type Decodable<T extends HasId, S = HasIdObject> = (doc: HasSameKeyObject<S> & HasId) => T
+export type WebEncodable<T extends HasId, S = firestore.DocumentData> = (obj: OptionalIdStorable<T>) => Storable<S>
+export type WebDecodable<T extends HasId, S = HasIdObject> = (doc: HasSameKeyObject<S> & HasId) => T

@@ -1,14 +1,14 @@
 import { DocumentSnapshot } from '@google-cloud/firestore'
-import { HasId, OmitId, Encodable, Decodable, OptionalIdStorable, Storable } from './types'
+import { HasId, OmitId, AdminEncodable, AdminDecodable, OptionalIdStorable, Storable } from './types'
 import { Optional } from 'utility-types'
 
 export class AdminConverter<T extends HasId, S = OmitId<T>> {
-  private _encode?: Encodable<T, S>
-  private _decode?: Decodable<T, S>
+  private _encode?: AdminEncodable<T, S>
+  private _decode?: AdminDecodable<T, S>
 
   constructor ({ encode, decode }: {
-    encode?: Encodable<T, S>,
-    decode?: Decodable<T, S>,
+    encode?: AdminEncodable<T, S>,
+    decode?: AdminDecodable<T, S>,
   }) {
     this._encode = encode
     this._decode = decode
