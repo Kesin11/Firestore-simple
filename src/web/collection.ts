@@ -1,35 +1,30 @@
-import {
-  CollectionReference,
-  DocumentReference,
-  DocumentSnapshot,
-  QuerySnapshot,
-} from '@google-cloud/firestore'
-import { HasId, OmitId, AdminEncodable, AdminDecodable, OptionalIdStorable, Storable, PartialStorable, QueryKey } from './types'
+import type { firestore } from 'firebase'
+import { HasId, OmitId, WebEncodable, WebDecodable, OptionalIdStorable, Storable, PartialStorable, QueryKey } from './types'
 import { Context } from './context'
-import { AdminConverter } from './converter'
-import { AdminQuery } from './query'
+import { WebConverter } from './converter'
+import { WebQuery } from './query'
 
-export class AdminCollection<T extends HasId, S = OmitId<T>> {
+export class WebCollection<T extends HasId, S = OmitId<T>> {
   context: Context
-  collectionRef: CollectionReference
-  private converter: AdminConverter<T, S>
+  collectionRef: firestore.CollectionReference
+  private converter: WebConverter<T, S>
 
   constructor ({ context, path, encode, decode }: {
     context: Context,
     path: string,
-    encode?: AdminEncodable<T, S>,
-    decode?: AdminDecodable<T, S>,
+    encode?: WebEncodable<T, S>,
+    decode?: WebDecodable<T, S>,
   }) {
     this.context = context
     this.collectionRef = context.firestore.collection(path)
-    this.converter = new AdminConverter({ encode, decode })
+    this.converter = new WebConverter({ encode, decode })
   }
 
-  toObject (documentSnapshot: DocumentSnapshot): T {
+  toObject (documentSnapshot: firestore.DocumentSnapshot): T {
     return this.converter.decode(documentSnapshot)
   }
 
-  docRef (id?: string): DocumentReference {
+  docRef (id?: string): firestore.DocumentReference {
     if (id) return this.collectionRef.doc(id)
     return this.collectionRef.doc()
   }
@@ -45,19 +40,14 @@ export class AdminCollection<T extends HasId, S = OmitId<T>> {
   }
 
   async fetchAll (): Promise<T[]> {
-    const snapshot = (this.context.tx)
-      ? await this.context.tx.get(this.collectionRef)
-      : await this.collectionRef.get()
-    const arr: T[] = []
+    if (this.context.tx) throw new Error('Web SDK transaction.get() does not support QuerySnapshot')
 
-    snapshot.forEach((documentSnapshot) => {
-      arr.push(this.toObject(documentSnapshot))
-    })
-    return arr
+    const snapshot = await this.collectionRef.get()
+    return snapshot.docs.map((snapshot) => this.toObject(snapshot))
   }
 
   async add (obj: OptionalIdStorable<T>): Promise<string> {
-    let docRef: DocumentReference
+    let docRef: firestore.DocumentReference
     const doc = this.converter.encode(obj)
 
     if (this.context.tx) {
@@ -124,42 +114,42 @@ export class AdminCollection<T extends HasId, S = OmitId<T>> {
     return id
   }
 
-  async bulkAdd (objects: Array<OptionalIdStorable<T>>): Promise<FirebaseFirestore.WriteResult[]> {
+  async bulkAdd (objects: Array<OptionalIdStorable<T>>): Promise<void> {
     return this.context.runBatch(async () => {
       objects.forEach((obj) => { this.add(obj) })
     })
   }
 
-  async bulkSet (objects: Array<Storable<T>>): Promise<FirebaseFirestore.WriteResult[]> {
+  async bulkSet (objects: Array<Storable<T>>): Promise<void> {
     return this.context.runBatch(async () => {
       objects.forEach((obj) => { this.set(obj) })
     })
   }
 
-  async bulkDelete (docIds: string[]): Promise<FirebaseFirestore.WriteResult[]> {
+  async bulkDelete (docIds: string[]): Promise<void> {
     return this.context.runBatch(async () => {
       docIds.forEach((docId) => { this.delete(docId) })
     })
   }
 
-  where (fieldPath: QueryKey<S>, opStr: FirebaseFirestore.WhereFilterOp, value: any): AdminQuery<T, S> {
+  where (fieldPath: QueryKey<S>, opStr: FirebaseFirestore.WhereFilterOp, value: any): WebQuery<T, S> {
     const query = this.collectionRef.where(fieldPath as string | FirebaseFirestore.FieldPath, opStr, value)
-    return new AdminQuery<T, S>(this.converter, this.context, query)
+    return new WebQuery<T, S>(this.converter, this.context, query)
   }
 
-  orderBy (fieldPath: QueryKey<S>, directionStr?: FirebaseFirestore.OrderByDirection): AdminQuery<T, S> {
+  orderBy (fieldPath: QueryKey<S>, directionStr?: FirebaseFirestore.OrderByDirection): WebQuery<T, S> {
     const query = this.collectionRef.orderBy(fieldPath as string | FirebaseFirestore.FieldPath, directionStr)
-    return new AdminQuery<T, S>(this.converter, this.context, query)
+    return new WebQuery<T, S>(this.converter, this.context, query)
   }
 
-  limit (limit: number): AdminQuery<T, S> {
+  limit (limit: number): WebQuery<T, S> {
     const query = this.collectionRef.limit(limit)
-    return new AdminQuery<T, S>(this.converter, this.context, query)
+    return new WebQuery<T, S>(this.converter, this.context, query)
   }
 
   onSnapshot (callback: (
-    querySnapshot: QuerySnapshot,
-    toObject: (documentSnapshot: DocumentSnapshot) => T
+    querySnapshot: firestore.QuerySnapshot,
+    toObject: (documentSnapshot: firestore.DocumentSnapshot) => T
     ) => void
   ): () => void {
     return this.collectionRef.onSnapshot((_querySnapshot) => {

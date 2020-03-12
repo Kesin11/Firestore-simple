@@ -1,34 +1,39 @@
-import { FirestoreSimpleAdmin, AdminEncodable, AdminDecodable, AdminCollection } from '../../src'
-import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
+import { FirestoreSimpleWeb, WebCollection, WebEncodable, WebDecodable } from '../../src'
+import { WebFirestoreTestUtil } from './util'
 
-interface Book {
+const util = new WebFirestoreTestUtil()
+const webFirestore = util.webFirestore
+const collectionPath = 'factory_subcollection'
+
+type Book = {
   id: string,
   title: string,
   createdAt: Date,
 }
 
-interface BookDoc {
+type BookDoc = {
   title: string,
   created_at: Date,
 }
 
-const firestore = initFirestore()
-const collectionPath = createRandomCollectionName()
-const firestoreSimple = new FirestoreSimpleAdmin(firestore)
+const firestoreSimple = new FirestoreSimpleWeb(webFirestore)
 
 describe('Factory and Subcollection', () => {
-  // Delete all documents. (= delete collection)
-  afterEach(async () => {
-    await deleteCollection(firestore, collectionPath)
+  afterAll(async () => {
+    await util.deleteApps()
   })
 
-  const encodeFunc: AdminEncodable<Book, BookDoc> = (obj) => {
+  afterEach(async () => {
+    await util.clearFirestoreData()
+  })
+
+  const encodeFunc: WebEncodable<Book, BookDoc> = (obj) => {
     return {
       title: obj.title,
       created_at: obj.createdAt,
     }
   }
-  const decodeFunc: AdminDecodable<Book, BookDoc> = (doc) => {
+  const decodeFunc: WebDecodable<Book, BookDoc> = (doc) => {
     return {
       id: doc.id,
       title: doc.title,
@@ -60,14 +65,10 @@ describe('Factory and Subcollection', () => {
       encode: encodeFunc,
       decode: decodeFunc,
     })
-    let dao: AdminCollection<Book, BookDoc>
+    let dao: WebCollection<Book, BookDoc>
 
     beforeEach(async () => {
       dao = factory.create(subcollectionPath)
-    })
-
-    afterEach(async () => {
-      await deleteCollection(firestore, subcollectionPath)
     })
 
     it('should be same collection path', async () => {

@@ -1,20 +1,20 @@
-import { DocumentSnapshot } from '@google-cloud/firestore'
-import { HasId, OmitId, AdminEncodable, AdminDecodable, OptionalIdStorable, Storable } from './types'
+import type { firestore } from 'firebase'
+import { HasId, OmitId, WebEncodable, WebDecodable, OptionalIdStorable, Storable } from './types'
 import { Optional } from 'utility-types'
 
-export class AdminConverter<T extends HasId, S = OmitId<T>> {
-  private _encode?: AdminEncodable<T, S>
-  private _decode?: AdminDecodable<T, S>
+export class WebConverter<T extends HasId, S = OmitId<T>> {
+  private _encode?: WebEncodable<T, S>
+  private _decode?: WebDecodable<T, S>
 
   constructor ({ encode, decode }: {
-    encode?: AdminEncodable<T, S>,
-    decode?: AdminDecodable<T, S>,
+    encode?: WebEncodable<T, S>,
+    decode?: WebDecodable<T, S>,
   }) {
     this._encode = encode
     this._decode = decode
   }
 
-  decode (documentSnapshot: DocumentSnapshot): T {
+  decode (documentSnapshot: firestore.DocumentSnapshot): T {
     const obj = { id: documentSnapshot.id, ...documentSnapshot.data() }
     if (this._decode) return this._decode(obj as S & HasId)
 
