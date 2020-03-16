@@ -1,4 +1,4 @@
-import { FirestoreSimpleAdmin, AdminEncodable, AdminDecodable, AdminCollection } from '../../src'
+import { FirestoreSimpleAdmin, AdminEncodable, AdminDecodable, AdminCollection } from '../src'
 import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
 
 interface Book {

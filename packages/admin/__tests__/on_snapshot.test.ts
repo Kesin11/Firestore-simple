@@ -1,4 +1,4 @@
-import { FirestoreSimpleAdmin } from '../../src'
+import { FirestoreSimpleAdmin } from '../src'
 import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
 
 // Workaround for flaky onSnapshot callback tests.
@@ -8,13 +8,11 @@ interface Book {
   id: string,
   bookTitle: string,
   created: Date,
-  bookId: number,
 }
 
 interface BookDoc {
   book_title: string,
   created: Date,
-  book_id: number,
 }
 
 const firestore = initFirestore()
@@ -22,14 +20,13 @@ const collectionPath = createRandomCollectionName()
 const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 
 // Skip reason: Sometimes real Firestore is unstable so it will be replaced emulator test.
-describe.skip('query on_snapshot test', () => {
+describe.skip('on_snapshot test', () => {
   const dao = firestoreSimple.collection<Book, BookDoc>({
     path: collectionPath,
     encode: (book) => {
       return {
         book_title: book.bookTitle,
         created: book.created,
-        book_id: book.bookId,
       }
     },
     decode: (doc) => {
@@ -37,7 +34,6 @@ describe.skip('query on_snapshot test', () => {
         id: doc.id,
         bookTitle: doc.book_title,
         created: doc.created.toDate(), // Firestore timestamp to JS Date
-        bookId: doc.book_id,
       }
     },
   })
@@ -47,7 +43,6 @@ describe.skip('query on_snapshot test', () => {
     const addedDoc = {
       bookTitle: 'exists',
       created: new Date(),
-      bookId: 1,
     }
     const addedId = await dao.add(addedDoc)
     existsDoc = {
@@ -62,26 +57,24 @@ describe.skip('query on_snapshot test', () => {
 
   it('observe add change', async () => {
     const doc = {
-      bookTitle: 'query_add',
+      bookTitle: 'add',
       created: new Date(),
-      bookId: 2
     }
 
     const promise = new Promise((resolve) => {
-      dao.where('book_id', '==', doc.bookId)
-        .onSnapshot((querySnapshot, toObject) => {
-          querySnapshot.docChanges().forEach((change) => {
-            if (change.type === 'added') {
-              const changedDoc = toObject(change.doc)
+      dao.onSnapshot((querySnapshot, toObject) => {
+        querySnapshot.docChanges().forEach((change) => {
+          if (change.type === 'added' && change.doc.data().book_title === doc.bookTitle) {
+            const changedDoc = toObject(change.doc)
 
-              expect(changedDoc).toEqual({
-                ...doc,
-                id: expect.anything(),
-              })
-              resolve()
-            }
-          })
+            expect(changedDoc).toEqual({
+              ...doc,
+              id: expect.anything()
+            })
+            resolve()
+          }
         })
+      })
     })
 
     await new Promise((resolve) => setTimeout(resolve, 100)) // for async stability
@@ -91,24 +84,21 @@ describe.skip('query on_snapshot test', () => {
 
   it('observe set changes', async () => {
     const doc = {
-      ...existsDoc!,
-      bookTitle: 'query_set',
+      ...existsDoc,
+      bookTitle: 'set'
     }
 
     const promise = new Promise((resolve) => {
-      // where('book_title', '==', existsDoc) is not triggered modify existsDoc.
-      // I don't know why, so book_id is hack for resolve this issue.
-      dao.where('book_id', '==', 1)
-        .onSnapshot((querySnapshot, toObject) => {
-          querySnapshot.docChanges().forEach((change) => {
-            if (change.type === 'modified') {
-              const changedDoc = toObject(change.doc)
+      dao.onSnapshot((querySnapshot, toObject) => {
+        querySnapshot.docChanges().forEach((change) => {
+          if (change.type === 'modified') {
+            const changedDoc = toObject(change.doc)
 
-              expect(changedDoc).toEqual(doc)
-              resolve()
-            }
-          })
+            expect(changedDoc).toEqual(doc)
+            resolve()
+          }
         })
+      })
     })
 
     await new Promise((resolve) => setTimeout(resolve, 100)) // for async stability
@@ -117,13 +107,25 @@ describe.skip('query on_snapshot test', () => {
   })
 
   it('observe delete change', async () => {
+    // prepare specific doc for delete onSnapshot()
+    // because onSnapshot() also triggerd deleteCollection() events and it will be confilict.
+    const deletedDoc = {
+      bookTitle: 'deleted',
+      created: new Date(),
+    }
+    const deletedId = await dao.add(deletedDoc)
+
     const promise = new Promise((resolve) => {
-      dao.where('book_title', '==', existsDoc.bookTitle).onSnapshot((querySnapshot, toObject) => {
+      dao.onSnapshot((querySnapshot, toObject) => {
         querySnapshot.docChanges().forEach((change) => {
-          if (change.type === 'removed' && change.doc.data().book_title === existsDoc.bookTitle) {
+          if (change.type === 'removed' && change.doc.data().book_title === deletedDoc.bookTitle) {
             const changedDoc = toObject(change.doc)
 
-            expect(changedDoc).toEqual(existsDoc)
+            expect(changedDoc).toEqual({
+              id: expect.anything(),
+              bookTitle: deletedDoc.bookTitle,
+              created: deletedDoc.created,
+            })
             resolve()
           }
         })
@@ -131,7 +133,7 @@ describe.skip('query on_snapshot test', () => {
     })
 
     await new Promise((resolve) => setTimeout(resolve, 100)) // for async stability
-    await dao.delete(existsDoc.id)
+    await dao.delete(deletedId)
     await promise
   })
 })

@@ -1,5 +1,5 @@
-import { FirestoreSimpleAdmin } from '../../src'
-import { AdminCollection } from '../../src/admin/collection'
+import { FirestoreSimpleAdmin } from '../src'
+import { AdminCollection } from '../src/collection'
 import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
 
 // Workaround for flaky nesting transaction/runBatch test
