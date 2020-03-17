@@ -8,26 +8,20 @@
     "dist/"
   ],
   "scripts": {
-    "clean": "rm -rf dist",
-    "build": "tsc --project .",
+    "bootstrap": "lerna bootstrap",
+    "clean": "lerna run clean",
+    "build": "lerna run build",
+    "build:clean": "npm run clean && npm run build",
     "test": "jest",
-    "test:web": "jest __tests__/web",
-    "emulators:start": "firebase emulators:start --only firestore",
     "lint": "eslint src __tests__ --ext=.ts",
     "lint:fix": "npm run lint -- --fix",
     "coverage": "codecov",
-    "publish:beta": "npm run clean && npm run build && npm version prerelease && npm publish --tag beta",
     "release:prepare": "shipjs prepare",
     "release:trigger": "shipjs trigger"
   },
   "dependencies": {
-    "utility-types": "3.10.0"
   },
   "devDependencies": {
-    "@firebase/testing": "0.16.14",
-    "@types/jest": "25.1.4",
-    "@typescript-eslint/eslint-plugin": "2.21.0",
-    "@typescript-eslint/parser": "2.21.0",
     "codecov": "3.6.5",
     "eslint": "6.8.0",
     "eslint-config-standard": "14.1.0",
@@ -36,12 +30,8 @@
     "eslint-plugin-promise": "4.2.1",
     "eslint-plugin-standard": "4.0.1",
     "firebase": "7.10.0",
-    "firebase-admin": "8.9.2",
-    "jest": "25.1.0",
-    "jest-circus": "25.1.0",
     "lerna": "^3.20.2",
     "shipjs": "0.17.0",
-    "ts-jest": "25.2.1",
     "typescript": "3.8.3"
   },
   "repository": {
