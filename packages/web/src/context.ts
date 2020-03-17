@@ -1,10 +1,10 @@
-import type { firestore } from 'firebase'
+import { firestore } from 'firebase/app'
 
 export class Context {
   firestore: firestore.Firestore
   private _tx?: firestore.Transaction = undefined
   private _batch?: firestore.WriteBatch = undefined
-  constructor (firestore: firestore.Firestore) {
+  constructor (firestore: firebase.firestore.Firestore) {
     this.firestore = firestore
   }
 

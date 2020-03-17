@@ -1,7 +1,6 @@
-import { FirestoreSimpleWeb } from '../../src'
-import {} from '../../src/admin/collection'
+import { FirestoreSimpleWeb } from '../src'
 import { WebFirestoreTestUtil } from './util'
-import { WebCollection } from '../../src/web/collection'
+import { WebCollection } from '../src/collection'
 
 const util = new WebFirestoreTestUtil()
 const webFirestore = util.webFirestore

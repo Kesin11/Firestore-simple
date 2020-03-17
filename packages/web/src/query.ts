@@ -1,4 +1,4 @@
-import { firestore } from 'firebase'
+import { firestore } from 'firebase/app'
 import { HasId, QueryKey } from './types'
 import { WebConverter } from './converter'
 import { Context } from './context'
@@ -6,13 +6,13 @@ import { Context } from './context'
 export class WebQuery<T extends HasId, S> {
   constructor (public converter: WebConverter<T, S>, public context: Context, public query: firestore.Query) { }
 
-  where (fieldPath: QueryKey<S>, opStr: FirebaseFirestore.WhereFilterOp, value: any): this {
-    this.query = this.query.where(fieldPath as string | FirebaseFirestore.FieldPath, opStr, value)
+  where (fieldPath: QueryKey<S>, opStr: firestore.WhereFilterOp, value: any): this {
+    this.query = this.query.where(fieldPath as string | firestore.FieldPath, opStr, value)
     return this
   }
 
-  orderBy (fieldPath: QueryKey<S>, directionStr?: FirebaseFirestore.OrderByDirection): this {
-    this.query = this.query.orderBy(fieldPath as string | FirebaseFirestore.FieldPath, directionStr)
+  orderBy (fieldPath: QueryKey<S>, directionStr?: firestore.OrderByDirection): this {
+    this.query = this.query.orderBy(fieldPath as string | firestore.FieldPath, directionStr)
     return this
   }
 

@@ -1,6 +1,5 @@
-import type { firestore } from 'firebase'
-import { HasId, WebEncodable, WebDecodable } from './types'
-import { OmitId } from '../admin/types'
+import { firestore } from 'firebase/app'
+import { HasId, WebEncodable, WebDecodable, OmitId } from './types'
 import { Context } from './context'
 import { WebCollection } from './collection'
 import { WebQuery } from './query'

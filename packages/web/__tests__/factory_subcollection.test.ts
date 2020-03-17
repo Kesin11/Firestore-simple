@@ -1,4 +1,4 @@
-import { FirestoreSimpleWeb, WebCollection, WebEncodable, WebDecodable } from '../../src'
+import { FirestoreSimpleWeb, WebCollection, WebEncodable, WebDecodable } from '../src'
 import { WebFirestoreTestUtil } from './util'
 
 const util = new WebFirestoreTestUtil()

@@ -1,4 +1,4 @@
-import type { firestore } from 'firebase'
+import { firestore } from 'firebase/app'
 import { HasId, OmitId, WebEncodable, WebDecodable, OptionalIdStorable, Storable, PartialStorable, QueryKey } from './types'
 import { Context } from './context'
 import { WebConverter } from './converter'
@@ -132,13 +132,13 @@ export class WebCollection<T extends HasId, S = OmitId<T>> {
     })
   }
 
-  where (fieldPath: QueryKey<S>, opStr: FirebaseFirestore.WhereFilterOp, value: any): WebQuery<T, S> {
-    const query = this.collectionRef.where(fieldPath as string | FirebaseFirestore.FieldPath, opStr, value)
+  where (fieldPath: QueryKey<S>, opStr: firestore.WhereFilterOp, value: any): WebQuery<T, S> {
+    const query = this.collectionRef.where(fieldPath as string | firestore.FieldPath, opStr, value)
     return new WebQuery<T, S>(this.converter, this.context, query)
   }
 
-  orderBy (fieldPath: QueryKey<S>, directionStr?: FirebaseFirestore.OrderByDirection): WebQuery<T, S> {
-    const query = this.collectionRef.orderBy(fieldPath as string | FirebaseFirestore.FieldPath, directionStr)
+  orderBy (fieldPath: QueryKey<S>, directionStr?: firestore.OrderByDirection): WebQuery<T, S> {
+    const query = this.collectionRef.orderBy(fieldPath as string | firestore.FieldPath, directionStr)
     return new WebQuery<T, S>(this.converter, this.context, query)
   }
 

@@ -1,0 +1,45 @@
+{
+  "name": "@firestore-simple/web",
+  "version": "7.0.0",
+  "description": "A simple wrapper for Firestore Web SDK",
+  "author": "Kenta Kase <kesin1202000@gmail.com>",
+  "homepage": "https://github.com/Kesin11/Firestore-simple/tree/master/packages/web#readme",
+  "bugs": {
+    "url": "https://github.com/Kesin11/Firestore-simple/issues"
+  },
+  "keywords": [
+    "Firestore"
+  ],
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kesin11/Firestore-simple.git"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "tsc --project .",
+    "test": "jest",
+    "test:ci": "firebase emulators:exec --only firestore jest",
+    "emulators:start": "firebase emulators:start --only firestore"
+  },
+  "dependencies": {
+    "utility-types": "3.10.0"
+  },
+  "devDependencies": {
+    "@firebase/testing": "0.16.14",
+    "@types/jest": "25.1.4",
+    "firebase": "7.10.0",
+    "jest": "25.1.0",
+    "rimraf": "3.0.2",
+    "ts-jest": "25.2.1",
+    "typescript": "3.8.3"
+  }
+}

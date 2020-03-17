@@ -1,4 +1,4 @@
-import type { firestore } from 'firebase'
+import { firestore } from 'firebase/app'
 import { Omit, Optional } from 'utility-types'
 
 export type HasId = { id: string }

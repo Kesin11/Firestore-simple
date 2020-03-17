@@ -1,4 +1,5 @@
-import type { firestore } from 'firebase'
+import { firestore } from 'firebase/app'
+
 import { HasId, OmitId, WebEncodable, WebDecodable, OptionalIdStorable, Storable } from './types'
 import { Optional } from 'utility-types'
 
