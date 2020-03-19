@@ -40,7 +40,7 @@ module.exports = {
   },
   "overrides": [
       {
-          "files": ["__tests__/**/*"],
+          "files": ["packages/**/__tests__/**/*"],
           "rules": {
               "@typescript-eslint/camelcase": "off",
               "@typescript-eslint/no-non-null-assertion": "off",

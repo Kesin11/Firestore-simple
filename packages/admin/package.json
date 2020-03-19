@@ -1,0 +1,43 @@
+{
+  "name": "@firestore-simple/admin",
+  "version": "7.0.0",
+  "description": "A simple wrapper for Firestore Admin SDK",
+  "author": "Kenta Kase <kesin1202000@gmail.com>",
+  "homepage": "https://github.com/Kesin11/Firestore-simple/tree/master/packages/admin#readme",
+  "bugs": {
+    "url": "https://github.com/Kesin11/Firestore-simple/issues"
+  },
+  "keywords": [
+    "Firestore"
+  ],
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kesin11/Firestore-simple.git"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "tsc --project .",
+    "test": "jest"
+  },
+  "dependencies": {
+    "utility-types": "3.10.0"
+  },
+  "devDependencies": {
+    "@types/jest": "25.1.4",
+    "firebase-admin": "8.9.2",
+    "jest": "25.1.0",
+    "jest-circus": "25.1.0",
+    "rimraf": "3.0.2",
+    "ts-jest": "25.2.1",
+    "typescript": "3.8.3"
+  }
+}
