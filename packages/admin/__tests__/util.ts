@@ -3,7 +3,17 @@ import crypto from 'crypto'
 import admin, { ServiceAccount } from 'firebase-admin'
 import serviceAccount from '../firebase_secret.json'
 
+// Using local Firestore emulator
 export const initFirestore = () => {
+  process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080'
+  admin.initializeApp({})
+  const firestore = admin.firestore()
+  firestore.settings({ timestampsInSnapshots: true })
+  return firestore
+}
+
+// Using real Firestore
+export const initRealFirestore = () => {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount as ServiceAccount),
   })
