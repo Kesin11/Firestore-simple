@@ -1,5 +1,10 @@
 import { FirestoreSimpleAdmin } from '../src'
-import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
+import { AdminFirestoreTestUtil } from './util'
+
+const util = new AdminFirestoreTestUtil()
+const firestore = util.adminFirestore
+const collectionPath = util.collectionPath
+const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 
 interface Book {
   id: string,
@@ -11,10 +16,6 @@ interface BookDoc {
   book_title: string,
   created: Date,
 }
-
-const firestore = initFirestore()
-const collectionPath = createRandomCollectionName()
-const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 
 describe('encode and decode', () => {
   const dao = firestoreSimple.collection<Book, BookDoc>({
@@ -35,9 +36,12 @@ describe('encode and decode', () => {
   })
   const now = new Date()
 
-  // Delete all documents. (= delete collection)
+  afterAll(async () => {
+    await util.deleteApps()
+  })
+
   afterEach(async () => {
-    await deleteCollection(firestore, collectionPath)
+    await util.deleteCollection()
   })
 
   it('add with encode/decode', async () => {

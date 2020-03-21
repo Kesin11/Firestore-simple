@@ -1,16 +1,17 @@
 import { FirestoreSimpleAdmin } from '../src'
-import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
 import { FieldValue } from '@google-cloud/firestore'
+import { AdminFirestoreTestUtil } from './util'
+
+const util = new AdminFirestoreTestUtil()
+const firestore = util.adminFirestore
+const collectionPath = util.collectionPath
+const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 
 interface TestDoc {
   id: string,
   title: string,
   num: number,
 }
-
-const firestore = initFirestore()
-const collectionPath = createRandomCollectionName()
-const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 
 describe('Basic', () => {
   const dao = firestoreSimple.collection<TestDoc>({ path: collectionPath })
@@ -28,9 +29,12 @@ describe('Basic', () => {
     })
   })
 
-  // Delete all documents. (= delete collection)
+  afterAll(async () => {
+    await util.deleteApps()
+  })
+
   afterEach(async () => {
-    await deleteCollection(firestore, collectionPath)
+    await util.deleteCollection()
   })
 
   describe('fetch', () => {

@@ -1,16 +1,17 @@
 import { FirestoreSimpleAdmin } from '../src'
-import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
+import { AdminFirestoreTestUtil } from './util'
+
+const util = new AdminFirestoreTestUtil()
+const firestore = util.adminFirestore
+// Set specific collection name because random name collection can not handle composit index in real firestore.
+const collectionPath = util.collectionPath + '/test/test_pagination'
+const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 
 export interface TestDoc {
   id: string,
   title: string,
   order: number,
 }
-
-const firestore = initFirestore()
-// Set specific collection name because random name collection can not handle composit index
-const collectionPath = createRandomCollectionName() + '/test/test_pagination'
-const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 
 describe('pagination', () => {
   const dao = firestoreSimple.collection<TestDoc>({ path: collectionPath })
@@ -28,8 +29,12 @@ describe('pagination', () => {
     await dao.bulkSet(docs)
   })
 
+  afterAll(async () => {
+    await util.deleteApps()
+  })
+
   afterEach(async () => {
-    await deleteCollection(firestore, collectionPath)
+    await util.deleteCollection()
   })
 
   describe('startAt', () => {

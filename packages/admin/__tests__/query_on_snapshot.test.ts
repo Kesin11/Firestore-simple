@@ -1,5 +1,10 @@
 import { FirestoreSimpleAdmin } from '../src'
-import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
+import { AdminFirestoreTestUtil } from './util'
+
+const util = new AdminFirestoreTestUtil()
+const firestore = util.adminFirestore
+const collectionPath = util.collectionPath
+const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 
 // Workaround for flaky onSnapshot callback tests.
 jest.retryTimes(3)
@@ -16,10 +21,6 @@ interface BookDoc {
   created: Date,
   book_id: number,
 }
-
-const firestore = initFirestore()
-const collectionPath = createRandomCollectionName()
-const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 
 describe('query on_snapshot test', () => {
   const dao = firestoreSimple.collection<Book, BookDoc>({
@@ -55,8 +56,12 @@ describe('query on_snapshot test', () => {
     }
   })
 
+  afterAll(async () => {
+    await util.deleteApps()
+  })
+
   afterEach(async () => {
-    await deleteCollection(firestore, collectionPath)
+    await util.deleteCollection()
   })
 
   it('observe add change', async () => {

@@ -1,5 +1,10 @@
 import { FirestoreSimpleAdmin, AdminEncodable, AdminDecodable, AdminCollection } from '../src'
-import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
+import { AdminFirestoreTestUtil } from './util'
+
+const util = new AdminFirestoreTestUtil()
+const firestore = util.adminFirestore
+const collectionPath = util.collectionPath
+const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 
 interface Book {
   id: string,
@@ -12,14 +17,13 @@ interface BookDoc {
   created_at: Date,
 }
 
-const firestore = initFirestore()
-const collectionPath = createRandomCollectionName()
-const firestoreSimple = new FirestoreSimpleAdmin(firestore)
-
 describe('Factory and Subcollection', () => {
-  // Delete all documents. (= delete collection)
+  afterAll(async () => {
+    await util.deleteApps()
+  })
+
   afterEach(async () => {
-    await deleteCollection(firestore, collectionPath)
+    await util.deleteCollection()
   })
 
   const encodeFunc: AdminEncodable<Book, BookDoc> = (obj) => {
@@ -64,10 +68,6 @@ describe('Factory and Subcollection', () => {
 
     beforeEach(async () => {
       dao = factory.create(subcollectionPath)
-    })
-
-    afterEach(async () => {
-      await deleteCollection(firestore, subcollectionPath)
     })
 
     it('should be same collection path', async () => {
