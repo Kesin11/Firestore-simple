@@ -79,7 +79,6 @@ describe('on_snapshot test', () => {
       })
     })
 
-    await new Promise((resolve) => setTimeout(resolve, 100)) // for async stability
     await dao.add(doc)
     await promise
   })
@@ -103,7 +102,6 @@ describe('on_snapshot test', () => {
       })
     })
 
-    await new Promise((resolve) => setTimeout(resolve, 100)) // for async stability
     await dao.set(doc)
     await promise
   })
@@ -134,7 +132,6 @@ describe('on_snapshot test', () => {
       })
     })
 
-    await new Promise((resolve) => setTimeout(resolve, 100)) // for async stability
     await dao.delete(deletedId)
     await promise
   })

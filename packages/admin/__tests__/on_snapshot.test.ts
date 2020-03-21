@@ -6,9 +6,6 @@ const firestore = util.adminFirestore
 const collectionPath = util.collectionPath
 const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 
-// Workaround for flaky onSnapshot callback tests.
-jest.retryTimes(3)
-
 interface Book {
   id: string,
   bookTitle: string,

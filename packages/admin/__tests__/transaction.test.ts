@@ -7,9 +7,6 @@ const firestore = util.adminFirestore
 const collectionPath = util.collectionPath
 const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 
-// Workaround for flaky nesting transaction/runBatch test
-jest.retryTimes(3)
-
 interface TestDoc {
   id: string,
   title: string,
