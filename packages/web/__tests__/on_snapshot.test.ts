@@ -18,8 +18,7 @@ type BookDoc = {
 
 const firestoreSimple = new FirestoreSimpleWeb(webFirestore)
 
-// Skip reason: Sometimes real Firestore is unstable so it will be replaced emulator test.
-describe.skip('on_snapshot test', () => {
+describe('on_snapshot test', () => {
   const dao = firestoreSimple.collection<Book, BookDoc>({
     path: collectionPath,
     encode: (book) => {

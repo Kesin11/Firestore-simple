@@ -19,8 +19,7 @@ const firestore = initFirestore()
 const collectionPath = createRandomCollectionName()
 const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 
-// Skip reason: Sometimes real Firestore is unstable so it will be replaced emulator test.
-describe.skip('on_snapshot test', () => {
+describe('on_snapshot test', () => {
   const dao = firestoreSimple.collection<Book, BookDoc>({
     path: collectionPath,
     encode: (book) => {
