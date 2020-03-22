@@ -36,7 +36,7 @@ jobs:
     - run: npm ci
     - run: npm run bootstrap
     - name: test
-      run: npx lerna run test:ci --scope=@firestore-simple/${{ matrix.packages }}
+      run: npm --prefix packages/${{ matrix.packages }} run test:ci
       timeout-minutes: 3
 
     # Post process
