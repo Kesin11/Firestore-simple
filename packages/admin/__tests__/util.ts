@@ -27,6 +27,8 @@ export class AdminFirestoreTestUtil {
         credential: admin.credential.cert(serviceAccount as ServiceAccount),
       })
     } else {
+      // Firestore still need to resolve firebase project name even using local emulator, so set real firebase project id
+      process.env.GCLOUD_PROJECT = 'firestore-simple-test'
       process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080'
       admin.initializeApp({})
     }
