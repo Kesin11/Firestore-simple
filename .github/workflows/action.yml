@@ -37,6 +37,7 @@ jobs:
     - run: npm run bootstrap
     - name: test
       run: npx lerna run test:ci --scope=@firestore-simple/${{ matrix.packages }}
+      timeout-minutes: 3
 
     # Post process
     # - name: Upload coverage
