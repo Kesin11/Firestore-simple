@@ -1,5 +1,4 @@
 // import fs from 'fs'
-import { Firestore } from '@google-cloud/firestore'
 import * as firebase from '@firebase/testing'
 import crypto from 'crypto'
 
@@ -7,7 +6,6 @@ export class WebFirestoreTestUtil {
   projectId: string
   uid: string
   webFirestore: firebase.firestore.Firestore
-  adminFirestore: Firestore
 
   constructor () {
     // Use random projectId to separate emulator firestore namespace for concurrent testing
@@ -20,10 +18,6 @@ export class WebFirestoreTestUtil {
       projectId: this.projectId,
       auth: { uid: this.uid }
     }).firestore()
-
-    this.adminFirestore = firebase.initializeAdminApp({
-      projectId: this.projectId
-    }).firestore() as unknown as Firestore
   }
 
   // Clear emulator Firestore data
