@@ -1,6 +1,5 @@
-import { firestore } from 'firebase'
 import { FirestoreSimpleWeb } from '../src/'
-import { WebFirestoreTestUtil } from './util'
+import { WebFirestoreTestUtil, FieldValue } from './util'
 
 const util = new WebFirestoreTestUtil()
 const webFirestore = util.webFirestore
@@ -183,7 +182,7 @@ describe('Basic', () => {
       const incrementNum = 100
       const updatedId = await dao.update({
         id: addedDoc.id,
-        num: firestore.FieldValue.increment(incrementNum)
+        num: FieldValue.increment(incrementNum)
       })
 
       const fetchedDoc = await dao.fetch(updatedId)

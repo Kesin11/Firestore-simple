@@ -2,6 +2,11 @@
 import * as firebase from '@firebase/testing'
 import crypto from 'crypto'
 
+// This is workaround for avoid error which occure using firestore.FieldValue.increment() with update() or set()
+// FieldValue which from `import { firestore } from 'firebase'` maybe can not use when using local emulator.
+// FieldValue which from @firebase/testing is OK. So export it for using FieldValue in each tests.
+export const FieldValue = firebase.firestore.FieldValue
+
 export class WebFirestoreTestUtil {
   projectId: string
   uid: string
