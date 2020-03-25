@@ -86,20 +86,21 @@ describe('query on_snapshot test', () => {
         })
     })
 
+    await new Promise((resolve) => setTimeout(resolve, 100)) // for async stability
     await dao.add(doc)
     await promise
   })
 
-  it('observe set changes', async () => {
+  it('observe update changes', async () => {
     const doc = {
       ...existsDoc!,
-      bookTitle: 'query_set',
+      bookTitle: 'query_update',
     }
 
     const promise = new Promise((resolve) => {
-      // where('book_title', '==', existsDoc) is not triggered modify existsDoc.
+      // where('book_title', '==', doc.bookTitle) is not triggered modify event.
       // I don't know why, so book_id is hack for resolve this issue.
-      dao.where('book_id', '==', 1)
+      dao.where('book_id', '==', doc.bookId)
         .onSnapshot((querySnapshot, toObject) => {
           querySnapshot.docChanges().forEach((change) => {
             if (change.type === 'modified') {
@@ -112,7 +113,8 @@ describe('query on_snapshot test', () => {
         })
     })
 
-    await dao.set(doc)
+    await new Promise((resolve) => setTimeout(resolve, 100)) // for async stability
+    await dao.update({ id: doc.id, book_title: doc.bookTitle })
     await promise
   })
 
@@ -130,6 +132,7 @@ describe('query on_snapshot test', () => {
       })
     })
 
+    await new Promise((resolve) => setTimeout(resolve, 100)) // for async stability
     await dao.delete(existsDoc.id)
     await promise
   })
