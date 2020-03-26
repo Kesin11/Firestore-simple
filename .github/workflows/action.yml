@@ -40,7 +40,7 @@ jobs:
       timeout-minutes: 3
 
     # Post process
-    # - name: Upload coverage
-    #   run: npm run coverage
-    #   env:
-    #     CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    - name: Upload coverage
+      run: npm run coverage
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
