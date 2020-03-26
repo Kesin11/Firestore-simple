@@ -27,16 +27,17 @@
     "clean": "rimraf dist",
     "build": "tsc --project .",
     "test": "jest",
-    "test:ci": "firebase emulators:exec --only firestore jest",
+    "test:ci": "firebase emulators:exec --only firestore 'jest --coverage'",
     "emulators:start": "firebase emulators:start --only firestore"
   },
   "dependencies": {
+    "firebase": "7.12.0",
     "utility-types": "3.10.0"
   },
   "devDependencies": {
-    "@firebase/testing": "0.16.14",
+    "@firebase/testing": "0.17.1",
     "@types/jest": "25.1.4",
-    "firebase": "7.10.0",
+    "firebase-tools": "^7.15.1",
     "jest": "25.1.0",
     "rimraf": "3.0.2",
     "ts-jest": "25.2.1",

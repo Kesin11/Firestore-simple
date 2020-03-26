@@ -1,15 +1,16 @@
 import { FirestoreSimpleAdmin } from '../src'
-import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
+import { AdminFirestoreTestUtil } from './util'
+
+const util = new AdminFirestoreTestUtil()
+const firestore = util.adminFirestore
+const collectionPath = util.collectionPath
+const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 
 export interface TestDoc {
   id: string,
   title: string,
   order: number,
 }
-
-const firestore = initFirestore()
-const collectionPath = createRandomCollectionName()
-const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 
 describe('query', () => {
   const dao = firestoreSimple.collection<TestDoc>({ path: collectionPath })
@@ -21,8 +22,12 @@ describe('query', () => {
     await dao.collectionRef.add({ title: 'ccc', order: 4 })
   })
 
+  afterAll(async () => {
+    await util.deleteApps()
+  })
+
   afterEach(async () => {
-    await deleteCollection(firestore, collectionPath)
+    await util.deleteCollection()
   })
 
   it('where ==', async () => {

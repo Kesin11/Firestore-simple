@@ -2,19 +2,31 @@ name: "CI"
 on: [push]
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    container:
+      image: "node:current"
+    steps:
+    - uses: actions/checkout@v2
+    - run: npm ci
+    - run: npm run lint
+
   test:
     strategy:
       matrix:
-        container: ["node:current", "node:lts"]
+        node: ["10.x", "12.x"]
+        packages: ["admin", "web"]
+      fail-fast: false
 
     runs-on: ubuntu-latest
-    container:
-      image: ${{ matrix.container }}
-    steps:
     # Prepare
-    - uses: actions/checkout@v1
+    steps:
+    - uses: actions/checkout@v2
     - name: Create firebase secret json
-      run: echo "${{ secrets.FIREBASE_SECRET }}" | base64 --decode > firebase_secret.json
+      run: echo "${{ secrets.FIREBASE_SECRET }}" | base64 --decode > packages/admin/firebase_secret.json
+    - uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node }}
     - name: "Show version"
       run: |
         node --version
@@ -22,12 +34,13 @@ jobs:
 
     # Run
     - run: npm ci
-    - run: npm run lint
+    - run: npm run bootstrap
     - name: test
-      run: npm run test -- --forceExit --coverage
+      run: npm --prefix packages/${{ matrix.packages }} run test:ci
+      timeout-minutes: 3
 
     # Post process
-    - name: Upload coverage
-      run: npm run coverage
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    # - name: Upload coverage
+    #   run: npm run coverage
+    #   env:
+    #     CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

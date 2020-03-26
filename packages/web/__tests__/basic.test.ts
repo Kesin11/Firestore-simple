@@ -1,10 +1,8 @@
-import { firestore } from 'firebase'
 import { FirestoreSimpleWeb } from '../src/'
-import { WebFirestoreTestUtil } from './util'
+import { WebFirestoreTestUtil, FieldValue } from './util'
 
 const util = new WebFirestoreTestUtil()
 const webFirestore = util.webFirestore
-const adminFirestore = util.adminFirestore
 const collectionPath = 'basic'
 
 type TestDoc = {
@@ -24,8 +22,8 @@ describe('Basic', () => {
   }
   // Add fix id document and random id document
   beforeEach(async () => {
-    await adminFirestore.collection(collectionPath).doc(existsDocId).set(existsDoc)
-    await adminFirestore.collection(collectionPath).add({
+    await webFirestore.collection(collectionPath).doc(existsDocId).set(existsDoc)
+    await webFirestore.collection(collectionPath).add({
       title: 'before',
       num: 10,
     })
@@ -184,7 +182,7 @@ describe('Basic', () => {
       const incrementNum = 100
       const updatedId = await dao.update({
         id: addedDoc.id,
-        num: firestore.FieldValue.increment(incrementNum)
+        num: FieldValue.increment(incrementNum)
       })
 
       const fetchedDoc = await dao.fetch(updatedId)

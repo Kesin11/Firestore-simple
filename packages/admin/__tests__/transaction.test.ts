@@ -1,18 +1,16 @@
 import { FirestoreSimpleAdmin } from '../src'
 import { AdminCollection } from '../src/collection'
-import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
+import { AdminFirestoreTestUtil, createRandomCollectionName } from './util'
 
-// Workaround for flaky nesting transaction/runBatch test
-jest.retryTimes(3)
+const util = new AdminFirestoreTestUtil()
+const firestore = util.adminFirestore
+const collectionPath = util.collectionPath
+const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 
 interface TestDoc {
   id: string,
   title: string,
 }
-
-const firestore = initFirestore()
-const collectionPath = createRandomCollectionName()
-const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 
 describe('transaction', () => {
   let txFirestoreSimple: FirestoreSimpleAdmin
@@ -24,9 +22,12 @@ describe('transaction', () => {
     txDao = txFirestoreSimple.collection<TestDoc>({ path: collectionPath })
   })
 
-  // Delete all documents. (= delete collection)
+  afterAll(async () => {
+    await util.deleteApps()
+  })
+
   afterEach(async () => {
-    await deleteCollection(firestore, collectionPath)
+    await util.deleteCollection()
   })
 
   describe('context.tx', () => {
@@ -198,10 +199,6 @@ describe('transaction', () => {
 
     beforeEach(async () => {
       txAnotherDao = txFirestoreSimple.collection<TestDoc>({ path: anotherCollectionPath })
-    })
-
-    afterEach(async () => {
-      await deleteCollection(firestore, anotherCollectionPath)
     })
 
     it('each collections share same transaction context', async () => {

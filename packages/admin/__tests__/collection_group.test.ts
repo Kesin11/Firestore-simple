@@ -1,5 +1,10 @@
 import { FirestoreSimpleAdmin } from '../src'
-import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
+import { AdminFirestoreTestUtil, deleteCollection } from './util'
+
+const util = new AdminFirestoreTestUtil()
+const firestore = util.adminFirestore
+const collectionPath = util.collectionPath
+const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 
 interface TestDoc {
   id: string,
@@ -9,19 +14,16 @@ interface TestDoc {
 const expectTitles = ['aaa', 'bbb', 'ccc', 'ddd']
 const collectionId = 'collection_group'
 
-const firestore = initFirestore()
-const collectionPath = createRandomCollectionName()
-const firestoreSimple = new FirestoreSimpleAdmin(firestore)
-
-// Skip reason: CollectionGroup can not handle parallel test(ex: node10 + node12).
-// CollectionGroup get all documents that have same collectionId from "ALL" collections.
-// We will use Firestore local emulator to resolve this problem.
-describe.skip('collectionGroup', () => {
+describe('collectionGroup', () => {
   beforeEach(async () => {
     await firestore.collection(`${collectionPath}/1/${collectionId}`).add({ title: expectTitles[0] })
     await firestore.collection(`${collectionPath}/1/${collectionId}`).add({ title: expectTitles[1] })
     await firestore.collection(`${collectionPath}/2/${collectionId}`).add({ title: expectTitles[2] })
     await firestore.collection(`${collectionPath}/3/${collectionId}`).add({ title: expectTitles[3] })
+  })
+
+  afterAll(async () => {
+    await util.deleteApps()
   })
 
   afterEach(async () => {

@@ -1,13 +1,16 @@
 // import fs from 'fs'
-import { Firestore } from '@google-cloud/firestore'
 import * as firebase from '@firebase/testing'
 import crypto from 'crypto'
+
+// This is workaround for avoid error which occure using firestore.FieldValue.increment() with update() or set()
+// FieldValue which from `import { firestore } from 'firebase'` maybe can not use when using local emulator.
+// FieldValue which from @firebase/testing is OK. So export it for using FieldValue in each tests.
+export const FieldValue = firebase.firestore.FieldValue
 
 export class WebFirestoreTestUtil {
   projectId: string
   uid: string
   webFirestore: firebase.firestore.Firestore
-  adminFirestore: Firestore
 
   constructor () {
     // Use random projectId to separate emulator firestore namespace for concurrent testing
@@ -20,10 +23,6 @@ export class WebFirestoreTestUtil {
       projectId: this.projectId,
       auth: { uid: this.uid }
     }).firestore()
-
-    this.adminFirestore = firebase.initializeAdminApp({
-      projectId: this.projectId
-    }).firestore() as unknown as Firestore
   }
 
   // Clear emulator Firestore data

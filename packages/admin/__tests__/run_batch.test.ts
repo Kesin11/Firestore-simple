@@ -1,17 +1,15 @@
 import { FirestoreSimpleAdmin } from '../src'
 import { AdminCollection } from '../src/collection'
-import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
+import { AdminFirestoreTestUtil, createRandomCollectionName } from './util'
 
-// Workaround for flaky nesting transaction/runBatch test
-jest.retryTimes(3)
+const util = new AdminFirestoreTestUtil()
+const firestore = util.adminFirestore
+const collectionPath = util.collectionPath
 
 interface TestDoc {
   id: string,
   title: string,
 }
-
-const firestore = initFirestore()
-const collectionPath = createRandomCollectionName()
 
 describe('runBatch', () => {
   let firestoreSimple: FirestoreSimpleAdmin
@@ -22,9 +20,12 @@ describe('runBatch', () => {
     dao = firestoreSimple.collection<TestDoc>({ path: collectionPath })
   })
 
-  // Delete all documents. (= delete collection)
+  afterAll(async () => {
+    await util.deleteApps()
+  })
+
   afterEach(async () => {
-    await deleteCollection(firestore, collectionPath)
+    await util.deleteCollection()
   })
 
   describe('context.batch', () => {
@@ -142,10 +143,6 @@ describe('runBatch', () => {
 
     beforeEach(async () => {
       batchAnotherDao = firestoreSimple.collection<TestDoc>({ path: anotherCollectionPath })
-    })
-
-    afterEach(async () => {
-      await deleteCollection(firestore, anotherCollectionPath)
     })
 
     it('each collections share same batch context', async () => {

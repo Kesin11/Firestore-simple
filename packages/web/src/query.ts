@@ -1,4 +1,5 @@
 import { firestore } from 'firebase/app'
+import '@firebase/firestore' // for instanceof firestore.DocumentSnapshot
 import { HasId, QueryKey } from './types'
 import { WebConverter } from './converter'
 import { Context } from './context'

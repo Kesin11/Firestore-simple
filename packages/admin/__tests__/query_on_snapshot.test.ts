@@ -1,8 +1,10 @@
 import { FirestoreSimpleAdmin } from '../src'
-import { createRandomCollectionName, deleteCollection, initFirestore } from './util'
+import { AdminFirestoreTestUtil } from './util'
 
-// Workaround for flaky onSnapshot callback tests.
-jest.retryTimes(3)
+const util = new AdminFirestoreTestUtil()
+const firestore = util.adminFirestore
+const collectionPath = util.collectionPath
+const firestoreSimple = new FirestoreSimpleAdmin(firestore)
 
 interface Book {
   id: string,
@@ -17,12 +19,7 @@ interface BookDoc {
   book_id: number,
 }
 
-const firestore = initFirestore()
-const collectionPath = createRandomCollectionName()
-const firestoreSimple = new FirestoreSimpleAdmin(firestore)
-
-// Skip reason: Sometimes real Firestore is unstable so it will be replaced emulator test.
-describe.skip('query on_snapshot test', () => {
+describe('query on_snapshot test', () => {
   const dao = firestoreSimple.collection<Book, BookDoc>({
     path: collectionPath,
     encode: (book) => {
@@ -56,8 +53,12 @@ describe.skip('query on_snapshot test', () => {
     }
   })
 
+  afterAll(async () => {
+    await util.deleteApps()
+  })
+
   afterEach(async () => {
-    await deleteCollection(firestore, collectionPath)
+    await util.deleteCollection()
   })
 
   it('observe add change', async () => {
@@ -89,16 +90,16 @@ describe.skip('query on_snapshot test', () => {
     await promise
   })
 
-  it('observe set changes', async () => {
+  it('observe update changes', async () => {
     const doc = {
       ...existsDoc!,
-      bookTitle: 'query_set',
+      bookTitle: 'query_update',
     }
 
     const promise = new Promise((resolve) => {
-      // where('book_title', '==', existsDoc) is not triggered modify existsDoc.
+      // where('book_title', '==', doc.bookTitle) is not triggered modify event.
       // I don't know why, so book_id is hack for resolve this issue.
-      dao.where('book_id', '==', 1)
+      dao.where('book_id', '==', doc.bookId)
         .onSnapshot((querySnapshot, toObject) => {
           querySnapshot.docChanges().forEach((change) => {
             if (change.type === 'modified') {
@@ -112,7 +113,7 @@ describe.skip('query on_snapshot test', () => {
     })
 
     await new Promise((resolve) => setTimeout(resolve, 100)) // for async stability
-    await dao.set(doc)
+    await dao.update({ id: doc.id, book_title: doc.bookTitle })
     await promise
   })
 

@@ -18,8 +18,7 @@ type BookDoc = {
 
 const firestoreSimple = new FirestoreSimpleWeb(webFirestore)
 
-// Skip reason: Sometimes real Firestore is unstable so it will be replaced emulator test.
-describe.skip('on_snapshot test', () => {
+describe('on_snapshot test', () => {
   const dao = firestoreSimple.collection<Book, BookDoc>({
     path: collectionPath,
     encode: (book) => {
@@ -80,7 +79,6 @@ describe.skip('on_snapshot test', () => {
       })
     })
 
-    await new Promise((resolve) => setTimeout(resolve, 100)) // for async stability
     await dao.add(doc)
     await promise
   })
@@ -104,7 +102,6 @@ describe.skip('on_snapshot test', () => {
       })
     })
 
-    await new Promise((resolve) => setTimeout(resolve, 100)) // for async stability
     await dao.set(doc)
     await promise
   })
@@ -135,7 +132,6 @@ describe.skip('on_snapshot test', () => {
       })
     })
 
-    await new Promise((resolve) => setTimeout(resolve, 100)) // for async stability
     await dao.delete(deletedId)
     await promise
   })
