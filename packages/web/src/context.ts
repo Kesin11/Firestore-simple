@@ -1,22 +1,22 @@
-import { firestore } from 'firebase/app'
+import { Firestore, Transaction, WriteBatch } from './types'
 
 export class Context {
-  firestore: firestore.Firestore
-  private _tx?: firestore.Transaction = undefined
-  private _batch?: firestore.WriteBatch = undefined
-  constructor (firestore: firebase.firestore.Firestore) {
+  firestore: Firestore
+  private _tx?: Transaction = undefined
+  private _batch?: WriteBatch = undefined
+  constructor (firestore: Firestore) {
     this.firestore = firestore
   }
 
-  get tx (): firestore.Transaction | undefined {
+  get tx (): Transaction | undefined {
     return this._tx
   }
 
-  get batch (): firestore.WriteBatch | undefined {
+  get batch (): WriteBatch | undefined {
     return this._batch
   }
 
-  async runTransaction (updateFunction: (tx: firestore.Transaction) => Promise<void>): Promise<void> {
+  async runTransaction (updateFunction: (tx: Transaction) => Promise<void>): Promise<void> {
     if (this._tx || this._batch) throw new Error('Disallow nesting transaction or batch')
 
     await this.firestore.runTransaction(async (tx) => {
@@ -26,7 +26,7 @@ export class Context {
     this._tx = undefined
   }
 
-  async runBatch (updateFunction: (batch: firestore.WriteBatch) => Promise<void>): Promise<void> {
+  async runBatch (updateFunction: (batch: WriteBatch) => Promise<void>): Promise<void> {
     if (this._tx || this._batch) throw new Error('Disallow nesting transaction or batch')
 
     this._batch = this.firestore.batch()

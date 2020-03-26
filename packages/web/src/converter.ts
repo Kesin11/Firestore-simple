@@ -1,7 +1,4 @@
-import { firestore } from 'firebase/app'
-
-import { HasId, OmitId, WebEncodable, WebDecodable, OptionalIdStorable, Storable } from './types'
-import { Optional } from 'utility-types'
+import { HasId, OmitId, WebEncodable, WebDecodable, OptionalIdStorable, Storable, DocumentSnapshot } from './types'
 
 export class WebConverter<T extends HasId, S = OmitId<T>> {
   private _encode?: WebEncodable<T, S>
@@ -15,14 +12,14 @@ export class WebConverter<T extends HasId, S = OmitId<T>> {
     this._decode = decode
   }
 
-  decode (documentSnapshot: firestore.DocumentSnapshot): T {
+  decode (documentSnapshot: DocumentSnapshot): T {
     const obj = { id: documentSnapshot.id, ...documentSnapshot.data() }
     if (this._decode) return this._decode(obj as S & HasId)
 
     return obj as T
   }
 
-  encode (obj: OptionalIdStorable<T>): Optional<Storable<T>, 'id'> | Storable<S> {
+  encode (obj: OptionalIdStorable<T>): OptionalIdStorable<T> | Storable<S> {
     if (this._encode) return this._encode(obj)
 
     const doc = { ...obj }

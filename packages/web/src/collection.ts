@@ -1,12 +1,11 @@
-import { firestore } from 'firebase/app'
-import { HasId, OmitId, WebEncodable, WebDecodable, OptionalIdStorable, Storable, PartialStorable, QueryKey } from './types'
+import { HasId, OmitId, WebEncodable, WebDecodable, OptionalIdStorable, Storable, PartialStorable, QueryKey, DocumentSnapshot, WhereFilterOp, FieldPath, OrderByDirection, QuerySnapshot, CollectionReference, DocumentReference } from './types'
 import { Context } from './context'
 import { WebConverter } from './converter'
 import { WebQuery } from './query'
 
 export class WebCollection<T extends HasId, S = OmitId<T>> {
   context: Context
-  collectionRef: firestore.CollectionReference
+  collectionRef: CollectionReference
   private converter: WebConverter<T, S>
 
   constructor ({ context, path, encode, decode }: {
@@ -20,11 +19,11 @@ export class WebCollection<T extends HasId, S = OmitId<T>> {
     this.converter = new WebConverter({ encode, decode })
   }
 
-  toObject (documentSnapshot: firestore.DocumentSnapshot): T {
+  toObject (documentSnapshot: DocumentSnapshot): T {
     return this.converter.decode(documentSnapshot)
   }
 
-  docRef (id?: string): firestore.DocumentReference {
+  docRef (id?: string): DocumentReference {
     if (id) return this.collectionRef.doc(id)
     return this.collectionRef.doc()
   }
@@ -47,7 +46,7 @@ export class WebCollection<T extends HasId, S = OmitId<T>> {
   }
 
   async add (obj: OptionalIdStorable<T>): Promise<string> {
-    let docRef: firestore.DocumentReference
+    let docRef: DocumentReference
     const doc = this.converter.encode(obj)
 
     if (this.context.tx) {
@@ -132,13 +131,13 @@ export class WebCollection<T extends HasId, S = OmitId<T>> {
     })
   }
 
-  where (fieldPath: QueryKey<S>, opStr: firestore.WhereFilterOp, value: any): WebQuery<T, S> {
-    const query = this.collectionRef.where(fieldPath as string | firestore.FieldPath, opStr, value)
+  where (fieldPath: QueryKey<S>, opStr: WhereFilterOp, value: any): WebQuery<T, S> {
+    const query = this.collectionRef.where(fieldPath as string | FieldPath, opStr, value)
     return new WebQuery<T, S>(this.converter, this.context, query)
   }
 
-  orderBy (fieldPath: QueryKey<S>, directionStr?: firestore.OrderByDirection): WebQuery<T, S> {
-    const query = this.collectionRef.orderBy(fieldPath as string | firestore.FieldPath, directionStr)
+  orderBy (fieldPath: QueryKey<S>, directionStr?: OrderByDirection): WebQuery<T, S> {
+    const query = this.collectionRef.orderBy(fieldPath as string | FieldPath, directionStr)
     return new WebQuery<T, S>(this.converter, this.context, query)
   }
 
@@ -148,8 +147,8 @@ export class WebCollection<T extends HasId, S = OmitId<T>> {
   }
 
   onSnapshot (callback: (
-    querySnapshot: firestore.QuerySnapshot,
-    toObject: (documentSnapshot: firestore.DocumentSnapshot) => T
+    querySnapshot: QuerySnapshot,
+    toObject: (documentSnapshot: DocumentSnapshot) => T
     ) => void
   ): () => void {
     return this.collectionRef.onSnapshot((_querySnapshot) => {

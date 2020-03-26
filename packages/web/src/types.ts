@@ -16,3 +16,16 @@ export type QueryKey<T> = { [K in keyof T]: K }[keyof T] | firestore.FieldPath
 export type OmitId<T> = Omit<T, 'id'>
 export type WebEncodable<T extends HasId, S = firestore.DocumentData> = (obj: OptionalIdStorable<T>) => Storable<S>
 export type WebDecodable<T extends HasId, S = HasIdObject> = (doc: HasSameKeyObject<S> & HasId) => T
+
+// Export Firestore types
+export import Firestore = firestore.Firestore
+export import DocumentReference = firestore.DocumentReference
+export import CollectionReference = firestore.CollectionReference
+export import DocumentSnapshot = firestore.DocumentSnapshot
+export import QuerySnapshot = firestore.QuerySnapshot
+export import Transaction = firestore.Transaction
+export import WriteBatch = firestore.WriteBatch
+export import Query = firestore.Query
+export import WhereFilterOp = firestore.WhereFilterOp
+export import FieldPath = firestore.FieldPath
+export import OrderByDirection = firestore.OrderByDirection
