@@ -1,5 +1,4 @@
-import { firestore } from 'firebase/app'
-import { HasId, WebEncodable, WebDecodable, OmitId } from './types'
+import { HasId, WebEncodable, WebDecodable, OmitId, Firestore, Transaction, WriteBatch } from './types'
 import { Context } from './context'
 import { WebCollection } from './collection'
 import { WebQuery } from './query'
@@ -7,7 +6,7 @@ import { WebConverter } from './converter'
 
 export class FirestoreSimpleWeb {
   context: Context
-  constructor (firestore: firestore.Firestore) {
+  constructor (firestore: Firestore) {
     this.context = new Context(firestore)
   }
 
@@ -44,11 +43,11 @@ export class FirestoreSimpleWeb {
     return new WebQuery<T, S>(converter, this.context, query)
   }
 
-  async runTransaction (updateFunction: (tx: firestore.Transaction) => Promise<void>): Promise<void> {
+  async runTransaction (updateFunction: (tx: Transaction) => Promise<void>): Promise<void> {
     return this.context.runTransaction(updateFunction)
   }
 
-  async runBatch (updateFunction: (batch: firestore.WriteBatch) => Promise<void>): Promise<void> {
+  async runBatch (updateFunction: (batch: WriteBatch) => Promise<void>): Promise<void> {
     return this.context.runBatch(updateFunction)
   }
 }

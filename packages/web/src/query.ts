@@ -1,19 +1,19 @@
 import { firestore } from 'firebase/app'
 import '@firebase/firestore' // for instanceof firestore.DocumentSnapshot
-import { HasId, QueryKey } from './types'
+import { HasId, QueryKey, DocumentSnapshot, QuerySnapshot, WhereFilterOp, FieldPath, OrderByDirection, Query } from './types'
 import { WebConverter } from './converter'
 import { Context } from './context'
 
 export class WebQuery<T extends HasId, S> {
-  constructor (public converter: WebConverter<T, S>, public context: Context, public query: firestore.Query) { }
+  constructor (public converter: WebConverter<T, S>, public context: Context, public query: Query) { }
 
-  where (fieldPath: QueryKey<S>, opStr: firestore.WhereFilterOp, value: any): this {
-    this.query = this.query.where(fieldPath as string | firestore.FieldPath, opStr, value)
+  where (fieldPath: QueryKey<S>, opStr: WhereFilterOp, value: any): this {
+    this.query = this.query.where(fieldPath as string | FieldPath, opStr, value)
     return this
   }
 
-  orderBy (fieldPath: QueryKey<S>, directionStr?: firestore.OrderByDirection): this {
-    this.query = this.query.orderBy(fieldPath as string | firestore.FieldPath, directionStr)
+  orderBy (fieldPath: QueryKey<S>, directionStr?: OrderByDirection): this {
+    this.query = this.query.orderBy(fieldPath as string | FieldPath, directionStr)
     return this
   }
 
@@ -22,15 +22,15 @@ export class WebQuery<T extends HasId, S> {
     return this
   }
 
-  startAt (snapshot: firestore.DocumentSnapshot): WebQuery<T, S>
+  startAt (snapshot: DocumentSnapshot): WebQuery<T, S>
   startAt (...fieldValues: any[]): WebQuery<T, S>
   startAt (
-    snapshotOrValue: firestore.DocumentSnapshot | unknown,
+    snapshotOrValue: DocumentSnapshot | unknown,
     ...fieldValues: unknown[]
   ): this {
     if (!this.query) throw new Error('no query statement before startAt()')
 
-    if (snapshotOrValue instanceof firestore.DocumentSnapshot) {
+    if (snapshotOrValue instanceof DocumentSnapshot) {
       this.query = this.query.startAt(snapshotOrValue)
     } else {
       this.query = this.query.startAt(snapshotOrValue, ...fieldValues)
@@ -38,15 +38,15 @@ export class WebQuery<T extends HasId, S> {
     return this
   }
 
-  startAfter (snapshot: firestore.DocumentSnapshot): WebQuery<T, S>
+  startAfter (snapshot: DocumentSnapshot): WebQuery<T, S>
   startAfter (...fieldValues: any[]): WebQuery<T, S>
   startAfter (
-    snapshotOrValue: firestore.DocumentSnapshot | unknown,
+    snapshotOrValue: DocumentSnapshot | unknown,
     ...fieldValues: unknown[]
   ): this {
     if (!this.query) throw new Error('no query statement before startAfter()')
 
-    if (snapshotOrValue instanceof firestore.DocumentSnapshot) {
+    if (snapshotOrValue instanceof DocumentSnapshot) {
       this.query = this.query.startAfter(snapshotOrValue)
     } else {
       this.query = this.query.startAfter(snapshotOrValue, ...fieldValues)
@@ -54,10 +54,10 @@ export class WebQuery<T extends HasId, S> {
     return this
   }
 
-  endAt (snapshot: firestore.DocumentSnapshot): WebQuery<T, S>
+  endAt (snapshot: DocumentSnapshot): WebQuery<T, S>
   endAt (...fieldValues: any[]): WebQuery<T, S>
   endAt (
-    snapshotOrValue: firestore.DocumentSnapshot | unknown,
+    snapshotOrValue: DocumentSnapshot | unknown,
     ...fieldValues: unknown[]
   ): this {
     if (!this.query) throw new Error('no query statement before endAt()')
@@ -70,10 +70,10 @@ export class WebQuery<T extends HasId, S> {
     return this
   }
 
-  endBefore (snapshot: firestore.DocumentSnapshot): WebQuery<T, S>
+  endBefore (snapshot: DocumentSnapshot): WebQuery<T, S>
   endBefore (...fieldValues: any[]): WebQuery<T, S>
   endBefore (
-    snapshotOrValue: firestore.DocumentSnapshot | unknown,
+    snapshotOrValue: DocumentSnapshot | unknown,
     ...fieldValues: unknown[]
   ): this {
     if (!this.query) throw new Error('no query statement before endBefore()')
@@ -97,8 +97,8 @@ export class WebQuery<T extends HasId, S> {
   }
 
   onSnapshot (callback: (
-    querySnapshot: firestore.QuerySnapshot,
-    toObject: (documentSnapshot: firestore.DocumentSnapshot) => T
+    querySnapshot: QuerySnapshot,
+    toObject: (documentSnapshot: DocumentSnapshot) => T
     ) => void
   ): () => void {
     if (!this.query) throw new Error('no query statement before onSnapshot()')

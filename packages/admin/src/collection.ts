@@ -1,10 +1,4 @@
-import {
-  CollectionReference,
-  DocumentReference,
-  DocumentSnapshot,
-  QuerySnapshot,
-} from '@google-cloud/firestore'
-import { HasId, OmitId, AdminEncodable, AdminDecodable, OptionalIdStorable, Storable, PartialStorable, QueryKey } from './types'
+import { HasId, OmitId, AdminEncodable, AdminDecodable, OptionalIdStorable, Storable, PartialStorable, QueryKey, CollectionReference, DocumentSnapshot, DocumentReference, QuerySnapshot } from './types'
 import { Context } from './context'
 import { AdminConverter } from './converter'
 import { AdminQuery } from './query'
