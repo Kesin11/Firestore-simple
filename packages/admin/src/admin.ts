@@ -1,5 +1,4 @@
-import { Firestore } from '@google-cloud/firestore'
-import { HasId, OmitId, AdminEncodable, AdminDecodable } from './types'
+import { HasId, OmitId, AdminEncodable, AdminDecodable, Firestore } from './types'
 import { Context } from './context'
 import { AdminCollection } from './collection'
 import { AdminQuery } from './query'

@@ -1,4 +1,4 @@
-import { Firestore } from '@google-cloud/firestore'
+import { Firestore } from '../src/types'
 import crypto from 'crypto'
 import admin, { ServiceAccount } from 'firebase-admin'
 import serviceAccount from '../firebase_secret.json'

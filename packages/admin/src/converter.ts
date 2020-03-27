@@ -1,5 +1,4 @@
-import { DocumentSnapshot } from '@google-cloud/firestore'
-import { HasId, OmitId, AdminEncodable, AdminDecodable, OptionalIdStorable, Storable } from './types'
+import { HasId, OmitId, AdminEncodable, AdminDecodable, OptionalIdStorable, Storable, DocumentSnapshot } from './types'
 import { Optional } from 'utility-types'
 
 export class AdminConverter<T extends HasId, S = OmitId<T>> {

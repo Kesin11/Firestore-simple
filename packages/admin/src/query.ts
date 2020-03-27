@@ -1,18 +1,17 @@
-import { DocumentSnapshot, Query, QuerySnapshot } from '@google-cloud/firestore'
-import { HasId, QueryKey } from './types'
+import { HasId, QueryKey, Query, WhereFilterOp, FieldPath, OrderByDirection, DocumentSnapshot, QuerySnapshot } from './types'
 import { AdminConverter } from './converter'
 import { Context } from './context'
 
 export class AdminQuery<T extends HasId, S> {
   constructor (public converter: AdminConverter<T, S>, public context: Context, public query: Query) { }
 
-  where (fieldPath: QueryKey<S>, opStr: FirebaseFirestore.WhereFilterOp, value: any): this {
-    this.query = this.query.where(fieldPath as string | FirebaseFirestore.FieldPath, opStr, value)
+  where (fieldPath: QueryKey<S>, opStr: WhereFilterOp, value: any): this {
+    this.query = this.query.where(fieldPath as string | FieldPath, opStr, value)
     return this
   }
 
-  orderBy (fieldPath: QueryKey<S>, directionStr?: FirebaseFirestore.OrderByDirection): this {
-    this.query = this.query.orderBy(fieldPath as string | FirebaseFirestore.FieldPath, directionStr)
+  orderBy (fieldPath: QueryKey<S>, directionStr?: OrderByDirection): this {
+    this.query = this.query.orderBy(fieldPath as string | FieldPath, directionStr)
     return this
   }
 
