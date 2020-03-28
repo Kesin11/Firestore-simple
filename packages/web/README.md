@@ -1,6 +1,6 @@
 # `@firestore-simple/web`
 
-> TODO: description
+FirestoreSimple for web SDK
 
 ## Usage
 

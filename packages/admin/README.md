@@ -1,6 +1,6 @@
 # `@firestore-simple/admin`
 
-> TODO: description
+FirestoreSimple for admin SDK
 
 ## Usage
 
