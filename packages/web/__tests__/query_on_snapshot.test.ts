@@ -1,4 +1,4 @@
-import { FirestoreSimpleWeb } from '../src'
+import { FirestoreSimple } from '../src'
 import { WebFirestoreTestUtil } from './util'
 
 const util = new WebFirestoreTestUtil()
@@ -18,7 +18,7 @@ type BookDoc = {
   book_id: number,
 }
 
-const firestoreSimple = new FirestoreSimpleWeb(webFirestore)
+const firestoreSimple = new FirestoreSimple(webFirestore)
 
 describe('query on_snapshot test', () => {
   const dao = firestoreSimple.collection<Book, BookDoc>({

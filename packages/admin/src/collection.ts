@@ -1,22 +1,22 @@
-import { HasId, OmitId, AdminEncodable, AdminDecodable, OptionalIdStorable, Storable, PartialStorable, QueryKey, CollectionReference, DocumentSnapshot, DocumentReference, QuerySnapshot } from './types'
+import { HasId, OmitId, Encodable, Decodable, OptionalIdStorable, Storable, PartialStorable, QueryKey, CollectionReference, DocumentSnapshot, DocumentReference, QuerySnapshot } from './types'
 import { Context } from './context'
-import { AdminConverter } from './converter'
-import { AdminQuery } from './query'
+import { Converter } from './converter'
+import { Query } from './query'
 
-export class AdminCollection<T extends HasId, S = OmitId<T>> {
+export class Collection<T extends HasId, S = OmitId<T>> {
   context: Context
   collectionRef: CollectionReference
-  private converter: AdminConverter<T, S>
+  private converter: Converter<T, S>
 
   constructor ({ context, path, encode, decode }: {
     context: Context,
     path: string,
-    encode?: AdminEncodable<T, S>,
-    decode?: AdminDecodable<T, S>,
+    encode?: Encodable<T, S>,
+    decode?: Decodable<T, S>,
   }) {
     this.context = context
     this.collectionRef = context.firestore.collection(path)
-    this.converter = new AdminConverter({ encode, decode })
+    this.converter = new Converter({ encode, decode })
   }
 
   toObject (documentSnapshot: DocumentSnapshot): T {
@@ -136,19 +136,19 @@ export class AdminCollection<T extends HasId, S = OmitId<T>> {
     })
   }
 
-  where (fieldPath: QueryKey<S>, opStr: FirebaseFirestore.WhereFilterOp, value: any): AdminQuery<T, S> {
+  where (fieldPath: QueryKey<S>, opStr: FirebaseFirestore.WhereFilterOp, value: any): Query<T, S> {
     const query = this.collectionRef.where(fieldPath as string | FirebaseFirestore.FieldPath, opStr, value)
-    return new AdminQuery<T, S>(this.converter, this.context, query)
+    return new Query<T, S>(this.converter, this.context, query)
   }
 
-  orderBy (fieldPath: QueryKey<S>, directionStr?: FirebaseFirestore.OrderByDirection): AdminQuery<T, S> {
+  orderBy (fieldPath: QueryKey<S>, directionStr?: FirebaseFirestore.OrderByDirection): Query<T, S> {
     const query = this.collectionRef.orderBy(fieldPath as string | FirebaseFirestore.FieldPath, directionStr)
-    return new AdminQuery<T, S>(this.converter, this.context, query)
+    return new Query<T, S>(this.converter, this.context, query)
   }
 
-  limit (limit: number): AdminQuery<T, S> {
+  limit (limit: number): Query<T, S> {
     const query = this.collectionRef.limit(limit)
-    return new AdminQuery<T, S>(this.converter, this.context, query)
+    return new Query<T, S>(this.converter, this.context, query)
   }
 
   onSnapshot (callback: (

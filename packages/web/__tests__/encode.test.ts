@@ -1,4 +1,4 @@
-import { FirestoreSimpleWeb } from '../src'
+import { FirestoreSimple } from '../src'
 import { WebFirestoreTestUtil } from './util'
 const util = new WebFirestoreTestUtil()
 const webFirestore = util.webFirestore
@@ -17,7 +17,7 @@ class BookClass {
   constructor (public id: string, public bookTitle: string) { }
 }
 
-const firestoreSimple = new FirestoreSimpleWeb(webFirestore)
+const firestoreSimple = new FirestoreSimple(webFirestore)
 
 describe('encode', () => {
   afterAll(async () => {

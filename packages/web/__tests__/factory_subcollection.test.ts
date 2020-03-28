@@ -1,4 +1,4 @@
-import { FirestoreSimpleWeb, WebCollection, WebEncodable, WebDecodable } from '../src'
+import { FirestoreSimple, Collection, Encodable, Decodable } from '../src'
 import { WebFirestoreTestUtil } from './util'
 
 const util = new WebFirestoreTestUtil()
@@ -16,7 +16,7 @@ type BookDoc = {
   created_at: Date,
 }
 
-const firestoreSimple = new FirestoreSimpleWeb(webFirestore)
+const firestoreSimple = new FirestoreSimple(webFirestore)
 
 describe('Factory and Subcollection', () => {
   afterAll(async () => {
@@ -27,13 +27,13 @@ describe('Factory and Subcollection', () => {
     await util.clearFirestoreData()
   })
 
-  const encodeFunc: WebEncodable<Book, BookDoc> = (obj) => {
+  const encodeFunc: Encodable<Book, BookDoc> = (obj) => {
     return {
       title: obj.title,
       created_at: obj.createdAt,
     }
   }
-  const decodeFunc: WebDecodable<Book, BookDoc> = (doc) => {
+  const decodeFunc: Decodable<Book, BookDoc> = (doc) => {
     return {
       id: doc.id,
       title: doc.title,
@@ -65,7 +65,7 @@ describe('Factory and Subcollection', () => {
       encode: encodeFunc,
       decode: decodeFunc,
     })
-    let dao: WebCollection<Book, BookDoc>
+    let dao: Collection<Book, BookDoc>
 
     beforeEach(async () => {
       dao = factory.create(subcollectionPath)

@@ -1,11 +1,10 @@
-import { FirestoreSimpleAdmin } from '../src'
-import { AdminCollection } from '../src/collection'
+import { FirestoreSimple, Collection } from '../src'
 import { AdminFirestoreTestUtil, createRandomCollectionName } from './util'
 
 const util = new AdminFirestoreTestUtil()
 const firestore = util.adminFirestore
 const collectionPath = util.collectionPath
-const firestoreSimple = new FirestoreSimpleAdmin(firestore)
+const firestoreSimple = new FirestoreSimple(firestore)
 
 interface TestDoc {
   id: string,
@@ -13,12 +12,12 @@ interface TestDoc {
 }
 
 describe('transaction', () => {
-  let txFirestoreSimple: FirestoreSimpleAdmin
-  let txDao: AdminCollection<TestDoc>
+  let txFirestoreSimple: FirestoreSimple
+  let txDao: Collection<TestDoc>
   const dao = firestoreSimple.collection<TestDoc>({ path: collectionPath })
 
   beforeEach(async () => {
-    txFirestoreSimple = new FirestoreSimpleAdmin(firestore)
+    txFirestoreSimple = new FirestoreSimple(firestore)
     txDao = txFirestoreSimple.collection<TestDoc>({ path: collectionPath })
   })
 
@@ -195,7 +194,7 @@ describe('transaction', () => {
 
   describe('Collection.context.tx', () => {
     const anotherCollectionPath = createRandomCollectionName()
-    let txAnotherDao: AdminCollection<TestDoc>
+    let txAnotherDao: Collection<TestDoc>
 
     beforeEach(async () => {
       txAnotherDao = txFirestoreSimple.collection<TestDoc>({ path: anotherCollectionPath })

@@ -1,22 +1,22 @@
-import { HasId, OmitId, WebEncodable, WebDecodable, OptionalIdStorable, Storable, PartialStorable, QueryKey, DocumentSnapshot, WhereFilterOp, FieldPath, OrderByDirection, QuerySnapshot, CollectionReference, DocumentReference } from './types'
+import { HasId, OmitId, Encodable, Decodable, OptionalIdStorable, Storable, PartialStorable, QueryKey, DocumentSnapshot, WhereFilterOp, FieldPath, OrderByDirection, QuerySnapshot, CollectionReference, DocumentReference } from './types'
 import { Context } from './context'
-import { WebConverter } from './converter'
-import { WebQuery } from './query'
+import { Converter } from './converter'
+import { Query } from './query'
 
-export class WebCollection<T extends HasId, S = OmitId<T>> {
+export class Collection<T extends HasId, S = OmitId<T>> {
   context: Context
   collectionRef: CollectionReference
-  private converter: WebConverter<T, S>
+  private converter: Converter<T, S>
 
   constructor ({ context, path, encode, decode }: {
     context: Context,
     path: string,
-    encode?: WebEncodable<T, S>,
-    decode?: WebDecodable<T, S>,
+    encode?: Encodable<T, S>,
+    decode?: Decodable<T, S>,
   }) {
     this.context = context
     this.collectionRef = context.firestore.collection(path)
-    this.converter = new WebConverter({ encode, decode })
+    this.converter = new Converter({ encode, decode })
   }
 
   toObject (documentSnapshot: DocumentSnapshot): T {
@@ -131,19 +131,19 @@ export class WebCollection<T extends HasId, S = OmitId<T>> {
     })
   }
 
-  where (fieldPath: QueryKey<S>, opStr: WhereFilterOp, value: any): WebQuery<T, S> {
+  where (fieldPath: QueryKey<S>, opStr: WhereFilterOp, value: any): Query<T, S> {
     const query = this.collectionRef.where(fieldPath as string | FieldPath, opStr, value)
-    return new WebQuery<T, S>(this.converter, this.context, query)
+    return new Query<T, S>(this.converter, this.context, query)
   }
 
-  orderBy (fieldPath: QueryKey<S>, directionStr?: OrderByDirection): WebQuery<T, S> {
+  orderBy (fieldPath: QueryKey<S>, directionStr?: OrderByDirection): Query<T, S> {
     const query = this.collectionRef.orderBy(fieldPath as string | FieldPath, directionStr)
-    return new WebQuery<T, S>(this.converter, this.context, query)
+    return new Query<T, S>(this.converter, this.context, query)
   }
 
-  limit (limit: number): WebQuery<T, S> {
+  limit (limit: number): Query<T, S> {
     const query = this.collectionRef.limit(limit)
-    return new WebQuery<T, S>(this.converter, this.context, query)
+    return new Query<T, S>(this.converter, this.context, query)
   }
 
   onSnapshot (callback: (

@@ -1,11 +1,11 @@
 import { firestore } from 'firebase/app'
 import '@firebase/firestore' // for instanceof firestore.DocumentSnapshot
-import { HasId, QueryKey, DocumentSnapshot, QuerySnapshot, WhereFilterOp, FieldPath, OrderByDirection, Query } from './types'
-import { WebConverter } from './converter'
+import { HasId, QueryKey, DocumentSnapshot, QuerySnapshot, WhereFilterOp, FieldPath, OrderByDirection, Query as FirestoreQuery } from './types'
+import { Converter } from './converter'
 import { Context } from './context'
 
-export class WebQuery<T extends HasId, S> {
-  constructor (public converter: WebConverter<T, S>, public context: Context, public query: Query) { }
+export class Query<T extends HasId, S> {
+  constructor (public converter: Converter<T, S>, public context: Context, public query: FirestoreQuery) { }
 
   where (fieldPath: QueryKey<S>, opStr: WhereFilterOp, value: any): this {
     this.query = this.query.where(fieldPath as string | FieldPath, opStr, value)
@@ -22,8 +22,8 @@ export class WebQuery<T extends HasId, S> {
     return this
   }
 
-  startAt (snapshot: DocumentSnapshot): WebQuery<T, S>
-  startAt (...fieldValues: any[]): WebQuery<T, S>
+  startAt (snapshot: DocumentSnapshot): Query<T, S>
+  startAt (...fieldValues: any[]): Query<T, S>
   startAt (
     snapshotOrValue: DocumentSnapshot | unknown,
     ...fieldValues: unknown[]
@@ -38,8 +38,8 @@ export class WebQuery<T extends HasId, S> {
     return this
   }
 
-  startAfter (snapshot: DocumentSnapshot): WebQuery<T, S>
-  startAfter (...fieldValues: any[]): WebQuery<T, S>
+  startAfter (snapshot: DocumentSnapshot): Query<T, S>
+  startAfter (...fieldValues: any[]): Query<T, S>
   startAfter (
     snapshotOrValue: DocumentSnapshot | unknown,
     ...fieldValues: unknown[]
@@ -54,8 +54,8 @@ export class WebQuery<T extends HasId, S> {
     return this
   }
 
-  endAt (snapshot: DocumentSnapshot): WebQuery<T, S>
-  endAt (...fieldValues: any[]): WebQuery<T, S>
+  endAt (snapshot: DocumentSnapshot): Query<T, S>
+  endAt (...fieldValues: any[]): Query<T, S>
   endAt (
     snapshotOrValue: DocumentSnapshot | unknown,
     ...fieldValues: unknown[]
@@ -70,8 +70,8 @@ export class WebQuery<T extends HasId, S> {
     return this
   }
 
-  endBefore (snapshot: DocumentSnapshot): WebQuery<T, S>
-  endBefore (...fieldValues: any[]): WebQuery<T, S>
+  endBefore (snapshot: DocumentSnapshot): Query<T, S>
+  endBefore (...fieldValues: any[]): Query<T, S>
   endBefore (
     snapshotOrValue: DocumentSnapshot | unknown,
     ...fieldValues: unknown[]

@@ -1,4 +1,4 @@
-import { FirestoreSimpleWeb } from '../src'
+import { FirestoreSimple } from '../src'
 import { WebFirestoreTestUtil } from './util'
 
 const util = new WebFirestoreTestUtil()
@@ -16,7 +16,7 @@ type BookDoc = {
   created: Date,
 }
 
-const firestoreSimple = new FirestoreSimpleWeb(webFirestore)
+const firestoreSimple = new FirestoreSimple(webFirestore)
 
 describe('encode and decode', () => {
   const dao = firestoreSimple.collection<Book, BookDoc>({

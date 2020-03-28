@@ -1,10 +1,10 @@
-import { HasId, OmitId, AdminEncodable, AdminDecodable, Firestore } from './types'
+import { HasId, Encodable, Decodable, OmitId, Firestore, Transaction, WriteBatch } from './types'
 import { Context } from './context'
-import { AdminCollection } from './collection'
-import { AdminQuery } from './query'
-import { AdminConverter } from './converter'
+import { Collection } from './collection'
+import { Query } from './query'
+import { Converter } from './converter'
 
-export class FirestoreSimpleAdmin {
+export class FirestoreSimple {
   context: Context
   constructor (firestore: Firestore) {
     this.context = new Context(firestore)
@@ -12,9 +12,9 @@ export class FirestoreSimpleAdmin {
 
   collection<T extends HasId, S = OmitId<T>> ({ path, encode, decode }: {
     path: string,
-    encode?: AdminEncodable<T, S>,
-    decode?: AdminDecodable<T, S>,
-  }): AdminCollection<T, S> {
+    encode?: Encodable<T, S>,
+    decode?: Decodable<T, S>,
+  }): Collection<T, S> {
     const factory = new CollectionFactory<T, S>({
       context: this.context,
       encode,
@@ -24,8 +24,8 @@ export class FirestoreSimpleAdmin {
   }
 
   collectionFactory<T extends HasId, S = OmitId<T>> ({ encode, decode }: {
-    encode?: AdminEncodable<T, S>,
-    decode?: AdminDecodable<T, S>,
+    encode?: Encodable<T, S>,
+    decode?: Decodable<T, S>,
   }): CollectionFactory<T, S> {
     return new CollectionFactory<T, S>({
       context: this.context,
@@ -36,39 +36,39 @@ export class FirestoreSimpleAdmin {
 
   collectionGroup<T extends HasId, S = OmitId<T>> ({ collectionId, decode }: {
     collectionId: string,
-    decode?: AdminDecodable<T, S>,
-  }): AdminQuery<T, S> {
+    decode?: Decodable<T, S>,
+  }): Query<T, S> {
     const query = this.context.firestore.collectionGroup(collectionId)
-    const converter = new AdminConverter({ decode })
-    return new AdminQuery<T, S>(converter, this.context, query)
+    const converter = new Converter({ decode })
+    return new Query<T, S>(converter, this.context, query)
   }
 
-  async runTransaction (updateFunction: (tx: FirebaseFirestore.Transaction) => Promise<void>): Promise<void> {
+  async runTransaction (updateFunction: (tx: Transaction) => Promise<void>): Promise<void> {
     return this.context.runTransaction(updateFunction)
   }
 
-  async runBatch (updateFunction: (batch: FirebaseFirestore.WriteBatch) => Promise<void>): Promise<FirebaseFirestore.WriteResult[]> {
+  async runBatch (updateFunction: (batch: WriteBatch) => Promise<void>): Promise<void> {
     return this.context.runBatch(updateFunction)
   }
 }
 
 class CollectionFactory<T extends HasId, S = OmitId<T>> {
   context: Context
-  encode?: AdminEncodable<T, S>
-  decode?: AdminDecodable<T, S>
+  encode?: Encodable<T, S>
+  decode?: Decodable<T, S>
 
   constructor ({ context, encode, decode }: {
     context: Context,
-    encode?: AdminEncodable<T, S>,
-    decode?: AdminDecodable<T, S>,
+    encode?: Encodable<T, S>,
+    decode?: Decodable<T, S>,
   }) {
     this.context = context
     this.encode = encode
     this.decode = decode
   }
 
-  create (path: string): AdminCollection<T, S> {
-    return new AdminCollection<T, S>({
+  create (path: string): Collection<T, S> {
+    return new Collection<T, S>({
       context: this.context,
       path,
       encode: this.encode,

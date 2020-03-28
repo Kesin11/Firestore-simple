@@ -1,6 +1,5 @@
-import { FirestoreSimpleWeb } from '../src'
+import { FirestoreSimple, Collection } from '../src'
 import { WebFirestoreTestUtil } from './util'
-import { WebCollection } from '../src/collection'
 
 const util = new WebFirestoreTestUtil()
 const webFirestore = util.webFirestore
@@ -12,15 +11,15 @@ type TestDoc = {
   title: string,
 }
 
-const firestoreSimple = new FirestoreSimpleWeb(webFirestore)
+const firestoreSimple = new FirestoreSimple(webFirestore)
 
 describe('transaction', () => {
-  let txFirestoreSimple: FirestoreSimpleWeb
-  let txDao: WebCollection<TestDoc>
+  let txFirestoreSimple: FirestoreSimple
+  let txDao: Collection<TestDoc>
   const dao = firestoreSimple.collection<TestDoc>({ path: collectionPath })
 
   beforeEach(async () => {
-    txFirestoreSimple = new FirestoreSimpleWeb(webFirestore)
+    txFirestoreSimple = new FirestoreSimple(webFirestore)
     txDao = txFirestoreSimple.collection<TestDoc>({ path: collectionPath })
   })
 
@@ -180,7 +179,7 @@ describe('transaction', () => {
   })
 
   describe('Collection.context.tx', () => {
-    let txAnotherDao: WebCollection<TestDoc>
+    let txAnotherDao: Collection<TestDoc>
 
     beforeEach(async () => {
       txAnotherDao = txFirestoreSimple.collection<TestDoc>({ path: anotherCollectionPath })

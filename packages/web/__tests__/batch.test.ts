@@ -1,4 +1,4 @@
-import { FirestoreSimpleWeb } from '../src'
+import { FirestoreSimple } from '../src'
 import { WebFirestoreTestUtil } from './util'
 
 const util = new WebFirestoreTestUtil()
@@ -10,7 +10,7 @@ type TestDoc = {
   title: string,
 }
 
-const firestoreSimple = new FirestoreSimpleWeb(webFirestore)
+const firestoreSimple = new FirestoreSimple(webFirestore)
 
 describe('batch', () => {
   const dao = firestoreSimple.collection<TestDoc>({ path: collectionPath })

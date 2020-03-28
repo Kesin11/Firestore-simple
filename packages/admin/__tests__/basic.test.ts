@@ -1,11 +1,11 @@
-import { FirestoreSimpleAdmin } from '../src'
+import { FirestoreSimple } from '../src'
 import { FieldValue } from '@google-cloud/firestore'
 import { AdminFirestoreTestUtil } from './util'
 
 const util = new AdminFirestoreTestUtil()
 const firestore = util.adminFirestore
 const collectionPath = util.collectionPath
-const firestoreSimple = new FirestoreSimpleAdmin(firestore)
+const firestoreSimple = new FirestoreSimple(firestore)
 
 interface TestDoc {
   id: string,
