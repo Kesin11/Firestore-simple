@@ -1,10 +1,10 @@
-import { FirestoreSimpleAdmin, AdminEncodable, AdminDecodable, AdminCollection } from '../src'
+import { FirestoreSimple, Encodable, Decodable, Collection } from '../src'
 import { AdminFirestoreTestUtil } from './util'
 
 const util = new AdminFirestoreTestUtil()
 const firestore = util.adminFirestore
 const collectionPath = util.collectionPath
-const firestoreSimple = new FirestoreSimpleAdmin(firestore)
+const firestoreSimple = new FirestoreSimple(firestore)
 
 interface Book {
   id: string,
@@ -26,13 +26,13 @@ describe('Factory and Subcollection', () => {
     await util.deleteCollection()
   })
 
-  const encodeFunc: AdminEncodable<Book, BookDoc> = (obj) => {
+  const encodeFunc: Encodable<Book, BookDoc> = (obj) => {
     return {
       title: obj.title,
       created_at: obj.createdAt,
     }
   }
-  const decodeFunc: AdminDecodable<Book, BookDoc> = (doc) => {
+  const decodeFunc: Decodable<Book, BookDoc> = (doc) => {
     return {
       id: doc.id,
       title: doc.title,
@@ -64,7 +64,7 @@ describe('Factory and Subcollection', () => {
       encode: encodeFunc,
       decode: decodeFunc,
     })
-    let dao: AdminCollection<Book, BookDoc>
+    let dao: Collection<Book, BookDoc>
 
     beforeEach(async () => {
       dao = factory.create(subcollectionPath)

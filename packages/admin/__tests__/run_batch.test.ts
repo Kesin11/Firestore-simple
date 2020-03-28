@@ -1,5 +1,5 @@
-import { FirestoreSimpleAdmin } from '../src'
-import { AdminCollection } from '../src/collection'
+import { FirestoreSimple } from '../src'
+import { Collection } from '../src/collection'
 import { AdminFirestoreTestUtil, createRandomCollectionName } from './util'
 
 const util = new AdminFirestoreTestUtil()
@@ -12,11 +12,11 @@ interface TestDoc {
 }
 
 describe('runBatch', () => {
-  let firestoreSimple: FirestoreSimpleAdmin
-  let dao: AdminCollection<TestDoc>
+  let firestoreSimple: FirestoreSimple
+  let dao: Collection<TestDoc>
 
   beforeEach(async () => {
-    firestoreSimple = new FirestoreSimpleAdmin(firestore)
+    firestoreSimple = new FirestoreSimple(firestore)
     dao = firestoreSimple.collection<TestDoc>({ path: collectionPath })
   })
 
@@ -139,7 +139,7 @@ describe('runBatch', () => {
 
   describe('Collection.context.batch', () => {
     const anotherCollectionPath = createRandomCollectionName()
-    let batchAnotherDao: AdminCollection<TestDoc>
+    let batchAnotherDao: Collection<TestDoc>
 
     beforeEach(async () => {
       batchAnotherDao = firestoreSimple.collection<TestDoc>({ path: anotherCollectionPath })

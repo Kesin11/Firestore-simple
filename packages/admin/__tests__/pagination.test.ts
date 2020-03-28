@@ -1,11 +1,11 @@
-import { FirestoreSimpleAdmin } from '../src'
+import { FirestoreSimple } from '../src'
 import { AdminFirestoreTestUtil } from './util'
 
 const util = new AdminFirestoreTestUtil()
 const firestore = util.adminFirestore
 // Set specific collection name because random name collection can not handle composit index in real firestore.
 const collectionPath = util.collectionPath + '/test/test_pagination'
-const firestoreSimple = new FirestoreSimpleAdmin(firestore)
+const firestoreSimple = new FirestoreSimple(firestore)
 
 export interface TestDoc {
   id: string,

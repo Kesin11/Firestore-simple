@@ -1,13 +1,13 @@
-import { HasId, OmitId, AdminEncodable, AdminDecodable, OptionalIdStorable, Storable, DocumentSnapshot } from './types'
+import { HasId, OmitId, Encodable, Decodable, OptionalIdStorable, Storable, DocumentSnapshot } from './types'
 import { Optional } from 'utility-types'
 
-export class AdminConverter<T extends HasId, S = OmitId<T>> {
-  private _encode?: AdminEncodable<T, S>
-  private _decode?: AdminDecodable<T, S>
+export class Converter<T extends HasId, S = OmitId<T>> {
+  private _encode?: Encodable<T, S>
+  private _decode?: Decodable<T, S>
 
   constructor ({ encode, decode }: {
-    encode?: AdminEncodable<T, S>,
-    decode?: AdminDecodable<T, S>,
+    encode?: Encodable<T, S>,
+    decode?: Decodable<T, S>,
   }) {
     this._encode = encode
     this._decode = decode

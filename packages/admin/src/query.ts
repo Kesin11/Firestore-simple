@@ -1,9 +1,9 @@
-import { HasId, QueryKey, Query, WhereFilterOp, FieldPath, OrderByDirection, DocumentSnapshot, QuerySnapshot } from './types'
-import { AdminConverter } from './converter'
+import { HasId, QueryKey, Query as FirestoreQuery, WhereFilterOp, FieldPath, OrderByDirection, DocumentSnapshot, QuerySnapshot } from './types'
+import { Converter } from './converter'
 import { Context } from './context'
 
-export class AdminQuery<T extends HasId, S> {
-  constructor (public converter: AdminConverter<T, S>, public context: Context, public query: Query) { }
+export class Query<T extends HasId, S> {
+  constructor (public converter: Converter<T, S>, public context: Context, public query: FirestoreQuery) { }
 
   where (fieldPath: QueryKey<S>, opStr: WhereFilterOp, value: any): this {
     this.query = this.query.where(fieldPath as string | FieldPath, opStr, value)
@@ -20,8 +20,8 @@ export class AdminQuery<T extends HasId, S> {
     return this
   }
 
-  startAt (snapshot: DocumentSnapshot): AdminQuery<T, S>
-  startAt (...fieldValues: any[]): AdminQuery<T, S>
+  startAt (snapshot: DocumentSnapshot): Query<T, S>
+  startAt (...fieldValues: any[]): Query<T, S>
   startAt (
     snapshotOrValue: DocumentSnapshot | unknown,
     ...fieldValues: unknown[]
@@ -36,8 +36,8 @@ export class AdminQuery<T extends HasId, S> {
     return this
   }
 
-  startAfter (snapshot: DocumentSnapshot): AdminQuery<T, S>
-  startAfter (...fieldValues: any[]): AdminQuery<T, S>
+  startAfter (snapshot: DocumentSnapshot): Query<T, S>
+  startAfter (...fieldValues: any[]): Query<T, S>
   startAfter (
     snapshotOrValue: DocumentSnapshot | unknown,
     ...fieldValues: unknown[]
@@ -52,8 +52,8 @@ export class AdminQuery<T extends HasId, S> {
     return this
   }
 
-  endAt (snapshot: DocumentSnapshot): AdminQuery<T, S>
-  endAt (...fieldValues: any[]): AdminQuery<T, S>
+  endAt (snapshot: DocumentSnapshot): Query<T, S>
+  endAt (...fieldValues: any[]): Query<T, S>
   endAt (
     snapshotOrValue: DocumentSnapshot | unknown,
     ...fieldValues: unknown[]
@@ -68,8 +68,8 @@ export class AdminQuery<T extends HasId, S> {
     return this
   }
 
-  endBefore (snapshot: DocumentSnapshot): AdminQuery<T, S>
-  endBefore (...fieldValues: any[]): AdminQuery<T, S>
+  endBefore (snapshot: DocumentSnapshot): Query<T, S>
+  endBefore (...fieldValues: any[]): Query<T, S>
   endBefore (
     snapshotOrValue: DocumentSnapshot | unknown,
     ...fieldValues: unknown[]

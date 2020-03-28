@@ -1,10 +1,10 @@
-import { FirestoreSimpleAdmin } from '../src'
+import { FirestoreSimple } from '../src'
 import { AdminFirestoreTestUtil } from './util'
 
 const util = new AdminFirestoreTestUtil()
 const firestore = util.adminFirestore
 const collectionPath = util.collectionPath
-const firestoreSimple = new FirestoreSimpleAdmin(firestore)
+const firestoreSimple = new FirestoreSimple(firestore)
 
 export interface TestDoc {
   id: string,
