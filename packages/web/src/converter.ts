@@ -1,12 +1,12 @@
-import { HasId, OmitId, WebEncodable, WebDecodable, OptionalIdStorable, Storable, DocumentSnapshot } from './types'
+import { HasId, OmitId, Encodable, Decodable, OptionalIdStorable, Storable, DocumentSnapshot } from './types'
 
-export class WebConverter<T extends HasId, S = OmitId<T>> {
-  private _encode?: WebEncodable<T, S>
-  private _decode?: WebDecodable<T, S>
+export class Converter<T extends HasId, S = OmitId<T>> {
+  private _encode?: Encodable<T, S>
+  private _decode?: Decodable<T, S>
 
   constructor ({ encode, decode }: {
-    encode?: WebEncodable<T, S>,
-    decode?: WebDecodable<T, S>,
+    encode?: Encodable<T, S>,
+    decode?: Decodable<T, S>,
   }) {
     this._encode = encode
     this._decode = decode

@@ -1,4 +1,4 @@
 // Web SDK
-export { FirestoreSimpleWeb } from './web'
-export type { WebCollection } from './collection'
-export type { WebEncodable, WebDecodable } from './types'
+export { FirestoreSimple } from './web'
+export type { Collection } from './collection'
+export type { Encodable, Decodable } from './types'

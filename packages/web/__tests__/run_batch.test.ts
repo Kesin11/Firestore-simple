@@ -1,6 +1,6 @@
-import { FirestoreSimpleWeb } from '../src'
+import { FirestoreSimple } from '../src'
 import { WebFirestoreTestUtil } from './util'
-import { WebCollection } from '../src/collection'
+import { Collection } from '../src/collection'
 
 const util = new WebFirestoreTestUtil()
 const webFirestore = util.webFirestore
@@ -13,11 +13,11 @@ type TestDoc = {
 }
 
 describe('runBatch', () => {
-  let firestoreSimple: FirestoreSimpleWeb
-  let dao: WebCollection<TestDoc>
+  let firestoreSimple: FirestoreSimple
+  let dao: Collection<TestDoc>
 
   beforeEach(async () => {
-    firestoreSimple = new FirestoreSimpleWeb(webFirestore)
+    firestoreSimple = new FirestoreSimple(webFirestore)
     dao = firestoreSimple.collection<TestDoc>({ path: collectionPath })
   })
 
@@ -139,7 +139,7 @@ describe('runBatch', () => {
   })
 
   describe('Collection.context.batch', () => {
-    let batchAnotherDao: WebCollection<TestDoc>
+    let batchAnotherDao: Collection<TestDoc>
 
     beforeEach(async () => {
       batchAnotherDao = firestoreSimple.collection<TestDoc>({ path: anotherCollectionPath })

@@ -1,4 +1,4 @@
-import { FirestoreSimpleWeb } from '../src'
+import { FirestoreSimple } from '../src'
 import { WebFirestoreTestUtil } from './util'
 
 const util = new WebFirestoreTestUtil()
@@ -13,7 +13,7 @@ type TestDoc = {
 const expectTitles = ['aaa', 'bbb', 'ccc', 'ddd']
 const collectionId = 'collection_group'
 
-const firestoreSimple = new FirestoreSimpleWeb(webFirestore)
+const firestoreSimple = new FirestoreSimple(webFirestore)
 
 describe('collectionGroup', () => {
   beforeEach(async () => {
