@@ -1,5 +1,4 @@
-import { FirestoreSimple } from '../src'
-import { Collection } from '../src/collection'
+import { FirestoreSimple, Collection } from '../src'
 import { AdminFirestoreTestUtil, createRandomCollectionName } from './util'
 
 const util = new AdminFirestoreTestUtil()
