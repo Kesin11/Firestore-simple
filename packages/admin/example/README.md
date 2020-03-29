@@ -1,9 +1,11 @@
-# TypeScript admin SDK example
-If you want to run example in your local machine, please put your firebase secret json as `firebase_secret.json` in root directory.
+# FirestoreSimple admin SDK example
+If you want to run example in your local machine, start Firestore local emulator in background before run ts-node.
 
 ## Usage
-```console
-cd example
+```bash
+# Start Firestore local emulator in background
+npm run emulator:start
 
-npx ts-node ts_admin/basic.ts # or other script
+cd example
+npx ts-node basic.ts # or other script
 ```
