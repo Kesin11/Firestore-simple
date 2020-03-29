@@ -13,6 +13,7 @@
     "build": "lerna run build",
     "build:clean": "npm run clean && npm run build",
     "test": "lerna run test",
+    "example:ci": "lerna run example:ci",
     "lint": "eslint --cache \"packages/**/{src,__tests__}/**/*.ts\"",
     "lint:fix": "npm run lint -- --fix",
     "coverage": "codecov",
