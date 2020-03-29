@@ -12,7 +12,7 @@ import { WebFirestoreTestUtil, FieldValue } from '../__tests__/util'
 const util = new WebFirestoreTestUtil()
 const firestore = util.webFirestore
 
-const ROOT_PATH = 'example/ts_admin_encode_decode'
+const ROOT_PATH = 'example/web_encode_decode'
 
 class User {
   constructor (

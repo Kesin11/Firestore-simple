@@ -1,6 +1,10 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "noUnusedLocals": false
-  }
+    "noUnusedLocals": false,
+    "noEmit": true
+  },
+  "include": [
+    "./*.ts"
+  ]
 }

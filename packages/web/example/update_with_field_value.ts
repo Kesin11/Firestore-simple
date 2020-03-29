@@ -12,7 +12,7 @@ import { WebFirestoreTestUtil, FieldValue } from '../__tests__/util'
 const util = new WebFirestoreTestUtil()
 const firestore = util.webFirestore
 
-const ROOT_PATH = 'example/ts_admin_basic'
+const ROOT_PATH = 'example/web_basic'
 
 interface User {
   id: string,
