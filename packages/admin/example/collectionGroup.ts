@@ -1,13 +1,18 @@
 import admin, { ServiceAccount } from 'firebase-admin'
-import serviceAccount from '../../firebase_secret.json' // your firebase secret json
-import { FirestoreSimpleAdmin } from '../../src'
+import { FirestoreSimple } from '../src'
 
-const ROOT_PATH = 'example/ts_admin_collection_group'
+//
+// Start Firestore local emulator in background before start this script.
+// `npx firebase emulators:start --only firestore`
+//
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount as ServiceAccount),
-})
+// hack for using local emulator
+process.env.GCLOUD_PROJECT = 'firestore-simple-test'
+process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080'
+admin.initializeApp({})
 const firestore = admin.firestore()
+
+const ROOT_PATH = 'example/admin_collection_group'
 
 interface Review {
   id: string,
@@ -29,7 +34,7 @@ const main = async (): Promise<void> => {
     .add({ userId: 'john', text: 'ccc', created: admin.firestore.FieldValue.serverTimestamp() })
 
   // Create CollectionGroup dao
-  const firestoreSimple = new FirestoreSimpleAdmin(firestore)
+  const firestoreSimple = new FirestoreSimple(firestore)
   const reviewCollectionGroup = firestoreSimple.collectionGroup<Review>({
     collectionId: 'review',
     decode: (doc) => {

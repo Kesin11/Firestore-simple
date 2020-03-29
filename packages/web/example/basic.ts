@@ -1,13 +1,18 @@
-import admin, { ServiceAccount } from 'firebase-admin'
-import serviceAccount from '../../firebase_secret.json' // prepare your firebase secret json before exec example
-import { FirestoreSimpleAdmin } from '../../src'
+import * as firebase from 'firebase/app'
+import 'firebase/firestore'
+import { FirestoreSimple } from '../src/'
+import { WebFirestoreTestUtil } from '../__tests__/util'
 
-const ROOT_PATH = 'example/ts_admin_basic'
+//
+// Start Firestore local emulator in background before start this script.
+// `npx firebase emulators:start --only firestore`
+//
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount as ServiceAccount),
-})
-const firestore = admin.firestore()
+// hack for using local emulator
+const util = new WebFirestoreTestUtil()
+const firestore = util.webFirestore
+
+const ROOT_PATH = 'example/web_basic'
 
 interface User {
   id: string,
@@ -17,7 +22,7 @@ interface User {
 
 const main = async () => {
   // declaration
-  const firestoreSimple = new FirestoreSimpleAdmin(firestore)
+  const firestoreSimple = new FirestoreSimple(firestore)
   const dao = firestoreSimple.collection<User>({ path: `${ROOT_PATH}/user` })
 
   // add

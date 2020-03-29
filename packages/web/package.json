@@ -28,6 +28,7 @@
     "build": "tsc --project .",
     "test": "jest",
     "test:ci": "firebase emulators:exec --only firestore 'jest --coverage'",
+    "example:ci": "tsc --project example",
     "emulators:start": "firebase emulators:start --only firestore"
   },
   "dependencies": {

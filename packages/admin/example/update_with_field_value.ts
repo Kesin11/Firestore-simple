@@ -1,14 +1,18 @@
-import admin, { ServiceAccount } from 'firebase-admin'
-import serviceAccount from '../../firebase_secret.json' // prepare your firebase secret json before exec example
-import { FirestoreSimpleAdmin } from '../../src'
-import { FieldValue } from '@google-cloud/firestore'
+import admin from 'firebase-admin'
+import { FirestoreSimple } from '../src'
 
-const ROOT_PATH = 'example/ts_admin_basic'
+//
+// Start Firestore local emulator in background before start this script.
+// `npx firebase emulators:start --only firestore`
+//
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount as ServiceAccount),
-})
+// hack for using local emulator
+process.env.GCLOUD_PROJECT = 'firestore-simple-test'
+process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080'
+admin.initializeApp({})
 const firestore = admin.firestore()
+
+const ROOT_PATH = 'example/admin_field_value'
 
 interface User {
   id: string,
@@ -17,11 +21,11 @@ interface User {
 }
 
 const main = async () => {
-  const firestoreSimple = new FirestoreSimpleAdmin(firestore)
+  const firestoreSimple = new FirestoreSimple(firestore)
   const dao = firestoreSimple.collection<User>({ path: `${ROOT_PATH}/user` })
 
   // Setup user
-  const userId = await dao.add({ coin: 100, timestamp: FieldValue.serverTimestamp() })
+  const userId = await dao.add({ coin: 100, timestamp: admin.firestore.FieldValue.serverTimestamp() })
   console.log(await dao.fetch(userId))
   // { id: 'E4pROVpeLaE3WBCYDDSh',
   // coin: 100,
@@ -30,8 +34,8 @@ const main = async () => {
   // Add 100 coin and update timestamp
   await dao.update({
     id: userId,
-    coin: FieldValue.increment(100),
-    timestamp: FieldValue.serverTimestamp()
+    coin: admin.firestore.FieldValue.increment(100),
+    timestamp: admin.firestore.FieldValue.serverTimestamp()
   })
   console.log(await dao.fetch(userId))
   // { id: 'E4pROVpeLaE3WBCYDDSh',

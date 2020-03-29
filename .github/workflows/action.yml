@@ -11,6 +11,17 @@ jobs:
     - run: npm ci
     - run: npm run lint
 
+  build_and_check_example:
+    runs-on: ubuntu-latest
+    container:
+      image: "node:current"
+    steps:
+    - uses: actions/checkout@v2
+    - run: npm ci
+    - run: npm run bootstrap
+    - run: npm run build
+    - run: npm run example:ci
+
   test:
     strategy:
       matrix:

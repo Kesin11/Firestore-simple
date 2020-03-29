@@ -1,13 +1,18 @@
-import admin, { ServiceAccount } from 'firebase-admin'
-import serviceAccount from '../../firebase_secret.json' // your firebase secret json
-import { FirestoreSimpleAdmin } from '../../src'
+import admin from 'firebase-admin'
+import { FirestoreSimple } from '../src'
 
-const ROOT_PATH = 'example/ts_admin_subcollection'
+//
+// Start Firestore local emulator in background before start this script.
+// `npx firebase emulators:start --only firestore`
+//
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount as ServiceAccount),
-})
+// hack for using local emulator
+process.env.GCLOUD_PROJECT = 'firestore-simple-test'
+process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080'
+admin.initializeApp({})
 const firestore = admin.firestore()
+
+const ROOT_PATH = 'example/admin_subcollection'
 
 interface User {
   id: string,
@@ -23,7 +28,7 @@ interface UserFriend {
 const userNames = ['alice', 'bob', 'john']
 
 const main = async () => {
-  const firestoreSimple = new FirestoreSimpleAdmin(firestore)
+  const firestoreSimple = new FirestoreSimple(firestore)
   // Root collection
   const userDao = firestoreSimple.collection<User>({ path: `${ROOT_PATH}/user` })
   await userDao.bulkSet(

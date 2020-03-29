@@ -1,13 +1,18 @@
-import admin, { ServiceAccount } from 'firebase-admin'
-import serviceAccount from '../../firebase_secret.json' // your firebase secret json
-import { FirestoreSimpleAdmin, AdminCollection } from '../../src'
+import admin from 'firebase-admin'
+import { FirestoreSimple, Collection } from '../src'
 
-const ROOT_PATH = 'example/ts_admin_transaction'
+//
+// Start Firestore local emulator in background before start this script.
+// `npx firebase emulators:start --only firestore`
+//
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount as ServiceAccount),
-})
+// hack for using local emulator
+process.env.GCLOUD_PROJECT = 'firestore-simple-test'
+process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080'
+admin.initializeApp({})
 const firestore = admin.firestore()
+
+const ROOT_PATH = 'example/admin_transaction'
 
 interface User {
   id: string,
@@ -31,14 +36,14 @@ interface FriendRequest {
 }
 
 class FriendRequestUsecase {
-  firestoreSimple: FirestoreSimpleAdmin
-  userDao: AdminCollection<User>
-  friendRequestDao: AdminCollection<FriendRequest>
+  firestoreSimple: FirestoreSimple
+  userDao: Collection<User>
+  friendRequestDao: Collection<FriendRequest>
 
   constructor ({ firestoreSimple, userDao, friendRequestDao }: {
-    firestoreSimple: FirestoreSimpleAdmin,
-    userDao: AdminCollection<User>,
-    friendRequestDao: AdminCollection<FriendRequest>,
+    firestoreSimple: FirestoreSimple,
+    userDao: Collection<User>,
+    friendRequestDao: Collection<FriendRequest>,
   }) {
     this.firestoreSimple = firestoreSimple
     this.userDao = userDao
@@ -93,7 +98,7 @@ class FriendRequestUsecase {
 }
 
 const main = async () => {
-  const firestoreSimple = new FirestoreSimpleAdmin(firestore)
+  const firestoreSimple = new FirestoreSimple(firestore)
   const userDao = firestoreSimple.collection<User>({ path: `${ROOT_PATH}/user` })
   const friendRequestDao = firestoreSimple.collection<FriendRequest>({ path: `${ROOT_PATH}/request_friend` })
 

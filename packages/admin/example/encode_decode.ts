@@ -1,13 +1,19 @@
-import admin, { ServiceAccount } from 'firebase-admin'
-import serviceAccount from '../../firebase_secret.json'
-import { FirestoreSimpleAdmin } from '../../src'
+import admin from 'firebase-admin'
 
-const ROOT_PATH = 'example/ts_admin_encode_decode'
+import { FirestoreSimple } from '../src'
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount as ServiceAccount),
-})
+//
+// Start Firestore local emulator in background before start this script.
+// `npx firebase emulators:start --only firestore`
+//
+
+// hack for using local emulator
+process.env.GCLOUD_PROJECT = 'firestore-simple-test'
+process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080'
+admin.initializeApp({})
 const firestore = admin.firestore()
+
+const ROOT_PATH = 'example/admin_encode_decode'
 
 class User {
   constructor (
@@ -19,7 +25,7 @@ class User {
 }
 
 const main = async () => {
-  const firestoreSimple = new FirestoreSimpleAdmin(firestore)
+  const firestoreSimple = new FirestoreSimple(firestore)
   const dao = firestoreSimple.collection<User>({
     path: `${ROOT_PATH}/user`,
     encode: (user) => {
