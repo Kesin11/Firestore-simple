@@ -1,8 +1,8 @@
 # [7.0.0](https://github.com/Kesin11/Firestore-simple/compare/v6.0.1...v7.0.0) (2020-03-30)
 ### BREAKING CHANGES
-* Rename module name `FirestoreSimple` to `@firestore-simple/admin` ([#132](https://github.com/Kesin11/Firestore-simple/pull/132))
+* Change to monorepo and introduce `@firestore-simple/admin` and `@firestore-simple/web` ([#132](https://github.com/Kesin11/Firestore-simple/pull/132))
 
-Previous [firestore-simple](https://www.npmjs.com/package/firestore-simple) is **DEPRECATED!**
+:warning: Previous [firestore-simple](https://www.npmjs.com/package/firestore-simple) is **DEPRECATED!**
 
 `firestore-simple` is moved to [`@firestore-simple/admin`](https://www.npmjs.com/package/@firestore-simple/admin) and [`@firestore-simple/web`](https://www.npmjs.com/package/@firestore-simple/web). Please use these packages insted of `firestore-simple`.
 
