@@ -1,3 +1,47 @@
+# [7.0.0](https://github.com/Kesin11/Firestore-simple/compare/v7.0.0-6...v7.0.0) (2020-03-30)
+
+
+
+# [7.0.0-6](https://github.com/Kesin11/Firestore-simple/compare/v7.0.0-5...v7.0.0-6) (2020-03-30)
+
+
+### Bug Fixes
+
+* **deps:** Fix utility-types devDependencies to dependencies ([21ee895](https://github.com/Kesin11/Firestore-simple/commit/21ee89563787186bd7ee208a40c4934fa2484329))
+
+
+
+# [7.0.0-5](https://github.com/Kesin11/Firestore-simple/compare/v7.0.0-4...v7.0.0-5) (2020-03-30)
+
+
+### Bug Fixes
+
+* **deps:** Fix dependencies and devDependencies ([04012f6](https://github.com/Kesin11/Firestore-simple/commit/04012f66684cf2e983b92a688df642bdd268532b))
+
+
+
+# [7.0.0-4](https://github.com/Kesin11/Firestore-simple/compare/v7.0.0-3...v7.0.0-4) (2020-03-28)
+
+
+### Bug Fixes
+
+* Export 'Query' and revert type only export ([f2d9b26](https://github.com/Kesin11/Firestore-simple/commit/f2d9b26683d6398ca2f99df6579f499a843680e0))
+
+
+
+# [7.0.0-3](https://github.com/Kesin11/Firestore-simple/compare/v7.0.0-2...v7.0.0-3) (2020-03-28)
+
+
+
+# [7.0.0-2](https://github.com/Kesin11/Firestore-simple/compare/v7.0.0-1...v7.0.0-2) (2020-03-28)
+
+
+### Bug Fixes
+
+* **web:** Fix dependencies for bugfix firestore.DocumentSnapshot is undefined when run code ([a1a33ca](https://github.com/Kesin11/Firestore-simple/commit/a1a33ca2898f8c61637ae4b04251d5e0f071b55b))
+
+
+
 ## [6.0.1](https://github.com/Kesin11/Firestore-simple/compare/v5.0.1...v6.0.1) (2020-03-05)
 * chore(test): Skip flaky tests [#122](https://github.com/Kesin11/Firestore-simple/pull/122)
 
