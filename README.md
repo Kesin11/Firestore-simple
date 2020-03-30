@@ -8,11 +8,11 @@
 
 ## Features
 
-|||
-|:----|:----|
+||firestore-simple|
+|----|----|
 |**More simple API**|Original Firestore only provide a slightly complicated low-level API. firestore-simple provide a simple and easy to use API.|
 |**TypeScript friendly**|firestore-simple helps you type the document. You no longer need to cast after getting a document from Firestore.|
-|**Encoding and decoding**|Convert js object <-> firestore document every time? You need define to convert function just only one time.|
+|**Encoding and decoding**|Convert js object <-> Firestore document every time? You need define to convert function just only one time.|
 |**Easy and safe transaction**|firestore-simple allow same CRUD API in `runTransaction`. No longer need to worry about transaction context.|
 
 
@@ -30,12 +30,12 @@
 - [TypeScriptからFirestoreを使いやすくするfirestore-simple v4をリリースしました](https://qiita.com/Kesin11/items/c2a52e4e33d6f8e83723)
 - [firestore-simple v5をリリースしました](https://qiita.com/Kesin11/items/999011de9b6aeba37e78)
 
-# :warning: `firestore-simple` package is DEPRECATED
+# :warning: `firestore-simple` is DEPRECATED
 Previous [firestore-simple](https://www.npmjs.com/package/firestore-simple) is **DEPRECATED!**
 
 `firestore-simple` is moved to [`@firestore-simple/admin`](https://www.npmjs.com/package/@firestore-simple/admin) and [`@firestore-simple/web`](https://www.npmjs.com/package/@firestore-simple/web). Please use these packages insted of `firestore-simple`.
 
-If you use firestore-simple before v7.0.0 with admin SDK, migrate your code like this.
+If you are using firestore-simple before v7.0.0 with admin SDK, migrate your code like this.
 
 ```ts
 // old
@@ -149,10 +149,11 @@ After that, type of document obtained from FirestoreSimpleCollection will be `Us
 const bob: User | undefined = await dao.fetch(bobId)
 ```
 
-**:bulb: NOTICE:** The type passed to the type argument **MUST** have an **`id`** property. The reason is that firestore-simple treats `id` as firestore document id and relies on this limitation to provide a simple API(ex: `fetch`, `set`).
+**:bulb: NOTICE:**  
+The type passed to the type argument **MUST** have an **`id`** property. The reason is that firestore-simple treats `id` as firestore document id and relies on this limitation to provide a simple API(ex: `fetch`, `set`).
 
 # encode/decode
-You can hook and convert object before post to firestore and after fetch from firestore. 
+You can hook and convert object before post to Firestore and after fetch from firestore. 
 `encode` is called before post, and `decode` is called after fetch.
 
 It useful for common usecase, for example change property name, convert value, map to class instances and so on.
@@ -160,7 +161,7 @@ It useful for common usecase, for example change property name, convert value, m
 Here is example code to realize following these features.
 
 - encode
-  - Map `User` class each property to firestore document key/value before post
+  - Map `User` class each property to Firestore document key/value before post
   - Update `updated` property using Firebase server timestamp when update document
 - decode
   - Map document data fetched from firestore to `User` class instance
@@ -200,9 +201,9 @@ const dao = firestoreSimple.collection<User>({
 ```
 
 ## Generics of `FirestoreSimple.collection`
-`FirestoreSimple.collection<T, S>` has two of the type arguments `T` and `S`. If property names of `T` and property names of the document in firestore as same, you no longer to need `S`. firestore-simple provide auto completion and restriction in most methods by using `T`.
+`FirestoreSimple.collection<T, S>` has two of the type arguments `T` and `S`. If property names of `T` and property names of the document in Firestore as same, you no longer to need `S`. firestore-simple provide auto completion and restriction in most methods by using `T`.
 
-On the other hand, if property names of the document in firestore are different from `T`, you need to assign` S` that has same property names as the document in firestore.
+On the other hand, if property names of the document in Firestore are different from `T`, you need to assign `S` that has same property names as the document in firestore.
 
 ```ts
 // T: A type that firestore-simple types automatically after fetch.
@@ -254,7 +255,7 @@ dao.where('age', '>=', 20)
 # Subcollection
 firestore-simple does not provide API that direct manipulate subcollection. But `collectionFactory` is useful for subcollection.
 
-It can define `encode` and `decode` but not `path`. You can create AdminCollection instance from this factory with `path` and both `encode` and `decode` are inherited from the factory.
+It can define `encode` and `decode` but not `path`. You can create Collection instance from `CollectionFactory` with `path` and both `encode` and `decode` are inherited from the factory.
 
 This is example using `collectionFactory` for subcollection.
 
@@ -292,7 +293,7 @@ const main = async () => {
 ```
 
 # CollectionGroup
-Firestore `collectionGroup` is also supported. As same as `FirestoreSimple.collection`, `FirestoreSimple.collectionGroup` has generics and decode features too.
+Firestore `CollectionGroup` is also supported. As same as `FirestoreSimple.collection`, `FirestoreSimple.collectionGroup` has generics and decode features too.
 
 ```ts
 interface Review {
@@ -401,6 +402,7 @@ await firestoreSimple.runBatch(async (_batch) => {
     rank += 1
   }
 })
+// <- `batch.commit()`
 ```
 
 If you want to see more runBatch example, please check [example code](./packages/admin/example) and [test code](./packages/admin/__tests__).
@@ -445,10 +447,10 @@ console.log(await dao.fetch(userId))
 ```
 
 
-# Fallback to use original firestore
+# Fallback to use original Firestore document
 Unfortunately firestore-simple does not support all the features of Firestore, so sometimes you may want to use raw collection references or document references.
 
-In this case, you can get raw collection reference from FirestoreSimpleCollection using `collectionRef` also document reference using `docRef(docId)`.
+In this case, you can get raw collection reference from Collection using `collectionRef` also document reference using `docRef(docId)`.
 
 ```ts
 const firestoreSimple = new FirestoreSimple(firestore)
