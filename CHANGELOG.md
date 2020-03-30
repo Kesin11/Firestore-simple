@@ -1,3 +1,7 @@
+# [7.0.0-1](https://github.com/Kesin11/Firestore-simple/compare/v7.0.0-6...v7.0.0-1) (2020-03-30)
+
+
+
 ## [6.0.1](https://github.com/Kesin11/Firestore-simple/compare/v5.0.1...v6.0.1) (2020-03-05)
 * chore(test): Skip flaky tests [#122](https://github.com/Kesin11/Firestore-simple/pull/122)
 
