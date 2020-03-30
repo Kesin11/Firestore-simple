@@ -1,5 +1,30 @@
-# [7.0.0-1](https://github.com/Kesin11/Firestore-simple/compare/v7.0.0-6...v7.0.0-1) (2020-03-30)
+# [7.0.0](https://github.com/Kesin11/Firestore-simple/compare/v6.0.1...v7.0.0) (2020-03-30)
+### BREAKING CHANGES
+* Rename module name `FirestoreSimple` to `@firestore-simple/admin` ([#132](https://github.com/Kesin11/Firestore-simple/pull/132))
 
+Previous [firestore-simple](https://www.npmjs.com/package/firestore-simple) is **DEPRECATED!**
+
+`firestore-simple` is moved to [`@firestore-simple/admin`](https://www.npmjs.com/package/@firestore-simple/admin) and [`@firestore-simple/web`](https://www.npmjs.com/package/@firestore-simple/web). Please use these packages insted of `firestore-simple`.
+
+If you are using firestore-simple before v7.0.0 with admin SDK, migrate your code like this.
+
+```ts
+// old
+import { FirestoreSimple } from 'firestore-simple'
+
+// new
+import { FirestoreSimple } from '@firestore-simple/admin'
+```
+
+### New feature
+:tada: Introduce new `@firestore-simple/web` for web SDK.  
+`@firestore-simple/web` has almost same API as `@firestore-simple/admin`. So you can use same code with `@firestore-simple/web` for web SDK.
+
+### Features
+
+- feat: monorepo [#132](https://github.com/Kesin11/Firestore-simple/pull/132)
+- Fix class name more simply. [#141](https://github.com/Kesin11/Firestore-simple/pull/141)
+- Fix export from index.ts [#142](https://github.com/Kesin11/Firestore-simple/pull/142)
 
 
 ## [6.0.1](https://github.com/Kesin11/Firestore-simple/compare/v5.0.1...v6.0.1) (2020-03-05)
