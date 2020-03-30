@@ -483,22 +483,6 @@ Sorry not yet. Please check [source code](./packages/admin/src) or look interfac
 Patches are welcome!  
 Also welcome fixing english documentation.
 
-# Development
-Unit tests are using [Firestore local emulator](https://firebase.google.com/docs/emulator-suite).
-
-So if you want to run unit test in your local machine, start emulator in background before run test.
-
-```bash
-# setup monorepo
-npm ci
-npm run bootstrap
-
-cd packages/admin # or packages/web
-
-npm run emulators:start
-npm run test
-```
-
 # Versioning
 
 The versioning follows [Semantic Versioning](http://semver.org/):
