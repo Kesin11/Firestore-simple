@@ -1,56 +1,77 @@
-# Firestore-simple
-[![npm version](https://badge.fury.io/js/firestore-simple.svg)](https://badge.fury.io/js/firestore-simple)
-[![Build Status](https://github.com/Kesin11/Firestore-simple/workflows/CI/badge.svg)](https://github.com/Kesin11/Firestore-simple/actions)
-[![codecov](https://codecov.io/gh/Kesin11/Firestore-simple/branch/master/graph/badge.svg)](https://codecov.io/gh/Kesin11/Firestore-simple)
+<p align="center"><img width="200" src="https://user-images.githubusercontent.com/1324862/77878373-1cf81200-7293-11ea-8905-7d63a7de95b7.png" alt="firestore-simple logo"></p>
 
-More simple, powerful and TypeScript friendly Firestore wrapper.
+<h1 align="center">Firestore-simple</h1>
+<p align="center">
+  <a href="https://github.com/Kesin11/Firestore-simple/actions"><img src="https://github.com/Kesin11/Firestore-simple/workflows/CI/badge.svg" alt="Build Status"></a>
+  <a href="https://codecov.io/gh/Kesin11/Firestore-simple"><img src="https://codecov.io/gh/Kesin11/Firestore-simple/branch/master/graph/badge.svg" alt="Code coverage"></a>
+</p>
 
-- **More simple API:** Original Firestore only provide a slightly complicated low-level API. firestore-simple provide a simple and easy to use API.
-- **TypeScript friendly:** firestore-simple helps you type the document. You no longer need to cast after getting a document from Firestore.
-- **Encoding and decoding:** Convert js object <-> firestore document every time? You need define to convert function just only one time.
-- **Easy and safe transaction:** firestore-simple allow same CRUD API in `runTransaction`. No longer need to worry about transaction context.
-- **A lot of test:** Test many of the Firestore features using **REAL** Firestore instead of an emulator.
+> More simple, powerful and TypeScript friendly Firestore wrapper.
 
-|Support Firestore SDK|
-|----|
-|[Cloud Functions](https://firebase.google.com/docs/reference/functions/functions.firestore)|
-|[admin](https://firebase.google.com/docs/reference/admin/node/admin.firestore)|
+## Features
+
+||firestore-simple|
+|----|----|
+|**More simple API**|Original Firestore only provide a slightly complicated low-level API. firestore-simple provide a simple and easy to use API.|
+|**TypeScript friendly**|firestore-simple helps you type the document. You no longer need to cast after getting a document from Firestore.|
+|**Encoding and decoding**|Convert js object <-> Firestore document every time? You need define to convert function just only one time.|
+|**Easy and safe transaction**|firestore-simple allow same CRUD API in `runTransaction`. No longer need to worry about transaction context.|
 
 
-Blog posts (sorry Japanese only)
+## Packages
+
+|Pakcages|version|Support Firestore SDK|
+|----|----|----|
+|[\@firestore-simple/admin](./packages/admin)|[![admin](https://badgen.net/npm/v/@firestore-simple/admin)](https://www.npmjs.com/package/@firestore-simple/admin)|admin SDK|
+|[\@firestore-simple/web](./packages/web)|[![web](https://badgen.net/npm/v/@firestore-simple/web)](https://www.npmjs.com/package/@firestore-simple/web)|web SDK|
+
+
+## Blog posts (sorry Japanese only)
 
 - [Firestoreをもっと手軽に使えるfirestore-simpleがバージョン2になりました](http://kesin.hatenablog.com/entry/firestore_simple_v2)
 - [TypeScriptからFirestoreを使いやすくするfirestore-simple v4をリリースしました](https://qiita.com/Kesin11/items/c2a52e4e33d6f8e83723)
 - [firestore-simple v5をリリースしました](https://qiita.com/Kesin11/items/999011de9b6aeba37e78)
 
-# NOTICE
-Exported class name `FirestoreSimple` was **DEPRECATED**. Please use `FirestoreSimpleAdmin` instead.
-You can still import `FirestoreSimple`, but it will be removed in future versoin.
+# :warning: `firestore-simple` is DEPRECATED
+Previous [firestore-simple](https://www.npmjs.com/package/firestore-simple) is **DEPRECATED!**
 
-If you use firestore-simple before v6.0.0, migrate your code like this.
+`firestore-simple` is moved to [`@firestore-simple/admin`](https://www.npmjs.com/package/@firestore-simple/admin) and [`@firestore-simple/web`](https://www.npmjs.com/package/@firestore-simple/web). Please use these packages insted of `firestore-simple`.
+
+If you are using firestore-simple before v7.0.0 with admin SDK, migrate your code like this.
 
 ```ts
 // old
 import { FirestoreSimple } from 'firestore-simple'
 
 // new
-import { FirestoreSimpleAdmin } from 'firestore-simple'
+import { FirestoreSimple } from '@firestore-simple/admin'
 ```
 
 
 # Install
+Firestore has two SDK [admin](https://firebase.google.com/docs/reference/admin/node) and [web](https://firebase.google.com/docs/reference/node) for js/ts. Please install firestore-simple which corresponds to the SDK you are using.
+
+with admin SDK
+
+```bash
+npm i @firestore-simple/admin
 ```
-npm i firestore-simple
+
+with web SDK
+
+```bash
+npm i @firestore-simple/web
 ```
 
 # Usage
-Use with Node.js admin SDK sample.
+These code using `@firestore-simple/admin` with admin SDK, but `@firestore-simple/web` has almost same API. So you can use same code with `@firestore-simple/web` for web SDK.
 
 ```ts
 // TypeScript
+
 import admin, { ServiceAccount } from 'firebase-admin'
 import serviceAccount from '../../firebase_secret.json' // prepare your firebase secret json before exec example
-import { FirestoreSimpleAdmin } from 'firestore-simple'
+import { FirestoreSimple } from '@firestore-simple/admin'
 
 const ROOT_PATH = 'example/usage'
 
@@ -65,7 +86,7 @@ interface User {
 
 const main = async () => {
   // declaration
-  const firestoreSimple = new FirestoreSimpleAdmin(firestore)
+  const firestoreSimple = new FirestoreSimple(firestore)
   const dao = firestoreSimple.collection<User>({ path: `${ROOT_PATH}/user` })
 
   // add
@@ -119,7 +140,7 @@ interface User {
   age: number,
 }
 
-const firestoreSimple = new FirestoreSimpleAdmin(firestore)
+const firestoreSimple = new FirestoreSimple(firestore)
 const dao = firestoreSimple.collection<User>({ path: `user` })
 ```
 
@@ -130,10 +151,11 @@ After that, type of document obtained from FirestoreSimpleCollection will be `Us
 const bob: User | undefined = await dao.fetch(bobId)
 ```
 
-**NOTICE:** The type passed to the type argument **MUST** have an `id` property. The reason is that firestore-simple treats `id` as firestore document id and relies on this limitation to provide a simple API(ex: `fetch`, `set`).
+**:bulb: NOTICE:**  
+The type passed to the type argument **MUST** have an **`id`** property. The reason is that firestore-simple treats `id` as firestore document id and relies on this limitation to provide a simple API(ex: `fetch`, `set`).
 
 # encode/decode
-You can hook and convert object before post to firestore and after fetch from firestore. 
+You can hook and convert object before post to Firestore and after fetch from firestore. 
 `encode` is called before post, and `decode` is called after fetch.
 
 It useful for common usecase, for example change property name, convert value, map to class instances and so on.
@@ -141,7 +163,7 @@ It useful for common usecase, for example change property name, convert value, m
 Here is example code to realize following these features.
 
 - encode
-  - Map `User` class each property to firestore document key/value before post
+  - Map `User` class each property to Firestore document key/value before post
   - Update `updated` property using Firebase server timestamp when update document
 - decode
   - Map document data fetched from firestore to `User` class instance
@@ -157,7 +179,7 @@ class User {
   ) { }
 }
 
-const firestoreSimple = new FirestoreSimpleAdmin(firestore)
+const firestoreSimple = new FirestoreSimple(firestore)
 const dao = firestoreSimple.collection<User>({
   path: `user`,
   // Map `User` to firestore document
@@ -180,10 +202,10 @@ const dao = firestoreSimple.collection<User>({
 })
 ```
 
-## Generics of `FirestoreSimpleAdmin.collection`
-`FirestoreSimpleAdmin.collection<T, S>` has two of the type arguments `T` and `S`. If property names of `T` and property names of the document in firestore as same, you no longer to need `S`. firestore-simple provide auto completion and restriction in most methods by using `T`.
+## Generics of `FirestoreSimple.collection`
+`FirestoreSimple.collection<T, S>` has two of the type arguments `T` and `S`. If property names of `T` and property names of the document in Firestore as same, you no longer to need `S`. firestore-simple provide auto completion and restriction in most methods by using `T`.
 
-On the other hand, if property names of the document in firestore are different from `T`, you need to assign` S` that has same property names as the document in firestore.
+On the other hand, if property names of the document in Firestore are different from `T`, you need to assign `S` that has same property names as the document in firestore.
 
 ```ts
 // T: A type that firestore-simple types automatically after fetch.
@@ -235,7 +257,7 @@ dao.where('age', '>=', 20)
 # Subcollection
 firestore-simple does not provide API that direct manipulate subcollection. But `collectionFactory` is useful for subcollection.
 
-It can define `encode` and `decode` but not `path`. You can create AdminCollection instance from this factory with `path` and both `encode` and `decode` are inherited from the factory.
+It can define `encode` and `decode` but not `path`. You can create Collection instance from `CollectionFactory` with `path` and both `encode` and `decode` are inherited from the factory.
 
 This is example using `collectionFactory` for subcollection.
 
@@ -250,7 +272,7 @@ interface UserFriend {
 const userNames = ['alice', 'bob', 'john']
 
 const main = async () => {
-  const firestoreSimple = new FirestoreSimpleAdmin(firestore)
+  const firestoreSimple = new FirestoreSimple(firestore)
 
   // Create factory with define `decode` function for subcollection
   const userFriendFactory = firestoreSimple.collectionFactory<UserFriend>({
@@ -273,7 +295,7 @@ const main = async () => {
 ```
 
 # CollectionGroup
-Firestore `collectionGroup` is also supported. As same as `FirestoreSimpleAdmin.collection`, `FirestoreSimpleAdmin.collectionGroup` has generics and decode features too.
+Firestore `CollectionGroup` is also supported. As same as `FirestoreSimple.collection`, `FirestoreSimple.collectionGroup` has generics and decode features too.
 
 ```ts
 interface Review {
@@ -284,7 +306,7 @@ interface Review {
 }
 
 // Create CollectionGroup dao
-const firestoreSimple = new FirestoreSimpleAdmin(firestore)
+const firestoreSimple = new FirestoreSimple(firestore)
 const reviewCollectionGroup = firestoreSimple.collectionGroup<Review>({
   collectionId: 'review',
   decode: (doc) => {
@@ -329,7 +351,7 @@ await firestore.runTransaction(async (transaction) => {
 })
 
 // firestore-simple transaction
-const firestoreSimple = new FirestoreSimpleAdmin(firestore)
+const firestoreSimple = new FirestoreSimple(firestore)
 const dao = firestoreSimple.collection<User>({ path: `${ROOT_PATH}/user` })
 await firestoreSimple.runTransaction(async (_tx) => {
   await dao.fetch(docId)
@@ -340,7 +362,7 @@ await firestoreSimple.runTransaction(async (_tx) => {
 })
 ```
 
-If you want to see more transaction example, please check [example code](./example) and [test code](./__tests__).
+If you want to see more transaction example, please check [example code](./packages/admin/example) and [test code](./packages/admin/__tests__).
 
 # Batch
 firestore-simple provides `runBatch` it similar to `runTransaction`.  
@@ -354,7 +376,7 @@ interface User {
 }
 const userNames = ['bob', 'alice', 'john', 'meary', 'king']
 
-const firestoreSimple = new FirestoreSimpleAdmin(firestore)
+const firestoreSimple = new FirestoreSimple(firestore)
 const userDao = firestoreSimple.collection<User>({ path: `${ROOT_PATH}/user` })
 
 // add() convert batch.add() inside runBatch and batch.commit() called at end of block.
@@ -382,9 +404,10 @@ await firestoreSimple.runBatch(async (_batch) => {
     rank += 1
   }
 })
+// <- `batch.commit()`
 ```
 
-If you want to see more runBatch example, please check [example code](./example) and [test code](./__tests__).
+If you want to see more runBatch example, please check [example code](./packages/admin/example) and [test code](./packages/admin/__tests__).
 
 
 If you just want to add/set/delete documents with array, you can use `bulkAdd`, `bulkSet`, `bulkDelete`. These are simple wrapper of batch execution.
@@ -403,7 +426,7 @@ interface User {
   timestamp: Date,
 }
 
-const firestoreSimple = new FirestoreSimpleAdmin(firestore)
+const firestoreSimple = new FirestoreSimple(firestore)
 const dao = firestoreSimple.collection<User>({ path: `${ROOT_PATH}/user` })
 
 // Setup user
@@ -426,13 +449,13 @@ console.log(await dao.fetch(userId))
 ```
 
 
-# Fallback to use original firestore
+# Fallback to use original Firestore document
 Unfortunately firestore-simple does not support all the features of Firestore, so sometimes you may want to use raw collection references or document references.
 
-In this case, you can get raw collection reference from FirestoreSimpleCollection using `collectionRef` also document reference using `docRef(docId)`.
+In this case, you can get raw collection reference from Collection using `collectionRef` also document reference using `docRef(docId)`.
 
 ```ts
-const firestoreSimple = new FirestoreSimpleAdmin(firestore)
+const firestoreSimple = new FirestoreSimple(firestore)
 const dao = firestoreSimple.collection<User>({ path: `user` })
 
 // Same as firestore.collection('user')
@@ -446,29 +469,19 @@ const docRef = dao.docRef('documentId')
 firestore-simple provide more API and support almost firestore features.  
 ex: `addOrSet`, `update`, `where`, `orderBy`, `limit`.
 
-You can find more example from [example directory](./example). Also [test code](./__tests__) maybe as good sample.
+You can find more example from [example directory](./packages/admin/example). Also [test code](./packages/admin/__tests__) maybe as good sample.
 
 # API document
-Sorry not yet. Please check [source code](./src) or look interface using your IDE.
+Sorry not yet. Please check [source code](./packages/admin/src) or look interface using your IDE.
 
 # Feature works
-- [x] Support new feature of firestore
-  - [x] incrementValue
-  - [x] collectionGroup
-- [x] Support [pagination](https://firebase.google.com/docs/firestore/query-data/query-cursors)
+- [x] Support [web SDK](https://firebase.google.com/docs/reference/js/firebase.firestore) with basic feature
+- [ ] Support web SDK advanced feature (e.g. support web SDK only option in some methods like `get`, `onSnapshot`)
 - [ ] API document
-- [x] Lint with eslint
-- [x] Continuous upgrade and test new firestore SDK using with [Renovate](https://renovatebot.com/)(or similar other tool)
-- [ ] Support [web sdk](https://firebase.google.com/docs/reference/js/firebase.firestore)
 
 # Contribution
 Patches are welcome!  
 Also welcome fixing english documentation.
-
-# Development
-Unit tests are using **REAL Firestore(Firebase)**, not mock!
-
-So if you want to run unit test in your local machine, please put your firebase secret json as `firebase_secret.json` in root directory.
 
 # Versioning
 
@@ -482,3 +495,6 @@ The versioning follows [Semantic Versioning](http://semver.org/):
 
 # License
 MIT
+
+# Logo
+<div>Icons made by <a href="https://www.flaticon.com/authors/those-icons" title="Those Icons">Those Icons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
