@@ -1,8 +1,10 @@
-# Firestore-simple
-[![Build Status](https://github.com/Kesin11/Firestore-simple/workflows/CI/badge.svg)](https://github.com/Kesin11/Firestore-simple/actions)
-[![codecov](https://codecov.io/gh/Kesin11/Firestore-simple/branch/master/graph/badge.svg)](https://codecov.io/gh/Kesin11/Firestore-simple)
+<p align="center"><img width="200" src="https://user-images.githubusercontent.com/1324862/77878373-1cf81200-7293-11ea-8905-7d63a7de95b7.png" alt="firestore-simple logo"></p>
 
-![firestore-simple-logo](https://user-images.githubusercontent.com/1324862/77878373-1cf81200-7293-11ea-8905-7d63a7de95b7.png)
+<h1 align="center">Firestore-simple</h1>
+<p align="center">
+  <a href="https://github.com/Kesin11/Firestore-simple/actions"><img src="https://github.com/Kesin11/Firestore-simple/workflows/CI/badge.svg" alt="Build Status"></a>
+  <a href="https://codecov.io/gh/Kesin11/Firestore-simple"><img src="https://codecov.io/gh/Kesin11/Firestore-simple/branch/master/graph/badge.svg" alt="Code coverage"></a>
+</p>
 
 > More simple, powerful and TypeScript friendly Firestore wrapper.
 
