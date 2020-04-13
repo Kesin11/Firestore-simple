@@ -38,7 +38,7 @@
   "devDependencies": {
     "@firebase/testing": "0.19.0",
     "@types/jest": "25.2.1",
-    "firebase-tools": "8.0.2",
+    "firebase-tools": "8.0.3",
     "jest": "25.3.0",
     "rimraf": "3.0.2",
     "ts-jest": "25.3.1",
