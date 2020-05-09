@@ -41,7 +41,7 @@
     "firebase-tools": "8.0.3",
     "jest": "25.5.4",
     "rimraf": "3.0.2",
-    "ts-jest": "25.5.0",
+    "ts-jest": "25.5.1",
     "typescript": "3.8.3"
   }
 }
