@@ -32,7 +32,7 @@
     "emulators:start": "firebase emulators:start --only firestore"
   },
   "dependencies": {
-    "firebase": "7.14.6",
+    "firebase": "7.15.0",
     "utility-types": "3.10.0"
   },
   "devDependencies": {
