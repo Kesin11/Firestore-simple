@@ -31,6 +31,7 @@
 - [Firestoreをもっと手軽に使えるfirestore-simpleがバージョン2になりました](http://kesin.hatenablog.com/entry/firestore_simple_v2)
 - [TypeScriptからFirestoreを使いやすくするfirestore-simple v4をリリースしました](https://qiita.com/Kesin11/items/c2a52e4e33d6f8e83723)
 - [firestore-simple v5をリリースしました](https://qiita.com/Kesin11/items/999011de9b6aeba37e78)
+- [v7をリリースしたので改めてfirestore-simpleを紹介します](http://kesin.hatenablog.com/entry/2020/04/27/150000)
 
 # :warning: `firestore-simple` is DEPRECATED
 Previous [firestore-simple](https://www.npmjs.com/package/firestore-simple) is **DEPRECATED!**
