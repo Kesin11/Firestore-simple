@@ -1,18 +1,30 @@
-import { FirestoreSimple } from '../src'
+import { FirestoreSimple, Collection } from '../src'
 import { AdminFirestoreTestUtil } from './util'
 
 const util = new AdminFirestoreTestUtil()
 const firestore = util.adminFirestore
 const collectionPath = util.collectionPath
-const firestoreSimple = new FirestoreSimple(firestore)
 
-interface TestDoc {
+type TestDoc = {
   id: string,
   title: string,
 }
 
+type InvalidTestDoc = {
+  id: string,
+  title: string | undefined, // Firestore does not accept undefined!
+}
+
 describe('batch', () => {
-  const dao = firestoreSimple.collection<TestDoc>({ path: collectionPath })
+  let firestoreSimple: FirestoreSimple
+  let dao: Collection<TestDoc>
+  let invalidDao: Collection<InvalidTestDoc>
+
+  beforeEach(async () => {
+    firestoreSimple = new FirestoreSimple(firestore)
+    dao = firestoreSimple.collection<TestDoc>({ path: collectionPath })
+    invalidDao = firestoreSimple.collection<InvalidTestDoc>({ path: collectionPath })
+  })
 
   afterAll(async () => {
     await util.deleteApps()
@@ -22,46 +34,96 @@ describe('batch', () => {
     await util.deleteCollection()
   })
 
-  it('bulkAdd', async () => {
-    const docs = [
-      { title: 'aaa' },
-      { title: 'bbb' },
-      { title: 'ccc' },
-    ]
-    await dao.bulkAdd(docs)
-    const fetchedDocs = await dao.fetchAll()
+  describe('bulkAdd', () => {
+    it('should be commited when no error', async () => {
+      const docs = [
+        { title: 'aaa' },
+        { title: 'bbb' },
+        { title: 'ccc' },
+      ]
+      await dao.bulkAdd(docs)
+      const fetchedDocs = await dao.fetchAll()
 
-    const actualTitles = fetchedDocs.map((doc) => doc.title).sort()
-    const expectTitles = docs.map((doc) => doc.title).sort()
-    expect(actualTitles).toEqual(expectTitles)
+      const actualTitles = fetchedDocs.map((doc) => doc.title).sort()
+      const expectTitles = docs.map((doc) => doc.title).sort()
+      expect(actualTitles).toEqual(expectTitles)
+    })
+
+    it('should not be commited when throw some error', async () => {
+      const docs = [
+        { title: 'aaa' },
+        { title: undefined }, // invalid value
+        { title: 'ccc' },
+      ]
+
+      await expect(invalidDao.bulkAdd(docs)).rejects.toThrow()
+
+      const actualDocs = await invalidDao.fetchAll()
+      expect(actualDocs).toEqual([])
+    })
   })
 
-  it('bulkSet', async () => {
-    const docs = [
-      { id: 'test1', title: 'aaa' },
-      { id: 'test2', title: 'bbb' },
-      { id: 'test3', title: 'ccc' },
-    ]
-    await dao.bulkSet(docs)
+  describe('bulkSet', () => {
+    it('should be commited when no error', async () => {
+      const docs = [
+        { id: 'test1', title: 'aaa' },
+        { id: 'test2', title: 'bbb' },
+        { id: 'test3', title: 'ccc' },
+      ]
+      await dao.bulkSet(docs)
 
-    const actualDocs = await dao.fetchAll()
-    expect(actualDocs).toEqual(docs)
+      const actualDocs = await dao.fetchAll()
+      expect(actualDocs).toEqual(docs)
+    })
+
+    it('should not be commited when throw some error', async () => {
+      const docs = [
+        { id: 'test1', title: 'aaa' },
+        { id: 'test2', title: undefined }, // invalid!
+        { id: 'test3', title: 'ccc' },
+      ]
+      await expect(invalidDao.bulkSet(docs)).rejects.toThrow()
+
+      const actualDocs = await invalidDao.fetchAll()
+      expect(actualDocs).toEqual([])
+    })
   })
 
-  it('bulkDelete', async () => {
-    const docs = [
-      { id: 'test1', title: 'aaa' },
-      { id: 'test2', title: 'bbb' },
-      { id: 'test3', title: 'ccc' },
-    ]
-    await dao.set(docs[0])
-    await dao.set(docs[1])
-    await dao.set(docs[2])
+  describe('bulkDelete', () => {
+    it('should be commited when no error', async () => {
+      const docs = [
+        { id: 'test1', title: 'aaa' },
+        { id: 'test2', title: 'bbb' },
+        { id: 'test3', title: 'ccc' },
+      ]
+      await dao.set(docs[0])
+      await dao.set(docs[1])
+      await dao.set(docs[2])
 
-    const docIds = docs.map((doc) => doc.id)
-    await dao.bulkDelete(docIds)
+      const docIds = docs.map((doc) => doc.id)
+      await dao.bulkDelete(docIds)
 
-    const actualDocs = await dao.fetchAll()
-    expect(actualDocs).toEqual([])
+      const actualDocs = await dao.fetchAll()
+      expect(actualDocs).toEqual([])
+    })
+
+    it('should not be commited when throw some error', async () => {
+      const docs = [
+        { id: 'test1', title: 'aaa' },
+        { id: 'test2', title: 'bbb' },
+        { id: 'test3', title: 'ccc' },
+      ]
+      await dao.set(docs[0])
+      await dao.set(docs[1])
+      await dao.set(docs[2])
+
+      const invalidValue = () => { console.log('invalid') }
+      await expect(
+        dao.bulkDelete(['test1', invalidValue, 'test3'] as any[]) // invalid key
+      ).rejects.toThrow()
+
+      const actualDocs = await dao.fetchAll()
+      expect(actualDocs).toEqual(docs)
+    })
   })
 })

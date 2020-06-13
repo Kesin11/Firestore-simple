@@ -120,19 +120,25 @@ export class Collection<T extends HasId, S = OmitId<T>> {
 
   async bulkAdd (objects: Array<OptionalIdStorable<T>>): Promise<FirebaseFirestore.WriteResult[]> {
     return this.context.runBatch(async () => {
-      objects.forEach((obj) => { this.add(obj) })
+      for (const obj of objects) {
+        await this.add(obj)
+      }
     })
   }
 
   async bulkSet (objects: Array<Storable<T>>): Promise<FirebaseFirestore.WriteResult[]> {
     return this.context.runBatch(async () => {
-      objects.forEach((obj) => { this.set(obj) })
+      for (const obj of objects) {
+        await this.set(obj)
+      }
     })
   }
 
   async bulkDelete (docIds: string[]): Promise<FirebaseFirestore.WriteResult[]> {
     return this.context.runBatch(async () => {
-      docIds.forEach((docId) => { this.delete(docId) })
+      for (const docId of docIds) {
+        await this.delete(docId)
+      }
     })
   }
 
