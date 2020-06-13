@@ -62,6 +62,16 @@ describe('runBatch', () => {
         ).rejects.toThrow()
       })
     })
+
+    it('should be undefined when throw some error in runBatch', async () => {
+      try {
+        await firestoreSimple.runBatch(async () => {
+          await dao.add({ title: undefined } as any) // invalid value
+        })
+      } catch { }
+
+      expect(firestoreSimple.context.batch).toBeUndefined()
+    })
   })
 
   describe('write method', () => {

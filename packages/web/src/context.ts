@@ -31,9 +31,14 @@ export class Context {
 
     this._batch = this.firestore.batch()
 
-    await updateFunction(this._batch)
-    await this._batch.commit()
-
-    this._batch = undefined
+    try {
+      await updateFunction(this._batch)
+      const writeResults = await this._batch.commit()
+      this._batch = undefined
+      return writeResults
+    } catch (err) {
+      this._batch = undefined
+      throw (err)
+    }
   }
 }
