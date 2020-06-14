@@ -11,15 +11,16 @@ type TestDoc = {
   title: string,
 }
 
-const firestoreSimple = new FirestoreSimple(webFirestore)
-
 describe('transaction', () => {
+  let firestoreSimple: FirestoreSimple
   let txFirestoreSimple: FirestoreSimple
+  let dao: Collection<TestDoc>
   let txDao: Collection<TestDoc>
-  const dao = firestoreSimple.collection<TestDoc>({ path: collectionPath })
 
   beforeEach(async () => {
+    firestoreSimple = new FirestoreSimple(webFirestore)
     txFirestoreSimple = new FirestoreSimple(webFirestore)
+    dao = firestoreSimple.collection<TestDoc>({ path: collectionPath })
     txDao = txFirestoreSimple.collection<TestDoc>({ path: collectionPath })
   })
 
@@ -64,6 +65,16 @@ describe('transaction', () => {
           txFirestoreSimple.runBatch(async (_batch) => { dao.add({ title: 'test' }) })
         ).rejects.toThrow()
       })
+    })
+
+    it('should be undefined when throw some error in transaction', async () => {
+      try {
+        await txFirestoreSimple.runTransaction(async (_tx) => {
+          await txDao.add({ title: undefined } as any) // invalid value
+        })
+      } catch { }
+
+      expect(txFirestoreSimple.context.tx).toBeUndefined()
     })
   })
 
@@ -138,6 +149,23 @@ describe('transaction', () => {
         // Updated document can see after transaction
         const fetched = await dao.fetch(doc.id)
         expect(fetched!.title).toEqual(updatedTitle)
+      })
+
+      it('should not be commited when throw error in runTransaction', async () => {
+        const doc = { id: 'test1', title: 'aaa' }
+        const updatedDoc = { id: 'test1', title: 'bbb' }
+        await dao.set(doc)
+
+        try {
+          await txFirestoreSimple.runTransaction(async () => {
+            await txDao.set(updatedDoc)
+            await txDao.set({ id: 'test1', title: undefined } as any) // invalid value!
+          })
+        } catch { }
+
+        // Update should not be commited
+        const fetched = await dao.fetch(doc.id)
+        expect(fetched).toEqual(doc)
       })
     })
 
