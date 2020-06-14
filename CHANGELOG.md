@@ -1,3 +1,15 @@
+# [7.0.0-1](https://github.com/Kesin11/Firestore-simple/compare/v7.0.0...v7.0.0-1) (2020-06-14)
+
+
+### Bug Fixes
+
+* **admin:** Bugfix batch methods execute unexpected commit when throw some error ([154663f](https://github.com/Kesin11/Firestore-simple/commit/154663f93a1f39b26d0c198fc875ea6b5f408396))
+* **admin:** Bugfix runTransaction() execute unexpected commit when throw some error ([0f72ae9](https://github.com/Kesin11/Firestore-simple/commit/0f72ae900c4323200f7ec0bd76bbfd92c145e1f7))
+* **web:** Bugfix batch methods execute unexpected commit when throw some error ([c643b5c](https://github.com/Kesin11/Firestore-simple/commit/c643b5c7ce5085de2ee33d5fc41198575d2d3b06))
+* **web:** Bugfix runTransaction() execute unexpected commit when throw some error ([edb4f3d](https://github.com/Kesin11/Firestore-simple/commit/edb4f3dfb7ca6d47e13aa174b3e9ecd95485b575))
+
+
+
 # [7.0.0](https://github.com/Kesin11/Firestore-simple/compare/v6.0.1...v7.0.0) (2020-03-30)
 ### BREAKING CHANGES
 * Change to monorepo and introduce `@firestore-simple/admin` and `@firestore-simple/web` ([#132](https://github.com/Kesin11/Firestore-simple/pull/132))
