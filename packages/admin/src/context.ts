@@ -19,11 +19,16 @@ export class Context {
   async runTransaction (updateFunction: (tx: Transaction) => Promise<void>): Promise<void> {
     if (this._tx || this._batch) throw new Error('Disallow nesting transaction or batch')
 
-    await this.firestore.runTransaction(async (tx) => {
-      this._tx = tx
-      await updateFunction(tx)
-    })
-    this._tx = undefined
+    try {
+      await this.firestore.runTransaction(async (tx) => {
+        this._tx = tx
+        await updateFunction(tx)
+      })
+      this._tx = undefined
+    } catch (err) {
+      this._tx = undefined
+      throw (err)
+    }
   }
 
   async runBatch (updateFunction: (batch: WriteBatch) => Promise<void>): Promise<WriteResult[]> {
