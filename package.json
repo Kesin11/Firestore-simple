@@ -33,7 +33,7 @@
     "eslint-plugin-promise": "4.2.1",
     "eslint-plugin-standard": "4.0.1",
     "lerna": "^3.22.1",
-    "shipjs": "0.20.0",
+    "shipjs": "0.20.1",
     "typescript": "3.9.5"
   },
   "repository": {
