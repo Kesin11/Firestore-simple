@@ -51,6 +51,11 @@ jobs:
       timeout-minutes: 3
 
     # Post process
+    - uses: actions/upload-artifact@v2
+      if: ${{ always() }}
+      with:
+        name: test_reports
+        path: packages/${{ matrix.packages }}/junit/junit.xml
     - name: Upload coverage
       run: npm run coverage
       env:
