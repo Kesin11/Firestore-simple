@@ -54,7 +54,7 @@ jobs:
     - uses: actions/upload-artifact@v2
       if: ${{ always() }}
       with:
-        name: test_reports
+        name: test_reports_${{ matrix.packages }}_node${{ matrix.node }}
         path: packages/${{ matrix.packages }}/junit/junit.xml
     - name: Upload coverage
       run: npm run coverage
