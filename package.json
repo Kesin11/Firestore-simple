@@ -34,7 +34,7 @@
     "eslint-plugin-standard": "4.0.1",
     "lerna": "^3.22.1",
     "shipjs": "0.20.1",
-    "typescript": "3.9.6"
+    "typescript": "3.9.7"
   },
   "repository": {
     "type": "git",
