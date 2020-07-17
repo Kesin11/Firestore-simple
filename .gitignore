@@ -68,3 +68,5 @@ coverage.lcov
 
 # My sandbox scripts dir
 sandbox/
+
+packages/**/junit/
