@@ -43,6 +43,6 @@
     "jest-junit": "^11.0.1",
     "rimraf": "3.0.2",
     "ts-jest": "26.1.1",
-    "typescript": "3.9.6"
+    "typescript": "3.9.7"
   }
 }
