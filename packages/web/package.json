@@ -39,7 +39,7 @@
     "@firebase/testing": "0.20.10",
     "@types/jest": "26.0.9",
     "firebase-tools": "8.4.3",
-    "jest": "26.2.2",
+    "jest": "26.4.0",
     "jest-junit": "^11.1.0",
     "rimraf": "3.0.2",
     "ts-jest": "26.1.4",
