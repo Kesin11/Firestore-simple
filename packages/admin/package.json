@@ -32,7 +32,7 @@
     "emulators:start": "firebase emulators:start --only firestore"
   },
   "dependencies": {
-    "firebase-admin": "8.13.0",
+    "firebase-admin": "9.1.0",
     "utility-types": "3.10.0"
   },
   "devDependencies": {
