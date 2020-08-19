@@ -1,12 +1,7 @@
 {
-  "name": "firestore-simple",
-  "version": "7.0.1",
+  "name": "root",
+  "private": true,
   "description": "A simple wrapper for Firestore",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "files": [
-    "dist/"
-  ],
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "clean": "lerna run clean",
