@@ -1,3 +1,12 @@
+# [7.0.2](https://github.com/Kesin11/Firestore-simple/compare/v7.0.1...v7.0.2) (2020-08-19)
+
+### Bug Fixes
+
+* **admin:** Change firebase-admin dependency type 'dependencies' to 'peerDependencies' ([f01fe22](https://github.com/Kesin11/Firestore-simple/commit/f01fe22e6e96950e63fa548dd0d5d41ed1cad025))
+* **web:** Change firebase dependency type 'dependencies' to 'peerDependencies' ([d4e72e3](https://github.com/Kesin11/Firestore-simple/commit/d4e72e377c3e271e93782aaba22962fca00c3254))
+
+
+
 # [7.0.1](https://github.com/Kesin11/Firestore-simple/compare/v7.0.0...v7.0.1) (2020-06-14)
 
 
