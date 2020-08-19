@@ -17,7 +17,7 @@
     "lint": "eslint --cache \"packages/**/{src,__tests__}/**/*.ts\"",
     "lint:fix": "npm run lint -- --fix",
     "coverage": "codecov",
-    "release:prepublish": "npm run build:clean && lerna publish prerelease --dist-tag=beta",
+    "release:prepublish": "npm run build:clean && lerna publish prerelease --dist-tag=beta -c",
     "release:prepare": "shipjs prepare --dry-run && shipjs prepare",
     "release:trigger": "npm run clean && shipjs trigger"
   },

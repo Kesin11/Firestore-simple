@@ -32,15 +32,18 @@
     "emulators:start": "firebase emulators:start --only firestore"
   },
   "dependencies": {
-    "firebase": "7.18.0",
-    "utility-types": "3.10.0"
+    "utility-types": "^3.10.0"
+  },
+  "peerDependencies": {
+    "firebase": "^7.18.0"
   },
   "devDependencies": {
     "@firebase/testing": "0.20.11",
     "@types/jest": "26.0.10",
+    "firebase": "7.18.0",
     "firebase-tools": "8.7.0",
     "jest": "26.4.0",
-    "jest-junit": "^11.1.0",
+    "jest-junit": "11.1.0",
     "rimraf": "3.0.2",
     "ts-jest": "26.2.0",
     "typescript": "3.9.7"
