@@ -3,42 +3,37 @@
     ":ignoreModulesAndTests",
     ":label(renovate)",
     ":prConcurrentLimit10",
-    ":timezone(Asia/Tokyo)"
+    ":timezone(Asia/Tokyo)",
+    ":unpublishSafe",
+    ":automergeMinor",
+    ":dependencyDashboard"
   ],
-  "masterIssue": true,
-  "npm": {
-    "extends": [
-      ":automergePatch",
-      ":unpublishSafe"
-    ],
-    "rangeStrategy": "bump",
-    "packageRules": [
-      {
-        "groupName": "ESLint and plugin and config monthly update",
-        "extends": ["schedule:monthly"],
-        "automerge": true,
-        "packageNames": ["eslint"],
-        "packagePatterns": ["^eslint-config-", "^eslint-plugin-", "^@typescript-eslint"]
-      },
-      {
-        "groupName": "Grouping jest and releated packages major update",
-        "updateTypes": ["major"],
-        "automerge": false,
-        "packageNames": ["jest", "@types/jest", "ts-jest"]
-      },
-      {
-        "description": "automerge minor/patch updates of widely used libraries in devDeps",
-        "updateTypes": ["minor", "patch"],
-        "depTypeList": ["devDependencies"],
-        "automerge": true,
-        "packageNames": ["codecov", "jest", "@types/jest", "ts-jest", "typescript", "shipjs", "lerna", "rimraf"],
-        "schedule": ["every weekend"]
-      },
-      {
-        "description": "automerge type utility module",
-        "automerge": true,
-        "packageNames": ["utility-types"]
-      }
-    ]
-  }
+  "packageRules": [
+    {
+      "groupName": "ESLint and plugin and config monthly update",
+      "extends": ["schedule:monthly"],
+      "automerge": true,
+      "packageNames": ["eslint"],
+      "packagePatterns": ["^eslint-config-", "^eslint-plugin-", "^@typescript-eslint"]
+    },
+    {
+      "groupName": "Grouping jest and releated packages major update",
+      "updateTypes": ["major"],
+      "automerge": false,
+      "packageNames": ["jest", "@types/jest", "ts-jest"]
+    },
+    {
+      "description": "automerge minor/patch updates of widely used libraries in devDeps",
+      "updateTypes": ["minor", "patch"],
+      "depTypeList": ["devDependencies"],
+      "automerge": true,
+      "packageNames": ["codecov", "jest", "@types/jest", "ts-jest", "typescript", "shipjs", "lerna", "rimraf"],
+      "schedule": ["every weekend"]
+    },
+    {
+      "description": "automerge type utility module",
+      "automerge": true,
+      "packageNames": ["utility-types"]
+    }
+  ]
 }
