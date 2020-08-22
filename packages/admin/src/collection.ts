@@ -93,8 +93,8 @@ export class Collection<T extends HasId, S = OmitId<T>> {
     if (!obj.id) throw new Error('Argument object must have "id" property')
 
     const docRef = this.docRef(obj.id)
-    const updateDoc = Object.assign({}, obj)
-    delete updateDoc.id
+    // Copy obj with exclude 'id' key
+    const { id, ...updateDoc } = { ...obj }
 
     if (this.context.tx) {
       this.context.tx.update(docRef, updateDoc)
