@@ -39,7 +39,7 @@
   },
   "devDependencies": {
     "@firebase/testing": "0.20.11",
-    "@types/jest": "26.0.13",
+    "@types/jest": "26.0.14",
     "firebase-admin": "9.2.0",
     "firebase-tools": "8.10.0",
     "jest": "26.4.2",
