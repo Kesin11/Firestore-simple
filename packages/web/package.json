@@ -38,7 +38,7 @@
     "firebase": "^7.18.0"
   },
   "devDependencies": {
-    "@firebase/testing": "0.20.11",
+    "@firebase/rules-unit-testing": "1.0.4",
     "@types/jest": "26.0.14",
     "firebase": "7.20.0",
     "firebase-tools": "8.11.0",
