@@ -1,5 +1,5 @@
 // import fs from 'fs'
-import * as firebase from '@firebase/testing'
+import * as firebase from '@firebase/rules-unit-testing'
 import crypto from 'crypto'
 
 // This is workaround for avoid error which occure using firestore.FieldValue.increment() with update() or set()
