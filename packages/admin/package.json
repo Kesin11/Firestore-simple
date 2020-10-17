@@ -1,6 +1,6 @@
 {
   "name": "@firestore-simple/admin",
-  "version": "7.0.2",
+  "version": "7.0.3",
   "description": "A simple wrapper for Firestore Admin SDK",
   "author": "Kenta Kase <kesin1202000@gmail.com>",
   "homepage": "https://github.com/Kesin11/Firestore-simple/tree/master/packages/admin#readme",
