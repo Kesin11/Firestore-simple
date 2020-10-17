@@ -28,11 +28,7 @@ export class Query<T extends HasId, S> {
   ): this {
     if (!this.query) throw new Error('no query statement before startAt()')
 
-    if (snapshotOrValue instanceof DocumentSnapshot) {
-      this.query = this.query.startAt(snapshotOrValue)
-    } else {
-      this.query = this.query.startAt(snapshotOrValue, ...fieldValues)
-    }
+    this.query = this.query.startAt(snapshotOrValue, ...fieldValues)
     return this
   }
 
@@ -44,11 +40,7 @@ export class Query<T extends HasId, S> {
   ): this {
     if (!this.query) throw new Error('no query statement before startAfter()')
 
-    if (snapshotOrValue instanceof DocumentSnapshot) {
-      this.query = this.query.startAfter(snapshotOrValue)
-    } else {
-      this.query = this.query.startAfter(snapshotOrValue, ...fieldValues)
-    }
+    this.query = this.query.startAfter(snapshotOrValue, ...fieldValues)
     return this
   }
 
@@ -60,11 +52,7 @@ export class Query<T extends HasId, S> {
   ): this {
     if (!this.query) throw new Error('no query statement before endAt()')
 
-    if (snapshotOrValue instanceof DocumentSnapshot) {
-      this.query = this.query.endAt(snapshotOrValue)
-    } else {
-      this.query = this.query.endAt(snapshotOrValue, ...fieldValues)
-    }
+    this.query = this.query.endAt(snapshotOrValue, ...fieldValues)
     return this
   }
 
@@ -76,11 +64,7 @@ export class Query<T extends HasId, S> {
   ): this {
     if (!this.query) throw new Error('no query statement before endBefore()')
 
-    if (snapshotOrValue instanceof DocumentSnapshot) {
-      this.query = this.query.endBefore(snapshotOrValue)
-    } else {
-      this.query = this.query.endBefore(snapshotOrValue, ...fieldValues)
-    }
+    this.query = this.query.endBefore(snapshotOrValue, ...fieldValues)
     return this
   }
 
