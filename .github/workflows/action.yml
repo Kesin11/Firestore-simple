@@ -9,7 +9,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     container:
-      image: "node:current"
+      image: "node:lts"
     steps:
     - uses: actions/checkout@v2
     - run: npm ci
@@ -18,7 +18,7 @@ jobs:
   build_and_check_example:
     runs-on: ubuntu-latest
     container:
-      image: "node:current"
+      image: "node:lts"
     steps:
     - uses: actions/checkout@v2
     - run: npm ci
