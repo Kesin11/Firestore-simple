@@ -1,3 +1,12 @@
+# [](https://github.com/Kesin11/Firestore-simple/compare/v7.0.3...v) (2020-11-21)
+
+
+### Bug Fixes
+
+* **web:** Support firebase js sdk v8 ([16ef76a](https://github.com/Kesin11/Firestore-simple/commit/16ef76ab0194eb54451f5da18c33a8029a753cff))
+
+
+
 # [7.0.3](https://github.com/Kesin11/Firestore-simple/compare/v7.0.2...v7.0.3) (2020-10-17)
 
 
