@@ -1,7 +1,6 @@
 import { Firestore } from '../src/types'
 import crypto from 'crypto'
 import admin, { ServiceAccount } from 'firebase-admin'
-import serviceAccount from '../firebase_secret.json'
 
 export const deleteCollection = async (firestore: Firestore, collectionPath: string) => {
   const batch = firestore.batch()
@@ -23,6 +22,8 @@ export class AdminFirestoreTestUtil {
 
   static initFirestore (real: boolean) {
     if (real) {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const serviceAccount = require('../firebase_secret.json')
       admin.initializeApp({
         credential: admin.credential.cert(serviceAccount as ServiceAccount),
       })
