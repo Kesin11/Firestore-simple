@@ -37,8 +37,6 @@ jobs:
     # Prepare
     steps:
     - uses: actions/checkout@v2
-    - name: Create firebase secret json
-      run: echo "${{ secrets.FIREBASE_SECRET }}" | base64 --decode > packages/admin/firebase_secret.json
     - uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node }}
