@@ -4,7 +4,7 @@ If you want to run example in your local machine, start Firestore local emulator
 ## Usage
 ```bash
 # Start Firestore local emulator in background
-npm run emulator:start
+npm run emulators:start
 
 cd example
 npx ts-node basic.ts # or other script

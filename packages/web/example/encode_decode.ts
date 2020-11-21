@@ -1,16 +1,18 @@
-import * as firebase from 'firebase/app'
+import firebase from 'firebase/app'
 import 'firebase/firestore'
 import { FirestoreSimple } from '../src/'
-import { WebFirestoreTestUtil, FieldValue } from '../__tests__/util'
 
 //
 // Start Firestore local emulator in background before start this script.
-// `npx firebase emulators:start --only firestore`
+// `npm run emulators:start`
+// or `npx firebase emulators:start --only firestore`
 //
 
-// hack for using local emulator
-const util = new WebFirestoreTestUtil()
-const firestore = util.webFirestore
+const app = firebase.initializeApp({
+  projectId: 'example'
+})
+const firestore = firebase.firestore()
+firestore.useEmulator('localhost', 8080)
 
 const ROOT_PATH = 'example/web_encode_decode'
 
@@ -31,7 +33,7 @@ const main = async () => {
       return {
         name: user.name,
         created: user.created,
-        updated: FieldValue.serverTimestamp() // Using Firebase server timestamp when set document
+        updated: firebase.firestore.FieldValue.serverTimestamp() // Using Firebase server timestamp when set document
       }
     },
     decode: (doc) => {
@@ -75,6 +77,8 @@ const main = async () => {
   if (!user) return
 
   await dao.delete(userId)
+
+  await app.delete()
 }
 
 main()
