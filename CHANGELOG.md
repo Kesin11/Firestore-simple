@@ -1,4 +1,4 @@
-# [](https://github.com/Kesin11/Firestore-simple/compare/v7.0.3...v) (2020-11-21)
+# [7.0.4](https://github.com/Kesin11/Firestore-simple/compare/v7.0.3...v7.0.4) (2020-11-21)
 
 
 ### Bug Fixes
