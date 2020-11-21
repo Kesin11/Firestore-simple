@@ -1,16 +1,18 @@
-import * as firebase from 'firebase/app'
+import firebase from 'firebase/app'
 import 'firebase/firestore'
 import { FirestoreSimple } from '../src/'
-import { WebFirestoreTestUtil } from '../__tests__/util'
 
 //
 // Start Firestore local emulator in background before start this script.
-// `npx firebase emulators:start --only firestore`
+// `npm run emulators:start`
+// or `npx firebase emulators:start --only firestore`
 //
 
-// hack for using local emulator
-const util = new WebFirestoreTestUtil()
-const firestore = util.webFirestore
+const app = firebase.initializeApp({
+  projectId: 'example'
+})
+const firestore = firebase.firestore()
+firestore.useEmulator('localhost', 8080)
 
 const ROOT_PATH = 'example/web_transaction'
 
@@ -67,5 +69,7 @@ const main = async (): Promise<void> => {
 
   // Remove documents
   await userDao.bulkDelete(users.map((user) => user.id))
+
+  await app.delete()
 }
 main()
