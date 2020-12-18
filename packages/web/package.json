@@ -40,7 +40,7 @@
   "devDependencies": {
     "@firebase/rules-unit-testing": "1.1.6",
     "@types/jest": "26.0.19",
-    "firebase": "8.2.0",
+    "firebase": "8.2.1",
     "firebase-tools": "8.20.0",
     "jest": "26.6.3",
     "jest-junit": "12.0.0",
