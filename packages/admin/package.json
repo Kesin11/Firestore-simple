@@ -35,7 +35,7 @@
     "utility-types": "^3.10.0"
   },
   "peerDependencies": {
-    "firebase-admin": "^9.1.0"
+    "firebase-admin": "^9.0.0"
   },
   "devDependencies": {
     "@types/jest": "26.0.20",
