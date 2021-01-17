@@ -1,3 +1,12 @@
+# [7.0.5](https://github.com/Kesin11/Firestore-simple/compare/v7.0.4...v7.0.5) (2021-01-17)
+
+
+### Bug Fixes
+
+* **admin:** Relax peerDependencies firebase-admin version range ([70e108f](https://github.com/Kesin11/Firestore-simple/commit/70e108faa19d118390cac9ebd05e1688427d6b81))
+
+
+
 # [7.0.4](https://github.com/Kesin11/Firestore-simple/compare/v7.0.3...v7.0.4) (2020-11-21)
 
 
