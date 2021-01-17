@@ -34,6 +34,10 @@
       "description": "automerge type utility module",
       "automerge": true,
       "packageNames": ["utility-types"]
+    },
+    {
+      "groupName": "Grouping firebase-js-sdk monorepo",
+      "packageNames": ["firebase", "@firebase/rules-unit-testing"]
     }
   ]
 }
