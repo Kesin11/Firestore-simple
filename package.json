@@ -9,6 +9,8 @@
     "build:clean": "npm run clean && npm run build",
     "test": "lerna run test",
     "example:ci": "lerna run example:ci",
+    "audit": "lerna exec -- npm audit",
+    "audit:fix": "lerna exec -- npm audit fix",
     "lint": "eslint --cache \"packages/**/{src,__tests__}/**/*.ts\"",
     "lint:fix": "npm run lint -- --fix",
     "coverage": "codecov",
