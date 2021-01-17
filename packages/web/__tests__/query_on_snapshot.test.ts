@@ -69,7 +69,7 @@ describe('query on_snapshot test', () => {
       bookId: 2
     }
 
-    const promise = new Promise((resolve) => {
+    const promise = new Promise<void>((resolve) => {
       dao.where('book_id', '==', doc.bookId)
         .onSnapshot((querySnapshot, toObject) => {
           querySnapshot.docChanges().forEach((change) => {
@@ -97,7 +97,7 @@ describe('query on_snapshot test', () => {
       bookTitle: 'query_update',
     }
 
-    const promise = new Promise((resolve) => {
+    const promise = new Promise<void>((resolve) => {
       // where('book_title', '==', doc.bookTitle) is not triggered modify event.
       // I don't know why, so book_id is hack for resolve this issue.
       dao.where('book_id', '==', doc.bookId)
@@ -119,7 +119,7 @@ describe('query on_snapshot test', () => {
   })
 
   it('observe delete change', async () => {
-    const promise = new Promise((resolve) => {
+    const promise = new Promise<void>((resolve) => {
       dao.where('book_title', '==', existsDoc.bookTitle).onSnapshot((querySnapshot, toObject) => {
         querySnapshot.docChanges().forEach((change) => {
           if (change.type === 'removed' && change.doc.data().book_title === existsDoc.bookTitle) {

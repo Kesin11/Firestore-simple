@@ -62,7 +62,7 @@ describe('on_snapshot test', () => {
       created: new Date(),
     }
 
-    const promise = new Promise((resolve) => {
+    const promise = new Promise<void>((resolve) => {
       dao.onSnapshot((querySnapshot, toObject) => {
         querySnapshot.docChanges().forEach((change) => {
           if (change.type === 'added' && change.doc.data().book_title === doc.bookTitle) {
@@ -89,7 +89,7 @@ describe('on_snapshot test', () => {
       bookTitle: 'set'
     }
 
-    const promise = new Promise((resolve) => {
+    const promise = new Promise<void>((resolve) => {
       dao.onSnapshot((querySnapshot, toObject) => {
         querySnapshot.docChanges().forEach((change) => {
           if (change.type === 'modified') {
@@ -116,7 +116,7 @@ describe('on_snapshot test', () => {
     }
     const deletedId = await dao.add(deletedDoc)
 
-    const promise = new Promise((resolve) => {
+    const promise = new Promise<void>((resolve) => {
       dao.onSnapshot((querySnapshot, toObject) => {
         querySnapshot.docChanges().forEach((change) => {
           if (change.type === 'removed' && change.doc.data().book_title === deletedDoc.bookTitle) {
