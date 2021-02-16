@@ -41,7 +41,7 @@
     "@firebase/rules-unit-testing": "1.2.0",
     "@types/jest": "26.0.20",
     "firebase": "8.2.7",
-    "firebase-tools": "9.3.0",
+    "firebase-tools": "9.4.0",
     "jest": "26.6.3",
     "jest-junit": "12.0.0",
     "rimraf": "3.0.2",
