@@ -1,5 +1,5 @@
-# [](https://github.com/Kesin11/Firestore-simple/compare/v7.0.5...v) (2021-04-05)
-
+# [7.0.6](https://github.com/Kesin11/Firestore-simple/compare/v7.0.5...v7.0.7) (2021-04-05)
+Bump dependencies.
 
 
 # [7.0.5](https://github.com/Kesin11/Firestore-simple/compare/v7.0.4...v7.0.5) (2021-01-17)
