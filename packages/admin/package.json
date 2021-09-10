@@ -41,7 +41,7 @@
     "@types/jest": "27.0.1",
     "firebase-admin": "9.11.1",
     "firebase-tools": "9.17.0",
-    "jest": "27.1.0",
+    "jest": "27.1.1",
     "jest-junit": "12.2.0",
     "rimraf": "3.0.2",
     "ts-jest": "27.0.5",
