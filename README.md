@@ -8,6 +8,14 @@
 
 > More simple, powerful and TypeScript friendly Firestore wrapper.
 
+# :city_sunset: @firestore-simple/admin and @firestore-simple/web are ARCHIVED
+Thank you for using `@firestore-simple/admin` and `@firestore-simple/web` to date. Unfortunately, I decided to end maintaining `@firestore-simple/admin` and `@firestore-simple/web`, so these do not support the new Firebase SDK v9.  
+If you want to find another TypeScript friendly Firestore package, [Firebase Open Source](https://firebaseopensource.com/) will be helpful.
+
+`Firestore-simple` is my first OSS that was maintained for long days, so I learned a lot of tasks that need to maintenance OSS continuity and how to use complex types of TypeScript from it. I loved Firestore and used it, so I was motivated to create and maintain `Firestore-simple`. But recently both of my work and hobby do not require Firebase, I'm not interested in Firebase day by day.
+
+New Firebase SDK v9 supports modern JS importing style, it will be welcome by nowaday JS/TS. But Firestore wrapper packages like `Firestore-simple` maybe need some fix to support a newer way to import original Firestore packages provided from Firebase SDK, I already have not enough motivation for support in `Firestore-simple`.
+
 ## Features
 
 ||firestore-simple|
