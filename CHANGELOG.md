@@ -1,3 +1,9 @@
+## [7.0.7](https://github.com/Kesin11/Firestore-simple/compare/v7.0.6...v7.0.7) (2021-09-26)
+
+Bump dependencies and fix README for archive this project.
+
+* Fix README for archive this packages ([#483](https://github.com/Kesin11/Firestore-simple/pull/483))
+
 # [7.0.6](https://github.com/Kesin11/Firestore-simple/compare/v7.0.5...v7.0.7) (2021-04-05)
 
 
