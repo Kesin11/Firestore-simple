@@ -2,6 +2,10 @@
 
 FirestoreSimple for admin SDK
 
+# :city_sunset: @firestore-simple/admin and @firestore-simple/web are ARCHIVED
+Thank you for using `@firestore-simple/admin` and `@firestore-simple/web` to date. Unfortunately, I decided to end maintaining `@firestore-simple/admin` and `@firestore-simple/web`, so these do not support the new Firebase SDK v9.  
+If you want to find another TypeScript friendly Firestore package, [Firebase Open Source](https://firebaseopensource.com/) will be helpful.
+
 ## Install
 ```
 npm i @firestore-simple/admin
